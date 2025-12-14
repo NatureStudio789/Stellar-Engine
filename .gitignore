@@ -1,0 +1,7 @@
+.vs/
+Build/
+Stellar Engine/Intermediate/
+
+*.sln
+*.vcxproj
+*.vcxproj.user
