@@ -21,7 +21,7 @@ LibraryDependenciesDir = "Dependencies/Libraries/"
 BinaryDependenciesDir = "Dependencies/Binaries/"
 
 project "Stellar Engine"
-	location "Stellar Engine"
+	location "./"
 	kind "ConsoleApp"
 	language "C++"
 
@@ -30,9 +30,13 @@ project "Stellar Engine"
 
 	files
 	{
-		"%{prj.name}/Sources/**.h",
-		"%{prj.name}/Sources/**.hpp",
-		"%{prj.name}/Sources/**.cpp",
+		"Engine/Sources/Runtime/**.h",
+		"Engine/Sources/Runtime/**.hpp",
+		"Engine/Sources/Runtime/**.cpp",
+
+		"Engine/Sources/Editor/**.h",
+		"Engine/Sources/Editor/**.hpp",
+		"Engine/Sources/Editor/**.cpp",
 	}
 
 	includedirs
@@ -48,6 +52,11 @@ project "Stellar Engine"
 	links
 	{
 
+	}
+
+	defines
+	{
+		"SE_BUILD_ENGINE",
 	}
 
 	filter "system:Windows"
