@@ -41,17 +41,17 @@ project "Stellar Engine"
 
 	includedirs
 	{
-
+		IncludeDependenciesDir,
 	}
 
 	libdirs
 	{
-
+		LibrariesDependenciesDir .. "GLFW/",
 	}
 
 	links
 	{
-
+		"glfw3.lib",
 	}
 
 	defines
