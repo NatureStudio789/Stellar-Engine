@@ -329,30 +329,30 @@ namespace SE
 
 		switch (index)
 		{
-		case 0:
-		{
-			return this->x;
-			break;
-		}
+			case 0:
+			{
+				return this->x;
+				break;
+			}
 
-		case 1:
-		{
-			return this->y;
-			break;
-		}
+			case 1:
+			{
+				return this->y;
+				break;
+			}
 
-		case 2:
-		{
-			return this->z;
-			break;
-		}
+			case 2:
+			{
+				return this->z;
+				break;
+			}
 
-		// For avoiding warnings.
-		default:
-		{
-			return this->y;
-			break;
-		}
+			// For avoiding warnings.
+			default:
+			{
+				return this->y;
+				break;
+			}
 		}
 	}
 
@@ -362,30 +362,30 @@ namespace SE
 
 		switch (index)
 		{
-		case 0:
-		{
-			return this->x;
-			break;
-		}
+			case 0:
+			{
+				return this->x;
+				break;
+			}
 
-		case 1:
-		{
-			return this->y;
-			break;
-		}
+			case 1:
+			{
+				return this->y;
+				break;
+			}
 
-		case 2:
-		{
-			return this->z;
-			break;
-		}
+			case 2:
+			{
+				return this->z;
+				break;
+			}
 
-		// For avoiding warnings.
-		default:
-		{
-			return this->y;
-			break;
-		}
+			// For avoiding warnings.
+			default:
+			{
+				return this->y;
+				break;
+			}
 		}
 	}
 
@@ -567,36 +567,36 @@ namespace SE
 
 		switch (index)
 		{
-		case 0:
-		{
-			return this->x;
-			break;
-		}
+			case 0:
+			{
+				return this->x;
+				break;
+			}
 
-		case 1:
-		{
-			return this->y;
-			break;
-		}
+			case 1:
+			{
+				return this->y;
+				break;
+			}
 
-		case 2:
-		{
-			return this->z;
-			break;
-		}
+			case 2:
+			{
+				return this->z;
+				break;
+			}
 
-		case 3:
-		{
-			return this->w;
-			break;
-		}
+			case 3:
+			{
+				return this->w;
+				break;
+			}
 
-		// For avoiding warnings.
-		default:
-		{
-			return this->y;
-			break;
-		}
+			// For avoiding warnings.
+			default:
+			{
+				return this->y;
+				break;
+			}
 		}
 	}
 
@@ -606,36 +606,36 @@ namespace SE
 
 		switch (index)
 		{
-		case 0:
-		{
-			return this->x;
-			break;
-		}
+			case 0:
+			{
+				return this->x;
+				break;
+			}
 
-		case 1:
-		{
-			return this->y;
-			break;
-		}
+			case 1:
+			{
+				return this->y;
+				break;
+			}
 
-		case 2:
-		{
-			return this->z;
-			break;
-		}
+			case 2:
+			{
+				return this->z;
+				break;
+			}
 
-		case 3:
-		{
-			return this->w;
-			break;
-		}
+			case 3:
+			{
+				return this->w;
+				break;
+			}
 
-		// For avoiding warnings.
-		default:
-		{
-			return this->y;
-			break;
-		}
+			// For avoiding warnings.
+			default:
+			{
+				return this->y;
+				break;
+			}
 		}
 	}
 
