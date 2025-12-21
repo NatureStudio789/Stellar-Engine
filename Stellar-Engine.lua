@@ -79,6 +79,16 @@ project "Stellar Engine"
 			"SE_PLATFORM_LINUX",
 		}
 
+	filter "system:macosx"
+		cppdialect "C++20"
+		staticruntime "Off"
+		systemversion "latest"
+
+		defines
+		{
+			"SE_PLATFORM_MACOS",
+		}
+
 	filter "configurations:Debug"
 		runtime "Debug"
 		defines
