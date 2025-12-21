@@ -2,6 +2,7 @@
 #define _SE_CORE_H_
 #include <string>
 #include <cmath>
+#include <iostream>
 
 #include <assert.h>
 
@@ -34,6 +35,8 @@ namespace SE
 	using SChar = char;
 	using SUChar = unsigned char;
 	using SByte = SUChar;
+
+	using SBool = bool;
 
 	using SString = std::string;
 	using SWString = std::wstring;
