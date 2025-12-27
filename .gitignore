@@ -5,3 +5,4 @@ Stellar Engine/Intermediate/
 *.sln
 *.vcxproj
 *.vcxproj.user
+*.vcxproj.filters
