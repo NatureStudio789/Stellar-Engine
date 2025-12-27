@@ -46,7 +46,7 @@ project "Stellar Engine"
 
 	libdirs
 	{
-		LibrariesDependenciesDir .. "GLFW/",
+		LibraryDependenciesDir .. "GLFW/",
 	}
 
 	links
