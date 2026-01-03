@@ -1,6 +1,7 @@
 #ifndef _SE_STELLARENGINE_H_
 #define _SE_STELLARENGINE_H_
 #include "Core/APIInitializer/APIInitializer.h"
+#include "Function/Input/Input.h"
 #include "Function/Application/Application.h"
 
 namespace SE
