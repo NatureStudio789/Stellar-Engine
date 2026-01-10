@@ -15,9 +15,24 @@
 
 #include <GLFW/glfw3.h>
 #ifdef SE_PLATFORM_WINDOWS
+
 #define GLFW_EXPOSE_NATIVE_WIN32
 #include <GLFW/glfw3native.h>
 #include <Windows.h>
+
+#endif
+
+#include <nvrhi/nvrhi.h>
+#include <nvrhi/validation.h>
+#ifdef SE_PLATFORM_WINDOWS
+
+#include <nvrhi/d3d11.h>
+#include <nvrhi/d3d12.h>
+
+#elif defined(SE_PLATFORM_MACOS) || defined(SE_PLATFORM_LINUX)
+
+#include <nvrhi/vulkan.h>
+
 #endif
 
 // Define nullptr to null for convenience.

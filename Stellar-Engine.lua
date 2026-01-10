@@ -47,11 +47,17 @@ project "Stellar Engine"
 	libdirs
 	{
 		LibraryDependenciesDir .. "GLFW/",
+		LibraryDependenciesDir .. "NVRHI/%{cfg.buildcfg}",
 	}
 
 	links
 	{
-		"glfw3.lib",
+		"glfw3",
+
+		"nvrhi",
+		"nvrhi_d3d11",
+		"nvrhi_d3d12",
+		"nvrhi_vk",
 	}
 
 	defines
