@@ -20,6 +20,8 @@ IncludeDependenciesDir = "Dependencies/Includes/"
 LibraryDependenciesDir = "Dependencies/Libraries/"
 BinaryDependenciesDir = "Dependencies/Binaries/"
 
+include "Third Party/GLFW/GLFW.lua"
+
 project "Stellar Engine"
 	location "./"
 	kind "ConsoleApp"
@@ -27,6 +29,9 @@ project "Stellar Engine"
 
 	targetdir("Build/" .. OutputDirectory)
 	objdir("%{prj.name}/Intermediate/" .. OutputDirectory)
+
+	pchheader "Core.h"
+	pchsource "Engine/Sources/Runtime/Core/Core.cpp"
 
 	files
 	{
@@ -41,23 +46,20 @@ project "Stellar Engine"
 
 	includedirs
 	{
+		"Engine/Sources/Runtime/Core/",
+
 		IncludeDependenciesDir,
+		"Third Party/GLFW/include/"
 	}
 
 	libdirs
 	{
-		LibraryDependenciesDir .. "GLFW/",
-		LibraryDependenciesDir .. "NVRHI/%{cfg.buildcfg}",
+		
 	}
 
 	links
 	{
-		"glfw3",
-
-		"nvrhi",
-		"nvrhi_d3d11",
-		"nvrhi_d3d12",
-		"nvrhi_vk",
+		"GLFW",
 	}
 
 	defines

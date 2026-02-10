@@ -13,7 +13,7 @@ namespace SE
 
 		void ShutdownApplication();
 
-		SBool IsApplicationRunning();
+		bool IsApplicationRunning();
 
 		std::shared_ptr<FWindow> GetMainWindow();
 

@@ -1,3 +1,4 @@
+#include <Core.h>
 #include "APIInitializer.h"
 
 namespace SE

@@ -1,16 +1,17 @@
+#include <Core.h>
 #include "MonitorUtil.h"
 
 namespace SE
 {
-	SVector2 FMonitorUtil::GetMonitorResolution()
+	glm::uvec2 FMonitorUtil::GetMonitorResolution()
 	{
 		GLFWmonitor* PrimaryMonitor = glfwGetPrimaryMonitor();
 		const GLFWvidmode* MonitorVideoMode = glfwGetVideoMode(PrimaryMonitor);
 
-		return SVector2((SFloat)MonitorVideoMode->width, (SFloat)MonitorVideoMode->height);
+		return glm::uvec2(MonitorVideoMode->width, MonitorVideoMode->height);
 	}
 
-	SInt FMonitorUtil::GetMonitorResolutionX()
+	int FMonitorUtil::GetMonitorResolutionX()
 	{
 		GLFWmonitor* PrimaryMonitor = glfwGetPrimaryMonitor();
 		const GLFWvidmode* MonitorVideoMode = glfwGetVideoMode(PrimaryMonitor);
@@ -18,7 +19,7 @@ namespace SE
 		return MonitorVideoMode->width;
 	}
 
-	SInt FMonitorUtil::GetMonitorResolutionY()
+	int FMonitorUtil::GetMonitorResolutionY()
 	{
 		GLFWmonitor* PrimaryMonitor = glfwGetPrimaryMonitor();
 		const GLFWvidmode* MonitorVideoMode = glfwGetVideoMode(PrimaryMonitor);

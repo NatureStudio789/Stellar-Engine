@@ -1,3 +1,4 @@
+#include <Core.h>
 #include "StellarEngine.h"
 
 namespace SE
@@ -22,16 +23,19 @@ namespace SE
 
 		// Initialize application of engine.
 		FWindow::Attribution MainWindowAttribution;
-		MainWindowAttribution.SetDefaultSize();
+		MainWindowAttribution.WindowStyle = FWindow::SE_WINDOW_DEFAULT;
 		MainWindowAttribution.WindowTitle = "Stellar Engine";
 		FApplication::Instance->InitializeApplication(MainWindowAttribution);
+		SWindowRegistry::Register(SWindowRegistry::MainInstanceName, FApplication::Instance->GetMainWindow());
 
 		// Initialize the input module.
-		FInput::InitializeInput(FApplication::Instance->GetMainWindow()->GetWindowHandle()->Instance);
+		FInput::InitializeInput(SWindowRegistry::GetMainFWindow()->GetWindowHandle()->Instance);
 	}
 
 	void StellarEngine::LaunchEngine()
 	{
+		SWindowRegistry::GetMainFWindow()->Display();
+
 		while (FApplication::Instance->IsApplicationRunning())
 		{
 			FApplication::Instance->UpdateApplication();

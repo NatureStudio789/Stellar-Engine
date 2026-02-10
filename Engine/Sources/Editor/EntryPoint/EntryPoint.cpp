@@ -1,3 +1,4 @@
+#include <Core.h>
 #include "../../Runtime/StellarEngine.h"
 
 int main(int argc, char* argv[])

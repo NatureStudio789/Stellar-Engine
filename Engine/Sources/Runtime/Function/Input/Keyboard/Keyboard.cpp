@@ -1,8 +1,9 @@
+#include <Core.h>
 #include "Keyboard.h"
 
 namespace SE
 {
-	std::map<SUChar, FKeyboard::KeyState> FKeyboard::KeyStateList;
+	std::map<unsigned char, FKeyboard::KeyState> FKeyboard::KeyStateList;
 
 
 	void FKeyboard::InitializeKeyboard(GLFWwindow* bindingWindow)
@@ -135,26 +136,26 @@ namespace SE
 			{
 				case GLFW_RELEASE:
 				{
-					KeyStateList[(SUChar)key] = SE_KEY_RELEASE;
+					KeyStateList[(unsigned char)key] = SE_KEY_RELEASE;
 					break;
 				}
 
 				case GLFW_PRESS:
 				{
-					if (KeyStateList[(SUChar)key] == SE_KEY_PRESS || KeyStateList[(SUChar)key] == SE_KEY_REPEAT)
+					if (KeyStateList[(unsigned char)key] == SE_KEY_PRESS || KeyStateList[(unsigned char)key] == SE_KEY_REPEAT)
 					{
-						KeyStateList[(SUChar)key] = SE_KEY_REPEAT;
+						KeyStateList[(unsigned char)key] = SE_KEY_REPEAT;
 					}
 					else
 					{
-						KeyStateList[(SUChar)key] = SE_KEY_PRESS;
+						KeyStateList[(unsigned char)key] = SE_KEY_PRESS;
 					}
 					break;
 				}
 
 				case GLFW_REPEAT:
 				{
-					KeyStateList[(SUChar)key] = SE_KEY_REPEAT;
+					KeyStateList[(unsigned char)key] = SE_KEY_REPEAT;
 					break;
 				}
 			}
@@ -166,12 +167,12 @@ namespace SE
 
 	}
 
-	FKeyboard::KeyState FKeyboard::GetKeyState(SUChar key)
+	FKeyboard::KeyState FKeyboard::GetKeyState(unsigned char key)
 	{
 		return KeyStateList[key];
 	}
 
-	SBool FKeyboard::GetKeyPress(SUChar key, SBool repeat)
+	bool FKeyboard::GetKeyPress(unsigned char key, bool repeat)
 	{
 		if (repeat)
 		{

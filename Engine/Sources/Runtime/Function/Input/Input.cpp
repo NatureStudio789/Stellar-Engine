@@ -1,3 +1,4 @@
+#include <Core.h>
 #include "Input.h"
 
 namespace SE

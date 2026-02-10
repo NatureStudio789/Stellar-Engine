@@ -7,33 +7,18 @@
 #include <memory>
 #include <map>
 
-#if defined(__x86_64__) || defined(_M_X64) || defined(__i386__) || defined(_M_IX86)
-#include <xmmintrin.h>
-#elif defined(__aarch64__) || defined(_M_ARM64) || defined(__arm__) || defined(_M_ARM)
-#include <arm_neon.h>
-#endif
-
 #include <GLFW/glfw3.h>
 #ifdef SE_PLATFORM_WINDOWS
-
 #define GLFW_EXPOSE_NATIVE_WIN32
 #include <GLFW/glfw3native.h>
 #include <Windows.h>
-
+#else
+#error Stellar Engine only supports Windows!!!!
 #endif
 
-#include <nvrhi/nvrhi.h>
-#include <nvrhi/validation.h>
-#ifdef SE_PLATFORM_WINDOWS
-
-#include <nvrhi/d3d11.h>
-#include <nvrhi/d3d12.h>
-
-#elif defined(SE_PLATFORM_MACOS) || defined(SE_PLATFORM_LINUX)
-
-#include <nvrhi/vulkan.h>
-
-#endif
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 // Define nullptr to null for convenience.
 #define null nullptr
@@ -44,37 +29,7 @@
 
 namespace SE
 {
-	// Here are some basic stellar types.
-	using SInt = int;
-	using SInt32 = int;
-	using SUInt = unsigned int;
-	using SUInt32 = unsigned int;
 
-	using SLong = long;
-	using SULong = unsigned long;
-
-	using SLongLong64 = long long;
-	using SULongLong64 = unsigned long long;
-
-	using SFloat = float;
-	using SDouble = double;
-
-	using SChar = char;
-	using SUChar = unsigned char;
-	using SByte = SUChar;
-
-	using SBool = bool;
-
-	using SString = std::string;
-	using SWString = std::wstring;
-
-	class SUtil
-	{
-	public:
-		static void AddSIMD(const SFloat a[4], const SFloat b[4], SFloat* out);
-		static void MultiplySIMD(const SFloat a[4], const SFloat b[4], SFloat* out);
-		static void DivideSIMD(const SFloat a[4], const SFloat b[4], SFloat* out);
-	};
 }
 
 /*

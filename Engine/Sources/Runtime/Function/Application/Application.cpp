@@ -1,3 +1,4 @@
+#include <Core.h>
 #include "Application.h"
 
 namespace SE
@@ -22,7 +23,7 @@ namespace SE
 		
 	}
 
-	SBool FApplication::IsApplicationRunning()
+	bool FApplication::IsApplicationRunning()
 	{
 		return this->MainWindow->IsWindowRunning();
 	}
