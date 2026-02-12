@@ -2,6 +2,7 @@
 #define _SE_WINDOW_H_
 #include "../MonitorUtil/MonitorUtil.h"
 #include "../../../Core/Registry/Registry.h"
+#include "../../../Core/MessageHandler/MessageHandler.h"
 
 namespace SE
 {

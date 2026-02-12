@@ -6,9 +6,13 @@ namespace SE
 	STELLAR_FINE_SINGLETON(FApplication, Instance);
 
 
-	void FApplication::InitializeApplication(const FWindow::Attribution& mainWindowAttribution)
+	void FApplication::InitializeApplication()
 	{
-		this->MainWindow = std::make_shared<FWindow>(mainWindowAttribution);
+		FWindow::Attribution MainWindowAttribution;
+		MainWindowAttribution.WindowStyle = FWindow::SE_WINDOW_DEFAULT;
+		MainWindowAttribution.WindowTitle = "Stellar Engine";
+		this->MainWindow = std::make_shared<FWindow>(MainWindowAttribution);
+		SWindowRegistry::Register(SWindowRegistry::MainInstanceName, FApplication::Instance->GetMainWindow());
 	}
 
 	void FApplication::UpdateApplication()

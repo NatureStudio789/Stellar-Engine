@@ -7,7 +7,7 @@ namespace SE
 	class FApplication
 	{
 	public:
-		void InitializeApplication(const FWindow::Attribution& mainWindowAttribution);
+		void InitializeApplication();
 
 		void UpdateApplication();
 

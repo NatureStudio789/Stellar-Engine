@@ -19,14 +19,10 @@ namespace SE
 	void StellarEngine::InitializeEngine()
 	{
 		// Initialize all APIs for engine.
-		SAPIInitializer::InitializeAPI();
+		SAPIConfigurator::InitializeAPI();
 
 		// Initialize application of engine.
-		FWindow::Attribution MainWindowAttribution;
-		MainWindowAttribution.WindowStyle = FWindow::SE_WINDOW_DEFAULT;
-		MainWindowAttribution.WindowTitle = "Stellar Engine";
-		FApplication::Instance->InitializeApplication(MainWindowAttribution);
-		SWindowRegistry::Register(SWindowRegistry::MainInstanceName, FApplication::Instance->GetMainWindow());
+		FApplication::Instance->InitializeApplication();
 
 		// Initialize the input module.
 		FInput::InitializeInput(SWindowRegistry::GetMainFWindow()->GetWindowHandle()->Instance);
@@ -45,6 +41,6 @@ namespace SE
 
 	void StellarEngine::ShutdownEngine()
 	{
-		SAPIInitializer::ShutdownAPI();
+		SAPIConfigurator::ShutdownAPI();
 	}
 }

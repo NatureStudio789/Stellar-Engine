@@ -34,6 +34,12 @@ namespace SE
 
 /*
 
+- Class Naming Rules:
+	Meanings Of Prefix Of Classes:
+		"S" - Core module's classes, which is low-level.
+		"F" - Function classes.
+		"G" - Graphics module's classes.
+
 - Platform Defines:
 	Windows: SE_PLATFORM_WINDOWS
 	Linux: SE_PLATFORM_LINUX

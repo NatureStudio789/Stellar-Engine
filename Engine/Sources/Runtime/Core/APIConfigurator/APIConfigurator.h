@@ -1,9 +1,9 @@
-#ifndef _SE_APIMANAGER_H_
-#define _SE_APIMANAGER_H_
+#ifndef _SE_APICONFIGURATOR_H_
+#define _SE_APICONFIGURATOR_H_
 
 namespace SE
 {
-	class SAPIInitializer
+	class SAPIConfigurator
 	{
 	public:
 		static void InitializeAPI();

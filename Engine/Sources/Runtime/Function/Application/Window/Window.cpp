@@ -60,9 +60,9 @@ namespace SE
 			this->WindowAttribution.WindowStyle == SE_WINDOW_FULLSCREEN ? glfwGetPrimaryMonitor() : null, null);
 		if (!_WindowHandle)
 		{
-			// TO DO: Make the error system.
-			return;
+			SMessageHandler::Instance->SetFatal("Application", "Failed to create window!");
 		}
+
 		this->WindowHandle = std::make_shared<Handle>(_WindowHandle);
 	}
 
