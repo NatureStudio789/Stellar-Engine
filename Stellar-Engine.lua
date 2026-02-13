@@ -60,6 +60,11 @@ project "Stellar Engine"
 	links
 	{
 		"GLFW",
+
+		"dxgi",
+		"d3d12",
+		"d3dcompiler",
+		"dxguid",
 	}
 
 	defines

@@ -11,7 +11,8 @@ namespace SE
 		FWindow::Attribution MainWindowAttribution;
 		MainWindowAttribution.WindowStyle = FWindow::SE_WINDOW_DEFAULT;
 		MainWindowAttribution.WindowTitle = "Stellar Engine";
-		this->MainWindow = std::make_shared<FWindow>(MainWindowAttribution);
+		this->MainWindow = FWindow::Create(MainWindowAttribution);
+
 		SWindowRegistry::Register(SWindowRegistry::MainInstanceName, FApplication::Instance->GetMainWindow());
 	}
 

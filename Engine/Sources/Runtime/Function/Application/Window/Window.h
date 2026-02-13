@@ -1,12 +1,13 @@
 #ifndef _SE_WINDOW_H_
 #define _SE_WINDOW_H_
 #include "../MonitorUtil/MonitorUtil.h"
+#include "../../../Core/Creatable/Creatable.h"
 #include "../../../Core/Registry/Registry.h"
 #include "../../../Core/MessageHandler/MessageHandler.h"
 
 namespace SE
 {
-	class FWindow
+	class FWindow : public SCreatable<FWindow>
 	{
 	public:
 		enum Style

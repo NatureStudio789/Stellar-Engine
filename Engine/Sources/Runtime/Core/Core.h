@@ -20,6 +20,13 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include <d3d12.h>
+#include <dxgi1_6.h>
+#include <d3dcompiler.h>
+
+#include <wrl/client.h>
+using namespace Microsoft;
+
 // Define nullptr to null for convenience.
 #define null nullptr
 
