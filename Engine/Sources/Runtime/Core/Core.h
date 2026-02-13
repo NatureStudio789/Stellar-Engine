@@ -30,6 +30,9 @@ using namespace Microsoft;
 // Define nullptr to null for convenience.
 #define null nullptr
 
+// Struct memory clearing function.
+#define STELLAR_CLEAR_MEMORY(Variable) ZeroMemory(&Variable, sizeof(Variable))
+
 // Calling for singleton.
 #define STELLAR_MAKE_SINGLETON(Class, Name) static std::unique_ptr<Class> ##Name;
 #define STELLAR_FINE_SINGLETON(Class, Name) std::unique_ptr<Class> Class::##Name = std::make_unique<Class>();

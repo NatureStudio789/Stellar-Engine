@@ -8,11 +8,6 @@ namespace SE
 
 	}
 
-	GGraphicsFactory::GGraphicsFactory(std::shared_ptr<FWindow::Handle> windowHandle)
-	{
-		this->Initialize(windowHandle);
-	}
-
 	GGraphicsFactory::GGraphicsFactory(const GGraphicsFactory& other)
 	{
 		this->FactoryInstance = other.FactoryInstance;
@@ -23,12 +18,12 @@ namespace SE
 
 	}
 
-	void GGraphicsFactory::Initialize(std::shared_ptr<FWindow::Handle> windowHandle)
+	void GGraphicsFactory::Initialize()
 	{
 		SMessageHandler::Instance->Check(CreateDXGIFactory1(__uuidof(IDXGIFactory4), (void**)this->FactoryInstance.GetAddressOf()));
 	}
 
-	WRL::ComPtr<IDXGIFactory4> GGraphicsFactory::GetFactoryInstance()
+	WRL::ComPtr<IDXGIFactory4> GGraphicsFactory::GetInstance()
 	{
 		return this->FactoryInstance;
 	}

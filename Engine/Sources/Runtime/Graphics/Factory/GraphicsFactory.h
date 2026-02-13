@@ -2,21 +2,19 @@
 #define _SE_GRAPHICSFACTORY_H_
 #include "../../Core/Creatable/Creatable.h"
 #include "../../Core/MessageHandler/MessageHandler.h"
-#include "../../Function/Application/Window/Window.h"
 
 namespace SE
 {
-	class GGraphicsFactory : public SCreatable<GGraphicsFactory>
+	class GGraphicsFactory : public SNoParameterCreatable<GGraphicsFactory>
 	{
 	public:
 		GGraphicsFactory();
-		GGraphicsFactory(std::shared_ptr<FWindow::Handle> windowHandle);
 		GGraphicsFactory(const GGraphicsFactory& other);
 		~GGraphicsFactory();
 
-		void Initialize(std::shared_ptr<FWindow::Handle> windowHandle);
+		void Initialize();
 
-		WRL::ComPtr<IDXGIFactory4> GetFactoryInstance();
+		WRL::ComPtr<IDXGIFactory4> GetInstance();
 
 	private:
 		WRL::ComPtr<IDXGIFactory4> FactoryInstance;

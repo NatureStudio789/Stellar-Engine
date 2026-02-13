@@ -13,6 +13,19 @@ namespace SE
 			return std::make_shared<CreateType>(std::forward<Args>(args)...);
 		}
 	};
+
+	template<typename CreateType>
+	class SNoParameterCreatable
+	{
+	public:
+		static std::shared_ptr<CreateType> Create()
+		{
+			auto& instance = std::make_shared<CreateType>();
+			instance->Initialize();
+
+			return instance;
+		}
+	};
 }
 
 #endif

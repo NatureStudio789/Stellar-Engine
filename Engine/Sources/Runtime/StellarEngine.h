@@ -3,6 +3,7 @@
 #include "Core/APIConfigurator/APIConfigurator.h"
 #include "Function/Input/Input.h"
 #include "Function/Application/Application.h"
+#include "Graphics/Context/GraphicsContext.h"
 
 namespace SE
 {
@@ -21,7 +22,7 @@ namespace SE
 		STELLAR_MAKE_SINGLETON(StellarEngine, Instance);
 
 	private:
-
+		std::shared_ptr<GGraphicsContext> MainGraphicsContext;
 	};
 }
 

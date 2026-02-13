@@ -44,11 +44,11 @@ namespace SE
 		return RegisteredInstanceList[name];
 	}
 
-#define SE_MAKE_DEFAULT_REGISTRY(Type, ClassName)\
+#define STELLAR_MAKE_DEFAULT_REGISTRY(Type, ClassName)\
 	class S##ClassName : public SRegistry<Type>\
 	{\
 	public:\
-		static std::shared_ptr<Type> GetMain##Type()\
+		static std::shared_ptr<Type> GetMainInstance()\
 		{\
 			return RegisteredInstanceList[MainInstanceName];\
 		}\

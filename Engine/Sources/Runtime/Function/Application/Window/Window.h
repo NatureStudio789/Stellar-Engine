@@ -140,7 +140,7 @@ namespace SE
 		std::shared_ptr<Handle> WindowHandle;
 	};
 
-	SE_MAKE_DEFAULT_REGISTRY(FWindow, WindowRegistry);
+	STELLAR_MAKE_DEFAULT_REGISTRY(FWindow, WindowRegistry);
 }
 
 #endif
