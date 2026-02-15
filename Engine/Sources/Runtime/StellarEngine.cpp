@@ -30,6 +30,7 @@ namespace SE
 		// Initialize the main graphics context for main window.
 		this->MainGraphicsContext = GGraphicsContext::Create(SWindowRegistry::GetMainInstance()->GetWindowHandle(),
 			SWindowRegistry::GetMainInstance()->GetWindowSize());
+		SGraphicsContextRegistry::Register(SGraphicsContextRegistry::MainInstanceName, this->MainGraphicsContext);
 	}
 
 	void StellarEngine::LaunchEngine()
@@ -40,6 +41,8 @@ namespace SE
 		{
 			FApplication::Instance->UpdateApplication();
 			FInput::UpdateInput();
+
+			this->MainGraphicsContext->Present(true);
 		}
 	}
 

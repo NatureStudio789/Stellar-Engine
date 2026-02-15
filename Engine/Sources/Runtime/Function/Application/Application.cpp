@@ -24,8 +24,6 @@ namespace SE
 	void FApplication::ShutdownApplication()
 	{
 		this->MainWindow.reset();
-
-		
 	}
 
 	bool FApplication::IsApplicationRunning()

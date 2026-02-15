@@ -53,6 +53,24 @@ namespace SE
 			return RegisteredInstanceList[MainInstanceName];\
 		}\
 	};
+
+#define STELLAR_MAKE_EXECUTABLE_REGISTRY(Type, ClassName)\
+	class S##ClassName : public SRegistry<Type>\
+	{\
+	public:\
+		static void SetCurrentInstance(std::string instanceName)\
+		{\
+			CurrentInstanceName = instanceName;\
+		}\
+		\
+		static std::shared_ptr<Type> GetCurrentInstance()\
+		{\
+			return RegisteredInstanceList[CurrentInstanceName];\
+		}\
+		\
+	private:\
+		static std::string CurrentInstanceName;\
+	};
 }
 
 #endif
