@@ -34,6 +34,13 @@ namespace SE
 
 		this->InitializationCommandList = GCommandList::Create(this->Device, GCommandList::SE_COMMAND_LIST_DIRECT);
 		SCommandListRegistry::Register("Initialization", this->InitializationCommandList);
+
+		this->RTVDescriptorHeap = GDescriptorHeap::Create(this->Device, 300, GDescriptorHeap::SE_DESCRIPTORHEAP_RTV);
+		this->DSVDescriptorHeap = GDescriptorHeap::Create(this->Device, 300, GDescriptorHeap::SE_DESCRIPTORHEAP_DSV);
+		this->SRVDescriptorHeap = GDescriptorHeap::Create(this->Device, 4096,
+			GDescriptorHeap::SE_DESCRIPTORHEAP_CBVSRVUAV, GDescriptorHeap::SE_DESCRIPTORHEAP_FLAG_SHADERVISIBLE);
+		this->SamplerDescriptorHeap = GDescriptorHeap::Create(this->Device, 6,
+			GDescriptorHeap::SE_DESCRIPTORHEAP_SAMPLER, GDescriptorHeap::SE_DESCRIPTORHEAP_FLAG_SHADERVISIBLE);
 	}
 
 	void GGraphicsContext::Resize(const glm::uvec2& newSize)
@@ -54,5 +61,25 @@ namespace SE
 	std::shared_ptr<GCommandList> GGraphicsContext::GetInitializationCommandList()
 	{
 		return this->InitializationCommandList;
+	}
+	
+	std::shared_ptr<GDescriptorHeap> GGraphicsContext::GetRTVDescriptorHeap()
+	{
+		return this->RTVDescriptorHeap;
+	}
+	
+	std::shared_ptr<GDescriptorHeap> GGraphicsContext::GetDSVDescriptorHeap()
+	{
+		return this->DSVDescriptorHeap;
+	}
+	
+	std::shared_ptr<GDescriptorHeap> GGraphicsContext::GetSRVDescriptorHeap()
+	{
+		return this->SRVDescriptorHeap;
+	}
+
+	std::shared_ptr<GDescriptorHeap> GGraphicsContext::GetSamplerDescriptorHeap()
+	{
+		return this->SamplerDescriptorHeap;
 	}
 }

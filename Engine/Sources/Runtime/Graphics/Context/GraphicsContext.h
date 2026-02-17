@@ -23,6 +23,11 @@ namespace SE
 
 		std::shared_ptr<GCommandList> GetInitializationCommandList();
 
+		std::shared_ptr<GDescriptorHeap> GetRTVDescriptorHeap();
+		std::shared_ptr<GDescriptorHeap> GetDSVDescriptorHeap();
+		std::shared_ptr<GDescriptorHeap> GetSRVDescriptorHeap();
+		std::shared_ptr<GDescriptorHeap> GetSamplerDescriptorHeap();
+
 	private:
 #ifdef SE_DEBUG
 		WRL::ComPtr<ID3D12Debug> Debug;
@@ -33,6 +38,10 @@ namespace SE
 
 		std::shared_ptr<GCommandList> InitializationCommandList;
 
+		std::shared_ptr<GDescriptorHeap> RTVDescriptorHeap;
+		std::shared_ptr<GDescriptorHeap> DSVDescriptorHeap;
+		std::shared_ptr<GDescriptorHeap> SRVDescriptorHeap;
+		std::shared_ptr<GDescriptorHeap> SamplerDescriptorHeap;
 	};
 
 	STELLAR_MAKE_DEFAULT_REGISTRY(GGraphicsContext, GraphicsContextRegistry);

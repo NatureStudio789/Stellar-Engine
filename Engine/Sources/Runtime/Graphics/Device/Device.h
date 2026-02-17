@@ -2,6 +2,7 @@
 #define _SE_DEVICE_H_
 #include "../../Core/Creatable/Creatable.h"
 #include "../../Core/MessageHandler/MessageHandler.h"
+#include "../Descriptor/DescriptorHeap.h"
 
 namespace SE
 {
@@ -13,6 +14,8 @@ namespace SE
 		~GDevice();
 
 		void Initialize();
+
+		UINT GetDescriptorSize(GDescriptorHeap::Type type);
 
 		WRL::ComPtr<ID3D12Device> GetInstance();
 		WRL::ComPtr<ID3D12CommandQueue> GetGraphicsCommandQueue();

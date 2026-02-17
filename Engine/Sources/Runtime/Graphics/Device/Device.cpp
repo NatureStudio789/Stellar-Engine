@@ -31,6 +31,12 @@ namespace SE
 			&CommandQueueDesc, __uuidof(ID3D12CommandQueue), (void**)this->GraphicsCommandQueue.GetAddressOf()));
 	}
 
+	UINT GDevice::GetDescriptorSize(GDescriptorHeap::Type type)
+	{
+		return this->DeviceInstance->GetDescriptorHandleIncrementSize(
+			(D3D12_DESCRIPTOR_HEAP_TYPE)type);
+	}
+
 	WRL::ComPtr<ID3D12Device> GDevice::GetInstance()
 	{
 		return this->DeviceInstance;
