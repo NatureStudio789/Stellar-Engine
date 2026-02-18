@@ -54,7 +54,7 @@ namespace SE
 		SMessageHandler::Instance->Check(this->CommandListInstance->Close());
 	}
 
-	WRL::ComPtr<ID3D12CommandList> GCommandList::GetInstance()
+	WRL::ComPtr<ID3D12GraphicsCommandList> GCommandList::GetInstance()
 	{
 		return this->CommandListInstance;
 	}

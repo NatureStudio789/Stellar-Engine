@@ -70,7 +70,9 @@ namespace SE
 		\
 	private:\
 		static std::string CurrentInstanceName;\
-	};
+	};\
+	\
+	inline std::string S##ClassName::CurrentInstanceName;
 }
 
 #endif

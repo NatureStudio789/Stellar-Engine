@@ -23,6 +23,9 @@ namespace SE
 
 		std::shared_ptr<GCommandList> GetInitializationCommandList();
 
+		std::shared_ptr<GDevice> GetDevice();
+		std::shared_ptr<GSwapChain> GetSwapChain();
+
 		std::shared_ptr<GDescriptorHeap> GetRTVDescriptorHeap();
 		std::shared_ptr<GDescriptorHeap> GetDSVDescriptorHeap();
 		std::shared_ptr<GDescriptorHeap> GetSRVDescriptorHeap();

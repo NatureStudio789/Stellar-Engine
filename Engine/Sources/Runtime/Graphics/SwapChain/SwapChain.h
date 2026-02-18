@@ -3,6 +3,7 @@
 #include "../../Core/Creatable/Creatable.h"
 #include "../../Core/MessageHandler/MessageHandler.h"
 #include "../../Function/Application/Window/Window.h"
+#include "PresentBuffer/PresentBuffer.h"
 
 namespace SE
 {
@@ -25,18 +26,13 @@ namespace SE
 		void Flush(std::shared_ptr<GDevice> device);
 		void Present(std::shared_ptr<GDevice> device, UINT syncInterval);
 
-
 		WRL::ComPtr<IDXGISwapChain> GetInstance();
 
 	private:
 		void CreateBackBuffer();
-		void ReleaseBackBuffer();
 
 		WRL::ComPtr<IDXGISwapChain> SwapChainInstance;
-		glm::uvec2 BackBufferSize;
-		UINT BackBufferCount;
-		UINT CurrentBufferIndex;
-		std::vector<WRL::ComPtr<ID3D12Resource>> BackBufferList;
+		std::shared_ptr<GPresentBuffer> PresentBuffer;
 
 		WRL::ComPtr<ID3D12Fence> Fence;
 		UINT FenceValue;

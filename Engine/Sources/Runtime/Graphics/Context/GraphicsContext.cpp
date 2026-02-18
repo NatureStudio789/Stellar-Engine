@@ -62,6 +62,16 @@ namespace SE
 	{
 		return this->InitializationCommandList;
 	}
+
+	std::shared_ptr<GDevice> GGraphicsContext::GetDevice()
+	{
+		return this->Device;
+	}
+
+	std::shared_ptr<GSwapChain> GGraphicsContext::GetSwapChain()
+	{
+		return this->SwapChain;
+	}
 	
 	std::shared_ptr<GDescriptorHeap> GGraphicsContext::GetRTVDescriptorHeap()
 	{

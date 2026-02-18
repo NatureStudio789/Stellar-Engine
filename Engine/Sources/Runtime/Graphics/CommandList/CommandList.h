@@ -30,7 +30,7 @@ namespace SE
 		void Open();
 		void Close();
 
-		WRL::ComPtr<ID3D12CommandList> GetInstance();
+		WRL::ComPtr<ID3D12GraphicsCommandList> GetInstance();
 
 	private:
 		Type CommandListType;

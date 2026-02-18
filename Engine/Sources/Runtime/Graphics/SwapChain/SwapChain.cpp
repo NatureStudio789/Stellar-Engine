@@ -6,10 +6,7 @@ namespace SE
 {
 	GSwapChain::GSwapChain()
 	{
-		this->BackBufferSize = {};
-		this->BackBufferCount = 0;
-		this->CurrentBufferIndex = 0;
-		this->BackBufferList.clear();
+		this->PresentBuffer = null;
 
 		this->FenceValue = 0;
 	}
@@ -23,10 +20,7 @@ namespace SE
 	GSwapChain::GSwapChain(const GSwapChain& other)
 	{
 		this->SwapChainInstance = other.SwapChainInstance;
-		this->BackBufferSize = other.BackBufferSize;
-		this->BackBufferCount = other.BackBufferCount;
-		this->CurrentBufferIndex = other.CurrentBufferIndex;
-		this->BackBufferList = other.BackBufferList;
+		this->PresentBuffer = other.PresentBuffer;
 
 		this->Fence = other.Fence;
 		this->FenceValue = other.FenceValue;
@@ -34,19 +28,21 @@ namespace SE
 
 	GSwapChain::~GSwapChain()
 	{
-
+		
 	}
 
 	void GSwapChain::Initialize(std::shared_ptr<GDevice> device, std::shared_ptr<FWindow::Handle> windowHandle,
 		const glm::uvec2& backBufferSize, UINT backBufferCount, bool fullscreen)
 	{
-		this->BackBufferSize = backBufferSize;
-		this->BackBufferCount = backBufferCount;
-		this->CurrentBufferIndex = 0;
+		this->PresentBuffer = std::make_shared<GPresentBuffer>();
 
-		if (this->BackBufferCount < 2)
+		this->PresentBuffer->Size = backBufferSize;
+		this->PresentBuffer->Count = backBufferCount;
+		this->PresentBuffer->CurrentBufferIndex = 0;
+
+		if (this->PresentBuffer->Count < 2)
 		{
-			SMessageHandler::Instance->SetFatal("Graphics", "Back buffer can't be less than 2!");
+			SMessageHandler::Instance->SetFatal("Graphics", "Present buffer can't be less than 2!");
 		}
 
 		WRL::ComPtr<IDXGIFactory4> Factory;
@@ -56,11 +52,11 @@ namespace SE
 		DXGI_SWAP_CHAIN_DESC SwapChainDesc;
 		STELLAR_CLEAR_MEMORY(SwapChainDesc);
 
-		SwapChainDesc.BufferDesc.Width = this->BackBufferSize.x;
-		SwapChainDesc.BufferDesc.Height = this->BackBufferSize.y;
+		SwapChainDesc.BufferDesc.Width = this->PresentBuffer->Size.x;
+		SwapChainDesc.BufferDesc.Height = this->PresentBuffer->Size.y;
 		SwapChainDesc.BufferDesc.RefreshRate.Numerator = 0;
 		SwapChainDesc.BufferDesc.RefreshRate.Denominator = 1;
-		SwapChainDesc.BufferCount = this->BackBufferCount;
+		SwapChainDesc.BufferCount = this->PresentBuffer->Count;
 		SwapChainDesc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 		SwapChainDesc.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
 		SwapChainDesc.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
@@ -84,13 +80,12 @@ namespace SE
 
 	void GSwapChain::Resize(const glm::uvec2& newSize)
 	{
-		this->ReleaseBackBuffer();
+		this->PresentBuffer->ResetBuffer();
 
 		SMessageHandler::Instance->Check(this->SwapChainInstance->ResizeBuffers(
-			this->BackBufferCount, newSize.x, newSize.y, DXGI_FORMAT_UNKNOWN, 0));
+			this->PresentBuffer->Count, newSize.x, newSize.y, DXGI_FORMAT_UNKNOWN, 0));
 
-		this->BackBufferSize = newSize;
-		this->CurrentBufferIndex = 0;
+		this->PresentBuffer->Size = newSize;
 
 		this->CreateBackBuffer();
 	}
@@ -119,7 +114,8 @@ namespace SE
 	void GSwapChain::Present(std::shared_ptr<GDevice> device, UINT syncInterval)
 	{
 		SMessageHandler::Instance->Check(this->SwapChainInstance->Present(syncInterval, 0));
-		this->CurrentBufferIndex = (this->CurrentBufferIndex + 1) % this->BackBufferCount;
+		this->PresentBuffer->CurrentBufferIndex = 
+			(this->PresentBuffer->CurrentBufferIndex + 1) % this->PresentBuffer->Count;
 
 		this->Flush(device);
 	}
@@ -131,20 +127,11 @@ namespace SE
 
 	void GSwapChain::CreateBackBuffer()
 	{
-		this->BackBufferList.resize(this->BackBufferCount);
-		for (UINT i = 0; i < this->BackBufferCount; i++)
+		this->PresentBuffer->BufferList.resize(this->PresentBuffer->Count);
+		for (UINT i = 0; i < this->PresentBuffer->Count; i++)
 		{
 			SMessageHandler::Instance->Check(this->SwapChainInstance->GetBuffer(i,
-				__uuidof(ID3D12Resource), (void**)this->BackBufferList[i].GetAddressOf()));
+				__uuidof(ID3D12Resource), (void**)this->PresentBuffer->BufferList[i].GetAddressOf()));
 		}
-	}
-
-	void GSwapChain::ReleaseBackBuffer()
-	{
-		for (UINT i = 0; i < this->BackBufferCount; i++)
-		{
-			this->BackBufferList[i].Reset();
-		}
-		this->BackBufferList.clear();
 	}
 }
