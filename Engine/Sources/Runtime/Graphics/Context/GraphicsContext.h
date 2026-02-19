@@ -21,6 +21,8 @@ namespace SE
 		void Present(UINT syncInterval);
 		void Flush();
 
+		void ExecuteInitialization();
+
 		std::shared_ptr<GCommandList> GetInitializationCommandList();
 
 		std::shared_ptr<GDevice> GetDevice();

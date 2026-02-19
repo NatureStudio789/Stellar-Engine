@@ -13,4 +13,14 @@ namespace SE
 	{
 		return SGraphicsContextRegistry::GetInstance(this->DependentContextName);
 	}
+
+	WRL::ComPtr<ID3D12Device> GContextDependent::GetDeviceInstance()
+	{
+		return this->GetContext()->GetDevice()->GetInstance();
+	}
+
+	WRL::ComPtr<ID3D12GraphicsCommandList> GContextDependent::GetInitializationCommandListInstance()
+	{
+		return this->GetContext()->GetInitializationCommandList()->GetInstance();
+	}
 }

@@ -22,7 +22,12 @@ namespace SE
 		void Clear(const glm::vec4& color);
 		void Apply();
 
+		void Begin();
+		void End();
+
 	private:
+		D3D12_CPU_DESCRIPTOR_HANDLE GetRTVDescriptorHandleInstance();
+
 		glm::uvec2 Size;
 
 		bool IsPresentingFramebuffer;
@@ -30,6 +35,12 @@ namespace SE
 
 		WRL::ComPtr<ID3D12Resource> RenderTargetBuffer;
 		std::shared_ptr<GDescriptorHandle> RTVDescriptorHandle;
+
+		WRL::ComPtr<ID3D12Resource> DepthStencilBuffer;
+		std::shared_ptr<GDescriptorHandle> DSVDescriptorHandle;
+
+		D3D12_VIEWPORT ViewportInstance;
+		D3D12_RECT ViewportScissorRect;
 	};
 }
 

@@ -125,6 +125,11 @@ namespace SE
 		return this->SwapChainInstance;
 	}
 
+	std::shared_ptr<GPresentBuffer> GSwapChain::GetPresentBuffer()
+	{
+		return this->PresentBuffer;
+	}
+
 	void GSwapChain::CreateBackBuffer()
 	{
 		this->PresentBuffer->BufferList.resize(this->PresentBuffer->Count);

@@ -31,6 +31,12 @@ namespace SE
 		this->MainGraphicsContext = GGraphicsContext::Create(SWindowRegistry::GetMainInstance()->GetWindowHandle(),
 			SWindowRegistry::GetMainInstance()->GetWindowSize());
 		SGraphicsContextRegistry::Register(SGraphicsContextRegistry::MainInstanceName, this->MainGraphicsContext);
+
+		auto& commandList = GCommandList::Create(this->MainGraphicsContext->GetDevice(), GCommandList::SE_COMMAND_LIST_DIRECT);
+		SCommandListRegistry::Register("Test", commandList);
+		SCommandListRegistry::SetCurrentInstance("Test");
+
+		this->TestFramebuffer = GFramebuffer::Create(this->MainGraphicsContext->GetSwapChain()->GetPresentBuffer());
 	}
 
 	void StellarEngine::LaunchEngine()
@@ -42,6 +48,16 @@ namespace SE
 			FApplication::Instance->UpdateApplication();
 			FInput::UpdateInput();
 
+			SCommandListRegistry::GetCurrentInstance()->Open();
+
+			this->TestFramebuffer->Begin();
+			this->TestFramebuffer->Clear({ 0.1f, 0.1f, 0.1f, 1.0f });
+			this->TestFramebuffer->Apply();
+			this->TestFramebuffer->End();
+
+			SCommandListRegistry::GetCurrentInstance()->Close();
+			this->MainGraphicsContext->GetDevice()->ExecuteCommandLists({ SCommandListRegistry::GetCurrentInstance()->GetInstance().Get() });
+			this->MainGraphicsContext->Flush();
 			this->MainGraphicsContext->Present(true);
 		}
 	}

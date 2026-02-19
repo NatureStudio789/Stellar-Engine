@@ -4,6 +4,7 @@
 #include "Function/Input/Input.h"
 #include "Function/Application/Application.h"
 #include "Graphics/Context/GraphicsContext.h"
+#include "Graphics/Framebuffer/Framebuffer.h"
 
 namespace SE
 {
@@ -23,6 +24,7 @@ namespace SE
 
 	private:
 		std::shared_ptr<GGraphicsContext> MainGraphicsContext;
+		std::shared_ptr<GFramebuffer> TestFramebuffer;
 	};
 }
 

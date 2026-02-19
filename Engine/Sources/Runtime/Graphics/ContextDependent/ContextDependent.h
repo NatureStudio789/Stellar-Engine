@@ -15,6 +15,8 @@ namespace SE
 		void SetDependentContext(const std::string& name);
 
 		std::shared_ptr<GGraphicsContext> GetContext();
+		WRL::ComPtr<ID3D12Device> GetDeviceInstance();
+		WRL::ComPtr<ID3D12GraphicsCommandList> GetInitializationCommandListInstance();
 
 	private:
 		std::string DependentContextName = "Main";

@@ -33,6 +33,7 @@ namespace SE
 		this->SwapChain = GSwapChain::Create(this->Device, windowHandle, backBufferSize, 2, false);
 
 		this->InitializationCommandList = GCommandList::Create(this->Device, GCommandList::SE_COMMAND_LIST_DIRECT);
+		this->InitializationCommandList->Open();
 		SCommandListRegistry::Register("Initialization", this->InitializationCommandList);
 
 		this->RTVDescriptorHeap = GDescriptorHeap::Create(this->Device, 300, GDescriptorHeap::SE_DESCRIPTORHEAP_RTV);
@@ -56,6 +57,19 @@ namespace SE
 	void GGraphicsContext::Flush()
 	{
 		this->SwapChain->Flush(this->Device);
+	}
+
+	void GGraphicsContext::ExecuteInitialization()
+	{
+		this->InitializationCommandList->Close();
+
+		std::vector<ID3D12GraphicsCommandList*> CommandLists = 
+			{ this->InitializationCommandList->GetInstance().Get() };
+		this->Device->ExecuteCommandLists(CommandLists);
+
+		this->Flush();
+
+		this->InitializationCommandList->Open();
 	}
 
 	std::shared_ptr<GCommandList> GGraphicsContext::GetInitializationCommandList()

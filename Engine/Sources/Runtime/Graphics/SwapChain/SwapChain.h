@@ -27,6 +27,7 @@ namespace SE
 		void Present(std::shared_ptr<GDevice> device, UINT syncInterval);
 
 		WRL::ComPtr<IDXGISwapChain> GetInstance();
+		std::shared_ptr<GPresentBuffer> GetPresentBuffer();
 
 	private:
 		void CreateBackBuffer();
