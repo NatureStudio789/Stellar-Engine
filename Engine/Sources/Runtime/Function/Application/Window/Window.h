@@ -4,6 +4,7 @@
 #include "../../../Core/Creatable/Creatable.h"
 #include "../../../Core/Registry/Registry.h"
 #include "../../../Core/MessageHandler/MessageHandler.h"
+#include "../Event/EventProcesser.h"
 
 namespace SE
 {
@@ -138,6 +139,8 @@ namespace SE
 	private:
 		Attribution WindowAttribution;
 		std::shared_ptr<Handle> WindowHandle;
+
+		std::shared_ptr<FEventProcesser> WindowEventProcesser;
 	};
 
 	STELLAR_MAKE_DEFAULT_REGISTRY(FWindow, WindowRegistry);

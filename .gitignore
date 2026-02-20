@@ -2,6 +2,7 @@
 Build/
 Stellar Engine/Intermediate/
 Third Party/GLFW/Intermediate/
+Third Party/imgui/Intermediate/
 
 *.sln
 *.vcxproj

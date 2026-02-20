@@ -5,6 +5,7 @@
 #include "Function/Application/Application.h"
 #include "Graphics/Context/GraphicsContext.h"
 #include "Graphics/Framebuffer/Framebuffer.h"
+#include "Function/Application/Event/EventProcesser.h"
 
 namespace SE
 {
@@ -25,6 +26,8 @@ namespace SE
 	private:
 		std::shared_ptr<GGraphicsContext> MainGraphicsContext;
 		std::shared_ptr<GFramebuffer> TestFramebuffer;
+
+		std::shared_ptr<FEventProcesser> EngineEventProcesser;
 	};
 }
 

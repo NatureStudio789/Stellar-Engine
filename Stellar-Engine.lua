@@ -21,6 +21,7 @@ LibraryDependenciesDir = "Dependencies/Libraries/"
 BinaryDependenciesDir = "Dependencies/Binaries/"
 
 include "Third Party/GLFW/GLFW.lua"
+include "Third Party/imgui/imgui.lua"
 
 project "Stellar Engine"
 	location "./"
@@ -49,7 +50,8 @@ project "Stellar Engine"
 		"Engine/Sources/Runtime/Core/",
 
 		IncludeDependenciesDir,
-		"Third Party/GLFW/include/"
+		"Third Party/GLFW/include/",
+		"Third Party/imgui/"
 	}
 
 	libdirs
@@ -60,6 +62,7 @@ project "Stellar Engine"
 	links
 	{
 		"GLFW",
+		"imgui",
 
 		"dxgi",
 		"d3d12",

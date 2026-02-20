@@ -25,6 +25,9 @@
 #include <d3dcompiler.h>
 #include <DirectX 12/d3dx12.h>
 
+#include <backends/imgui_impl_dx12.h>
+#include <imgui.h>
+
 #include <wrl/client.h>
 using namespace Microsoft;
 

@@ -36,7 +36,16 @@ namespace SE
 		SCommandListRegistry::Register("Test", commandList);
 		SCommandListRegistry::SetCurrentInstance("Test");
 
-		this->TestFramebuffer = GFramebuffer::Create(this->MainGraphicsContext->GetSwapChain()->GetPresentBuffer());
+		this->TestFramebuffer = GFramebuffer::Create(this->MainGraphicsContext->GetSwapChain());
+
+		this->EngineEventProcesser = std::make_shared<FEventProcesser>();
+		this->EngineEventProcesser->OnEvent<FWindowResizeEvent>([this](const FWindowResizeEvent& event)
+			{
+				if (event.WindowHandle == SWindowRegistry::GetMainInstance()->GetWindowHandle()->Instance)
+				{
+					this->TestFramebuffer->Resize({ event.ResizeWidth, event.ResizeHeight });
+				}
+			});
 	}
 
 	void StellarEngine::LaunchEngine()

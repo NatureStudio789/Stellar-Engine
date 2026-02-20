@@ -2,7 +2,7 @@
 #define _SE_FRAMEBUFFER_H_
 #include "../../Core/Creatable/Creatable.h"
 #include "../ContextDependent/ContextDependent.h"
-#include "../SwapChain/PresentBuffer/PresentBuffer.h"
+#include "../SwapChain/SwapChain.h"
 #include "../Descriptor/DescriptorHandle.h"
 
 namespace SE
@@ -12,15 +12,16 @@ namespace SE
 	public:
 		GFramebuffer();
 		GFramebuffer(const glm::uvec2& size);
-		GFramebuffer(std::shared_ptr<GPresentBuffer> presentBuffer);
+		GFramebuffer(std::shared_ptr<GSwapChain> bufferSwapChain);
 		GFramebuffer(const GFramebuffer& other);
 		~GFramebuffer();
 
 		void Initialize(const glm::uvec2& size);
-		void Initialize(std::shared_ptr<GPresentBuffer> presentBuffer);
+		void Initialize(std::shared_ptr<GSwapChain> bufferSwapChain);
 
 		void Clear(const glm::vec4& color);
 		void Apply();
+		void Resize(const glm::uvec2& newSize);
 
 		void Begin();
 		void End();
@@ -31,7 +32,7 @@ namespace SE
 		glm::uvec2 Size;
 
 		bool IsPresentingFramebuffer;
-		std::shared_ptr<GPresentBuffer> PresentRTBuffer;
+		std::shared_ptr<GSwapChain> RTBufferSwapChain;
 
 		WRL::ComPtr<ID3D12Resource> RenderTargetBuffer;
 		std::shared_ptr<GDescriptorHandle> RTVDescriptorHandle;
