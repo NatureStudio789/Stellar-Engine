@@ -6,6 +6,13 @@ project "ImGui"
 	targetdir ("../../Build/" .. OutputDirectory)
 	objdir ("Intermediate/" .. OutputDirectory)
 
+	includedirs
+	{
+		"./",
+		
+		"../GLFW/include/"
+	}
+
 	files
 	{
 		"imconfig.h",
@@ -18,7 +25,12 @@ project "ImGui"
 		"imstb_rectpack.h",
 		"imstb_textedit.h",
 		"imstb_truetype.h",
-		"imgui_demo.cpp"
+		"imgui_demo.cpp",
+
+		"backends/imgui_impl_dx12.h",
+		"backends/imgui_impl_dx12.cpp",
+		"backends/imgui_impl_glfw.h",
+		"backends/imgui_impl_glfw.cpp",
 	}
 
 	filter "system:windows"

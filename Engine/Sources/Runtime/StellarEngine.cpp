@@ -32,7 +32,7 @@ namespace SE
 			SWindowRegistry::GetMainInstance()->GetWindowSize());
 		SGraphicsContextRegistry::Register(SGraphicsContextRegistry::MainInstanceName, this->MainGraphicsContext);
 
-		auto& commandList = GCommandList::Create(this->MainGraphicsContext->GetDevice(), GCommandList::SE_COMMAND_LIST_DIRECT);
+		auto commandList = GCommandList::Create(this->MainGraphicsContext->GetDevice(), GCommandList::SE_COMMAND_LIST_DIRECT);
 		SCommandListRegistry::Register("Test", commandList);
 		SCommandListRegistry::SetCurrentInstance("Test");
 
@@ -41,11 +41,15 @@ namespace SE
 		this->EngineEventProcesser = std::make_shared<FEventProcesser>();
 		this->EngineEventProcesser->OnEvent<FWindowResizeEvent>([this](const FWindowResizeEvent& event)
 			{
-				if (event.WindowHandle == SWindowRegistry::GetMainInstance()->GetWindowHandle()->Instance)
+				if (event.WindowHandle == SWindowRegistry::GetMainInstance()->GetWindowHandle()->Instance &&
+					event.ResizeWidth != 0 && event.ResizeHeight != 0)
 				{
 					this->TestFramebuffer->Resize({ event.ResizeWidth, event.ResizeHeight });
 				}
 			});
+
+		// Post-Initialize those API which depend on other modules.
+		SAPIConfigurator::PostInitializeAPI();
 	}
 
 	void StellarEngine::LaunchEngine()

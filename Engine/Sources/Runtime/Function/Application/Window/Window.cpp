@@ -102,6 +102,11 @@ namespace SE
 					this->WindowAttribution.WindowSize.y = event.ResizeHeight;
 				}
 			});
+
+		glfwSetTitlebarHitTestCallback(this->WindowHandle->Instance, [](GLFWwindow* window, int x, int y, int* hit)
+			{
+				*hit = true;
+			});
 	}
 
 	void FWindow::Display()

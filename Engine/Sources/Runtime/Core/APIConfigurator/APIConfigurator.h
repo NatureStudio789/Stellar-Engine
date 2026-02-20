@@ -7,6 +7,7 @@ namespace SE
 	{
 	public:
 		static void InitializeAPI();
+		static void PostInitializeAPI();
 
 		static void ShutdownAPI();
 	};

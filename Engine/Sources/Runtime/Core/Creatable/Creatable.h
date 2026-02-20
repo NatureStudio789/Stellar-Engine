@@ -20,7 +20,7 @@ namespace SE
 	public:
 		static std::shared_ptr<CreateType> Create()
 		{
-			auto& instance = std::make_shared<CreateType>();
+			auto instance = std::make_shared<CreateType>();
 			instance->Initialize();
 
 			return instance;
