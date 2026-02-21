@@ -21,6 +21,7 @@ namespace SE
 		void Present(UINT syncInterval);
 		void Flush();
 
+		void ExecuteCommandLists(const std::vector<ID3D12GraphicsCommandList*>& graphicsCommandLists);
 		void ExecuteInitialization();
 
 		std::shared_ptr<GCommandList> GetInitializationCommandList();

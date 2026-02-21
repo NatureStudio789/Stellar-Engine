@@ -59,6 +59,13 @@ namespace SE
 		this->SwapChain->Flush(this->Device);
 	}
 
+	void GGraphicsContext::ExecuteCommandLists(const std::vector<ID3D12GraphicsCommandList*>& graphicsCommandLists)
+	{
+		this->Device->ExecuteCommandLists(graphicsCommandLists);
+
+		this->Flush();
+	}
+
 	void GGraphicsContext::ExecuteInitialization()
 	{
 		this->InitializationCommandList->Close();

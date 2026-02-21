@@ -15,7 +15,7 @@ namespace SE
 
 		void Initialize();
 
-		void ExecuteCommandLists(std::vector<ID3D12GraphicsCommandList*> graphicsCommandLists);
+		void ExecuteCommandLists(const std::vector<ID3D12GraphicsCommandList*>& graphicsCommandLists);
 
 		UINT GetDescriptorSize(GDescriptorHeap::Type type);
 

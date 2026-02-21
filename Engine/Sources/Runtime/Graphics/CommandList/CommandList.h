@@ -5,6 +5,8 @@
 
 namespace SE
 {
+	class GDevice;
+
 	class GCommandList : public SCreatable<GCommandList>
 	{
 	public:
