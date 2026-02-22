@@ -11,10 +11,11 @@ namespace SE
 	GRenderPass::GRenderPass(const std::string& name)
 	{
 		this->RenderPassName = name;
-
+		
 		this->PassCommandList = GCommandList::Create(
 			this->GetContext()->GetDevice(), GCommandList::SE_COMMAND_LIST_DIRECT);
-		SCommandListRegistry::Register(this->RenderPassName, this->PassCommandList);
+		this->PassCommandList->SetName(this->RenderPassName);
+		SCommandListRegistry::Register(this->PassCommandList);
 	}
 
 	GRenderPass::GRenderPass(const GRenderPass& other)
@@ -29,10 +30,10 @@ namespace SE
 
 	void GRenderPass::Execute()
 	{
-
+		
 	}
 
-	void GRenderPass::ActiveCommandList()
+	void GRenderPass::ActivateCommandList()
 	{
 		SCommandListRegistry::SetCurrentInstance(this->RenderPassName);
 	}

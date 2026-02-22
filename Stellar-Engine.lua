@@ -68,6 +68,8 @@ project "Stellar Engine"
 		"d3d12",
 		"d3dcompiler",
 		"dxguid",
+
+		"rpcrt4",
 	}
 
 	defines

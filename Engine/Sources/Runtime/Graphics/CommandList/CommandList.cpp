@@ -4,7 +4,7 @@
 
 namespace SE
 {
-	GCommandList::GCommandList()
+	GCommandList::GCommandList() : SAddressable()
 	{
 
 	}
@@ -14,7 +14,7 @@ namespace SE
 		this->Initialize(device, type);
 	}
 
-	GCommandList::GCommandList(const GCommandList& other)
+	GCommandList::GCommandList(const GCommandList& other) : SAddressable(other)
 	{
 		this->CommandListType = other.CommandListType;
 
@@ -40,6 +40,8 @@ namespace SE
 			null, __uuidof(ID3D12GraphicsCommandList), (void**)this->CommandListInstance.GetAddressOf()));
 
 		SMessageHandler::Instance->Check(this->CommandListInstance->Close());
+
+		this->Activate();
 	}
 
 	void GCommandList::Open()

@@ -3,7 +3,7 @@
 
 namespace SE
 {
-	GGraphicsContext::GGraphicsContext()
+	GGraphicsContext::GGraphicsContext() : SAddressable()
 	{
 		this->Device = null;
 	}
@@ -13,7 +13,7 @@ namespace SE
 		this->Initialize(windowHandle, backBufferSize);
 	}
 
-	GGraphicsContext::GGraphicsContext(const GGraphicsContext& other)
+	GGraphicsContext::GGraphicsContext(const GGraphicsContext& other) : SAddressable(other)
 	{
 		this->Device = other.Device;
 	}
@@ -34,7 +34,6 @@ namespace SE
 
 		this->InitializationCommandList = GCommandList::Create(this->Device, GCommandList::SE_COMMAND_LIST_DIRECT);
 		this->InitializationCommandList->Open();
-		SCommandListRegistry::Register("Initialization", this->InitializationCommandList);
 
 		this->RTVDescriptorHeap = GDescriptorHeap::Create(this->Device, 300, GDescriptorHeap::SE_DESCRIPTORHEAP_RTV);
 		this->DSVDescriptorHeap = GDescriptorHeap::Create(this->Device, 300, GDescriptorHeap::SE_DESCRIPTORHEAP_DSV);
@@ -42,6 +41,8 @@ namespace SE
 			GDescriptorHeap::SE_DESCRIPTORHEAP_CBVSRVUAV, GDescriptorHeap::SE_DESCRIPTORHEAP_FLAG_SHADERVISIBLE);
 		this->SamplerDescriptorHeap = GDescriptorHeap::Create(this->Device, 6,
 			GDescriptorHeap::SE_DESCRIPTORHEAP_SAMPLER, GDescriptorHeap::SE_DESCRIPTORHEAP_FLAG_SHADERVISIBLE);
+
+		this->Activate();
 	}
 
 	void GGraphicsContext::Resize(const glm::uvec2& newSize)

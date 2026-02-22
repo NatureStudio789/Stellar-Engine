@@ -7,7 +7,7 @@
 
 namespace SE
 {
-	class GGraphicsContext : public SCreatable<GGraphicsContext>
+	class GGraphicsContext : public SCreatable<GGraphicsContext>, public SAddressable
 	{
 	public:
 		GGraphicsContext();

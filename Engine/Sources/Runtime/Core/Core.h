@@ -6,6 +6,7 @@
 #include <assert.h>
 #include <memory>
 #include <map>
+#include <format>
 
 #include <GLFW/glfw3.h>
 #ifdef SE_PLATFORM_WINDOWS

@@ -30,10 +30,12 @@ namespace SE
 		// Initialize the main graphics context for main window.
 		this->MainGraphicsContext = GGraphicsContext::Create(SWindowRegistry::GetMainInstance()->GetWindowHandle(),
 			SWindowRegistry::GetMainInstance()->GetWindowSize());
-		SGraphicsContextRegistry::Register(SGraphicsContextRegistry::MainInstanceName, this->MainGraphicsContext);
+		this->MainGraphicsContext->SetName(SGraphicsContextRegistry::MainInstanceName);
+		SGraphicsContextRegistry::Register(this->MainGraphicsContext);
 
 		auto commandList = GCommandList::Create(this->MainGraphicsContext->GetDevice(), GCommandList::SE_COMMAND_LIST_DIRECT);
-		SCommandListRegistry::Register("Test", commandList);
+		commandList->SetName("Test");
+		SCommandListRegistry::Register(commandList);
 		SCommandListRegistry::SetCurrentInstance("Test");
 
 		this->TestFramebuffer = GFramebuffer::Create(this->MainGraphicsContext->GetSwapChain());

@@ -4,7 +4,7 @@
 
 namespace SE
 {
-	GFramebuffer::GFramebuffer()
+	GFramebuffer::GFramebuffer() : SAddressable()
 	{
 		this->Size = {};
 		this->IsPresentingFramebuffer = false;
@@ -21,7 +21,7 @@ namespace SE
 		this->Initialize(bufferSwapChain);
 	}
 
-	GFramebuffer::GFramebuffer(const GFramebuffer& other)
+	GFramebuffer::GFramebuffer(const GFramebuffer& other) : SAddressable(other)
 	{
 		this->Size = other.Size;
 	}
@@ -104,6 +104,8 @@ namespace SE
 		this->ViewportScissorRect.right = (long)this->Size.x;
 		this->ViewportScissorRect.top = 0;
 		this->ViewportScissorRect.bottom = (long)this->Size.y;
+
+		this->Activate();
 	}
 
 	void GFramebuffer::Initialize(std::shared_ptr<GSwapChain> bufferSwapChain)
@@ -171,6 +173,8 @@ namespace SE
 		this->ViewportScissorRect.right = (long)this->Size.x;
 		this->ViewportScissorRect.top = 0;
 		this->ViewportScissorRect.bottom = (long)this->Size.y;
+
+		this->Activate();
 	}
 
 	void GFramebuffer::Clear(const glm::vec4& color)

@@ -5,7 +5,7 @@
 
 namespace SE
 {
-	FWindow::FWindow()
+	FWindow::FWindow() : SAddressable()
 	{
 		this->WindowAttribution = {};
 		this->WindowHandle = null;
@@ -16,7 +16,7 @@ namespace SE
 		this->Initialize(attribution);
 	}
 
-	FWindow::FWindow(const FWindow& other)
+	FWindow::FWindow(const FWindow& other) : SAddressable(other)
 	{
 		this->WindowAttribution = other.WindowAttribution;
 		this->WindowHandle = other.WindowHandle;
@@ -107,6 +107,8 @@ namespace SE
 			{
 				*hit = true;
 			});
+
+		this->Activate();
 	}
 
 	void FWindow::Display()

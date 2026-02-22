@@ -1,5 +1,6 @@
 #ifndef _SE_COMMANDLIST_H_
 #define _SE_COMMANDLIST_H_
+#include "../../Core/Addressable/Addressable.h"
 #include "../../Core/Creatable/Creatable.h"
 #include "../../Core/Registry/Registry.h"
 
@@ -7,7 +8,7 @@ namespace SE
 {
 	class GDevice;
 
-	class GCommandList : public SCreatable<GCommandList>
+	class GCommandList : public SCreatable<GCommandList>, public SAddressable
 	{
 	public:
 		enum Type

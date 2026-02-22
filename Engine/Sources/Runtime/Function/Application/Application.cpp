@@ -12,8 +12,9 @@ namespace SE
 		MainWindowAttribution.WindowStyle = FWindow::SE_WINDOW_MODERN;
 		MainWindowAttribution.WindowTitle = "Stellar Engine";
 		this->MainWindow = FWindow::Create(MainWindowAttribution);
+		this->MainWindow->SetName(SWindowRegistry::MainInstanceName);
 
-		SWindowRegistry::Register(SWindowRegistry::MainInstanceName, FApplication::Instance->GetMainWindow());
+		SWindowRegistry::Register(FApplication::Instance->GetMainWindow());
 	}
 
 	void FApplication::UpdateApplication()

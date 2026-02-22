@@ -4,10 +4,11 @@
 #include "../ContextDependent/ContextDependent.h"
 #include "../SwapChain/SwapChain.h"
 #include "../Descriptor/DescriptorHandle.h"
+#include "../../Core/Registry/Registry.h"
 
 namespace SE
 {
-	class GFramebuffer : public SCreatable<GFramebuffer>, public GContextDependent
+	class GFramebuffer : public SCreatable<GFramebuffer>, public GContextDependent, public SAddressable
 	{
 	public:
 		GFramebuffer();
@@ -43,6 +44,8 @@ namespace SE
 		D3D12_VIEWPORT ViewportInstance;
 		D3D12_RECT ViewportScissorRect;
 	};
+
+	STELLAR_MAKE_DEFAULT_REGISTRY(GFramebuffer, FramebufferRegistry);
 }
 
 #endif

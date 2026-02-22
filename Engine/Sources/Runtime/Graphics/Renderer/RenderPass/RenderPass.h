@@ -17,7 +17,7 @@ namespace SE
 
 	protected:
 		// This function must be called in any execution function.
-		void ActiveCommandList();
+		void ActivateCommandList();
 
 		std::string RenderPassName;
 

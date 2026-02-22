@@ -1,5 +1,6 @@
 #ifndef _SE_WINDOW_H_
 #define _SE_WINDOW_H_
+#include "../../../Core/Addressable/Addressable.h"
 #include "../MonitorUtil/MonitorUtil.h"
 #include "../../../Core/Creatable/Creatable.h"
 #include "../../../Core/Registry/Registry.h"
@@ -8,7 +9,7 @@
 
 namespace SE
 {
-	class FWindow : public SCreatable<FWindow>
+	class FWindow : public SCreatable<FWindow>, public SAddressable
 	{
 	public:
 		enum Style
