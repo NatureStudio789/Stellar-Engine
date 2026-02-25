@@ -103,10 +103,10 @@ namespace SE
 				}
 			});
 
-		glfwSetTitlebarHitTestCallback(this->WindowHandle->Instance, [](GLFWwindow* window, int x, int y, int* hit)
-			{
-				*hit = true;
-			});
+		//glfwSetTitlebarHitTestCallback(this->WindowHandle->Instance, [](GLFWwindow* window, int x, int y, int* hit)
+		//	{
+		//		*hit = true;
+		//	});
 
 		this->Activate();
 	}

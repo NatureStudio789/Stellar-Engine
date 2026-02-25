@@ -60,6 +60,20 @@ namespace SE
 		this->SwapChain->Flush(this->Device);
 	}
 
+	void GGraphicsContext::ApplyDescriptorHeaps()
+	{
+		std::vector<ID3D12DescriptorHeap*> DescriptorList;
+		if (this->SRVDescriptorHeap)
+		{
+			DescriptorList.push_back(this->SRVDescriptorHeap->GetInstance().Get());
+		}
+		if (this->SamplerDescriptorHeap)
+		{
+			DescriptorList.push_back(this->SamplerDescriptorHeap->GetInstance().Get());
+		}
+		SCommandListRegistry::GetCurrentInstance()->GetInstance()->SetDescriptorHeaps((UINT)DescriptorList.size(), DescriptorList.data());
+	}
+
 	void GGraphicsContext::ExecuteCommandLists(const std::vector<ID3D12GraphicsCommandList*>& graphicsCommandLists)
 	{
 		this->Device->ExecuteCommandLists(graphicsCommandLists);

@@ -27,28 +27,8 @@ namespace SE
 		// Initialize the input module.
 		FInput::InitializeInput(SWindowRegistry::GetMainInstance()->GetWindowHandle()->Instance);
 
-		// Initialize the main graphics context for main window.
-		this->MainGraphicsContext = GGraphicsContext::Create(SWindowRegistry::GetMainInstance()->GetWindowHandle(),
-			SWindowRegistry::GetMainInstance()->GetWindowSize());
-		this->MainGraphicsContext->SetName(SGraphicsContextRegistry::MainInstanceName);
-		SGraphicsContextRegistry::Register(this->MainGraphicsContext);
-
-		auto commandList = GCommandList::Create(this->MainGraphicsContext->GetDevice(), GCommandList::SE_COMMAND_LIST_DIRECT);
-		commandList->SetName("Test");
-		SCommandListRegistry::Register(commandList);
-		SCommandListRegistry::SetCurrentInstance("Test");
-
-		this->TestFramebuffer = GFramebuffer::Create(this->MainGraphicsContext->GetSwapChain());
-
-		this->EngineEventProcesser = std::make_shared<FEventProcesser>();
-		this->EngineEventProcesser->OnEvent<FWindowResizeEvent>([this](const FWindowResizeEvent& event)
-			{
-				if (event.WindowHandle == SWindowRegistry::GetMainInstance()->GetWindowHandle()->Instance &&
-					event.ResizeWidth != 0 && event.ResizeHeight != 0)
-				{
-					this->TestFramebuffer->Resize({ event.ResizeWidth, event.ResizeHeight });
-				}
-			});
+		// Initialize all engine modules.
+		SEngineSystem::InitializeAll();
 
 		// Post-Initialize those API which depend on other modules.
 		SAPIConfigurator::PostInitializeAPI();
@@ -63,22 +43,14 @@ namespace SE
 			FApplication::Instance->UpdateApplication();
 			FInput::UpdateInput();
 
-			SCommandListRegistry::GetCurrentInstance()->Open();
-
-			this->TestFramebuffer->Begin();
-			this->TestFramebuffer->Clear({ 0.1f, 0.1f, 0.1f, 1.0f });
-			this->TestFramebuffer->Apply();
-			this->TestFramebuffer->End();
-
-			SCommandListRegistry::GetCurrentInstance()->Close();
-			this->MainGraphicsContext->GetDevice()->ExecuteCommandLists({ SCommandListRegistry::GetCurrentInstance()->GetInstance().Get() });
-			this->MainGraphicsContext->Flush();
-			this->MainGraphicsContext->Present(true);
+			SEngineSystem::ExecuteAll();
 		}
 	}
 
 	void StellarEngine::ShutdownEngine()
 	{
+		SEngineSystem::ReleaseAll();
+
 		SAPIConfigurator::ShutdownAPI();
 	}
 }

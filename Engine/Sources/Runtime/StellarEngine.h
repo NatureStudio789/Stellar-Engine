@@ -6,6 +6,7 @@
 #include "Graphics/Context/GraphicsContext.h"
 #include "Graphics/Framebuffer/Framebuffer.h"
 #include "Function/Application/Event/EventProcesser.h"
+#include "Core/EngineSystem/EngineSystem.h"
 
 namespace SE
 {
@@ -21,12 +22,9 @@ namespace SE
 
 		void ShutdownEngine();
 
-		STELLAR_MAKE_SINGLETON(StellarEngine, Instance);
+		STELLAR_MAKE_SINGLETON(StellarEngine, Instance)
 
 	private:
-		std::shared_ptr<GGraphicsContext> MainGraphicsContext;
-		std::shared_ptr<GFramebuffer> TestFramebuffer;
-
 		std::shared_ptr<FEventProcesser> EngineEventProcesser;
 	};
 }

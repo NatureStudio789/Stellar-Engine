@@ -7,6 +7,7 @@
 #include <memory>
 #include <map>
 #include <format>
+#include <algorithm>
 
 #include <GLFW/glfw3.h>
 #ifdef SE_PLATFORM_WINDOWS

@@ -13,6 +13,8 @@ namespace SE
 		static std::shared_ptr<RegType> GetInstance(std::string name);
 		static std::shared_ptr<RegType> GetInstance(SUUID uuid);
 
+		static std::map<SUUID, std::shared_ptr<RegType>> GetInstanceList();
+
 		static std::string MainInstanceName;
 
 	protected:
@@ -64,10 +66,16 @@ namespace SE
 		if (RegisteredInstanceList.count(uuid) < 0)
 		{
 			SMessageHandler::Instance->SetFatal("Core",
-				std::format("No instance with id : '{}' found in registry!", (std::string)uuid));
+				std::format("No instance with id : '{}' found in registry!", (const std::string&)uuid));
 		}
 
 		return RegisteredInstanceList[uuid];
+	}
+
+	template<typename RegType>
+	inline std::map<SUUID, std::shared_ptr<RegType>> SRegistry<RegType>::GetInstanceList()
+	{
+		return RegisteredInstanceList;
 	}
 
 #define STELLAR_MAKE_DEFAULT_REGISTRY(Type, ClassName)\
