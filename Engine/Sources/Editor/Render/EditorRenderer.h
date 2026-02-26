@@ -2,6 +2,7 @@
 #define _SE_EDITORRENDERER_H_
 #include "../../Runtime/Graphics/Framebuffer/Framebuffer.h"
 #include "../../Runtime/Graphics/Renderer/Renderer.h"
+#include "../../Runtime/Function/Application/Event/EventProcesser.h"
 
 namespace SE
 {
@@ -12,7 +13,8 @@ namespace SE
 
 	private:
 		std::shared_ptr<GFramebuffer> EditorMainFramebuffer;
-		GResourcePackage EditorMainFramebufferPackage;
+
+		std::shared_ptr<FEventProcesser> EventProcesser;
 	};
 }
 

@@ -135,6 +135,7 @@ namespace SE
 
 		SMessageHandler::Instance->SetFatal("Graphics",
 			std::format("No render pass named '{}' found in renderer!", name));
+		return null;
 	}
 
 	void GRenderer::LinkPassInflows(std::shared_ptr<GRenderPass> renderPass)

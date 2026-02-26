@@ -1,4 +1,5 @@
 #include <Core.h>
+#include "../Renderer/ResourcePackage/ResourcePackage.h"
 #include "../Context/GraphicsContext.h"
 #include "Framebuffer.h"
 
@@ -328,6 +329,11 @@ namespace SE
 					D3D12_RESOURCE_STATE_RENDER_TARGET,
 					D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE | D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE));
 		}
+	}
+
+	GResourcePackage GFramebuffer::GetResourcePackage() const noexcept
+	{
+		return GResourcePackage{ this->IdentifierHandle, GResourcePackage::SE_RESOURCE_FRAMEBUFFER };
 	}
 
 	D3D12_CPU_DESCRIPTOR_HANDLE GFramebuffer::GetRTVDescriptorHandleInstance()

@@ -128,7 +128,11 @@ namespace SE
 
 		void ProcessMessage();
 
+		void SetTitleBarHovered(bool hovered);
+
 		bool IsWindowRunning();
+		bool GetWindowMaximzied();
+		bool IsTitleBarCustomized();
 
 		const std::string& GetWindowTitle() const noexcept;
 		const glm::uvec2& GetWindowSize() const noexcept;
@@ -140,6 +144,9 @@ namespace SE
 	private:
 		Attribution WindowAttribution;
 		std::shared_ptr<Handle> WindowHandle;
+
+		bool IsWindowMaximized;
+		bool IsTitleBarHovered;
 
 		std::shared_ptr<FEventProcesser> WindowEventProcesser;
 	};

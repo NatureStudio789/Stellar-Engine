@@ -9,16 +9,16 @@ namespace SE
 	class GOutflow : public SCreatable<GOutflow>
 	{
 	public:
-		GOutflow(const std::string& name, GResourcePackage& package);
+		GOutflow(const std::string& name, GResourcePackage package);
 		GOutflow(const GOutflow& other);
 		~GOutflow();
 
 		const std::string& GetName() const noexcept;
-		GResourcePackage& GetResourcePackage();
+		GResourcePackage GetResourcePackage();
 
 	private:
 		std::string OutflowName;
-		GResourcePackage& ResourcePackage;
+		GResourcePackage ResourcePackage;
 	};
 }
 

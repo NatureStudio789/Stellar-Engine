@@ -3,7 +3,7 @@
 
 namespace SE
 {
-	GOutflow::GOutflow(const std::string& name, GResourcePackage& package) : ResourcePackage(package)
+	GOutflow::GOutflow(const std::string& name, GResourcePackage package) : ResourcePackage(package)
 	{
 		this->OutflowName = name;
 	}
@@ -23,7 +23,7 @@ namespace SE
 		return this->OutflowName;
 	}
 
-	GResourcePackage& GOutflow::GetResourcePackage()
+	GResourcePackage GOutflow::GetResourcePackage()
 	{
 		return this->ResourcePackage;
 	}

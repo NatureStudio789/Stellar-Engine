@@ -1,4 +1,5 @@
 #include <Core.h>
+#include "../../Framebuffer/Framebuffer.h"
 #include "RenderPass.h"
 
 namespace SE
@@ -90,6 +91,7 @@ namespace SE
 
 		SMessageHandler::Instance->SetFatal("Graphics",
 			std::format("No inflow named '{}' found in the {} Pass", name, this->RenderPassName));
+		return null;
 	}
 
 	std::shared_ptr<GOutflow> GRenderPass::GetOutflow(const std::string& name)
@@ -104,6 +106,7 @@ namespace SE
 
 		SMessageHandler::Instance->SetFatal("Graphics",
 			std::format("No outflow named '{}' found in the {} Pass", name, this->RenderPassName));
+		return null;
 	}
 
 	void GRenderPass::ActivateCommandList()
@@ -139,5 +142,15 @@ namespace SE
 		}
 
 		this->OutflowList.push_back(outflow);
+	}
+
+	std::shared_ptr<GFramebuffer> GRenderPass::GetFramebufferInstance(const GResourcePackage& package)
+	{
+		if (package.GetResourceType() != GResourcePackage::SE_RESOURCE_FRAMEBUFFER)
+		{
+			SMessageHandler::Instance->SetFatal("Graphics", "Incorrect resource package type for framebuffer!");
+		}
+
+		return SFramebufferRegistry::GetInstance(package.GetResourceIdentifier().GetUUID());
 	}
 }

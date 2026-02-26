@@ -103,10 +103,19 @@ namespace SE
 				}
 			});
 
-		//glfwSetTitlebarHitTestCallback(this->WindowHandle->Instance, [](GLFWwindow* window, int x, int y, int* hit)
-		//	{
-		//		*hit = true;
-		//	});
+		glfwSetWindowUserPointer(this->WindowHandle->Instance, this);
+
+		glfwSetTitlebarHitTestCallback(this->WindowHandle->Instance, [](GLFWwindow* window, int x, int y, int* hit)
+			{
+				FWindow* windowInstance = (FWindow*)glfwGetWindowUserPointer(window);
+				*hit = windowInstance->IsTitleBarHovered;
+			});
+
+		glfwSetWindowMaximizeCallback(this->WindowHandle->Instance, [](GLFWwindow* window, int maximized)
+			{
+				FWindow* windowInstance = (FWindow*)glfwGetWindowUserPointer(window);
+				windowInstance->IsWindowMaximized = maximized;
+			});
 
 		this->Activate();
 	}
@@ -145,9 +154,24 @@ namespace SE
 		glfwPollEvents();
 	}
 
+	void FWindow::SetTitleBarHovered(bool hovered)
+	{
+		this->IsTitleBarHovered = hovered;
+	}
+
 	bool FWindow::IsWindowRunning()
 	{
 		return !glfwWindowShouldClose(this->WindowHandle->Instance);
+	}
+
+	bool FWindow::GetWindowMaximzied()
+	{
+		return this->IsWindowMaximized;
+	}
+
+	bool FWindow::IsTitleBarCustomized()
+	{
+		return this->WindowAttribution.WindowStyle == SE_WINDOW_MODERN;
 	}
 
 	const std::string& FWindow::GetWindowTitle() const noexcept

@@ -8,6 +8,8 @@
 
 namespace SE
 {
+	class GFramebuffer;
+
 	class GRenderPass : public GContextDependent
 	{
 	public:
@@ -31,6 +33,8 @@ namespace SE
 
 		void AddInflow(std::shared_ptr<GInflow> inflow);
 		void AddOutflow(std::shared_ptr<GOutflow> outflow);
+
+		std::shared_ptr<GFramebuffer> GetFramebufferInstance(const GResourcePackage& package);
 
 		std::string RenderPassName;
 

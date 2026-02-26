@@ -9,7 +9,7 @@ namespace SE
 	void FApplication::InitializeApplication()
 	{
 		FWindow::Attribution MainWindowAttribution;
-		MainWindowAttribution.WindowStyle = FWindow::SE_WINDOW_DEFAULT;
+		MainWindowAttribution.WindowStyle = FWindow::SE_WINDOW_MODERN;
 		MainWindowAttribution.WindowTitle = "Stellar Engine";
 		this->MainWindow = FWindow::Create(MainWindowAttribution);
 		this->MainWindow->SetName(SWindowRegistry::MainInstanceName);

@@ -8,6 +8,8 @@
 
 namespace SE
 {
+	class GResourcePackage;
+
 	class GFramebuffer : public SCreatable<GFramebuffer>, public GContextDependent, public SAddressable
 	{
 	public:
@@ -26,6 +28,8 @@ namespace SE
 
 		void Begin();
 		void End();
+
+		GResourcePackage GetResourcePackage() const noexcept;
 
 	private:
 		D3D12_CPU_DESCRIPTOR_HANDLE GetRTVDescriptorHandleInstance();
