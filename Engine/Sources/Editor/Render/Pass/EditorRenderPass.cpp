@@ -42,7 +42,7 @@ namespace SE
 
 		{
 			ImGui::PushStyleColor(ImGuiCol_Border, IM_COL32(50, 50, 50, 255));
-			// Draw window border if the window is not maximized
+			
 			if (!SWindowRegistry::GetMainInstance()->GetWindowMaximzied())
 			{
 				ImGuiWindow* window = ImGui::GetCurrentWindow();
@@ -56,32 +56,32 @@ namespace SE
 
 				static const ImGuiResizeBorderDef resize_border_def[4] =
 				{
-					{ ImVec2(+1, 0), ImVec2(0, 1), ImVec2(0, 0), IM_PI * 1.00f }, // Left
-					{ ImVec2(-1, 0), ImVec2(1, 0), ImVec2(1, 1), IM_PI * 0.00f }, // Right
-					{ ImVec2(0, +1), ImVec2(0, 0), ImVec2(1, 0), IM_PI * 1.50f }, // Up
-					{ ImVec2(0, -1), ImVec2(1, 1), ImVec2(0, 1), IM_PI * 0.50f }  // Down
+					{ ImVec2(+1, 0), ImVec2(0, 1), ImVec2(0, 0), IM_PI * 1.00f },
+					{ ImVec2(-1, 0), ImVec2(1, 0), ImVec2(1, 1), IM_PI * 0.00f },
+					{ ImVec2(0, +1), ImVec2(0, 0), ImVec2(1, 0), IM_PI * 1.50f },
+					{ ImVec2(0, -1), ImVec2(1, 1), ImVec2(0, 1), IM_PI * 0.50f } 
 				};
 
 				auto GetResizeBorderRect = [](ImGuiWindow* window, int border_n, float perp_padding, float thickness)
+				{
+					ImRect rect = window->Rect();
+					if (thickness == 0.0f)
 					{
-						ImRect rect = window->Rect();
-						if (thickness == 0.0f)
-						{
-							rect.Max.x -= 1;
-							rect.Max.y -= 1;
-						}
-						if (border_n == ImGuiDir_Left) { return ImRect(rect.Min.x - thickness, rect.Min.y + perp_padding, rect.Min.x + thickness, rect.Max.y - perp_padding); }
-						if (border_n == ImGuiDir_Right) { return ImRect(rect.Max.x - thickness, rect.Min.y + perp_padding, rect.Max.x + thickness, rect.Max.y - perp_padding); }
-						if (border_n == ImGuiDir_Up) { return ImRect(rect.Min.x + perp_padding, rect.Min.y - thickness, rect.Max.x - perp_padding, rect.Min.y + thickness); }
-						if (border_n == ImGuiDir_Down) { return ImRect(rect.Min.x + perp_padding, rect.Max.y - thickness, rect.Max.x - perp_padding, rect.Max.y + thickness); }
-						IM_ASSERT(0);
-						return ImRect();
-					};
+						rect.Max.x -= 1;
+						rect.Max.y -= 1;
+					}
+					if (border_n == ImGuiDir_Left) { return ImRect(rect.Min.x - thickness, rect.Min.y + perp_padding, rect.Min.x + thickness, rect.Max.y - perp_padding); }
+					if (border_n == ImGuiDir_Right) { return ImRect(rect.Max.x - thickness, rect.Min.y + perp_padding, rect.Max.x + thickness, rect.Max.y - perp_padding); }
+					if (border_n == ImGuiDir_Up) { return ImRect(rect.Min.x + perp_padding, rect.Min.y - thickness, rect.Max.x - perp_padding, rect.Min.y + thickness); }
+					if (border_n == ImGuiDir_Down) { return ImRect(rect.Min.x + perp_padding, rect.Max.y - thickness, rect.Max.x - perp_padding, rect.Max.y + thickness); }
+					IM_ASSERT(0);
+					return ImRect();
+				};
 
 
 				ImGuiContext& g = *GImGui;
 				float rounding = window->WindowRounding;
-				float border_size = 1.0f; // window->WindowBorderSize;
+				float border_size = 1.0f;
 				if (border_size > 0.0f && !(window->Flags & ImGuiWindowFlags_NoBackground))
 					window->DrawList->AddRect(window->Pos, { window->Pos.x + window->Size.x,  window->Pos.y + window->Size.y }, 
 						ImGui::GetColorU32(ImGuiCol_Border), rounding, 0, border_size);
@@ -112,7 +112,7 @@ namespace SE
 				}
 			}
 
-			ImGui::PopStyleColor(); // ImGuiCol_Border
+			ImGui::PopStyleColor();
 		}
 
 		const float titlebarHeight = 58.0f;
