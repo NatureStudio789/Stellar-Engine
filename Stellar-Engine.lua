@@ -56,7 +56,7 @@ project "Stellar Engine"
 
 	libdirs
 	{
-		
+		LibraryDependenciesDir .. "DirectXTex/%{cfg.buildcfg}/",
 	}
 
 	links
@@ -70,6 +70,8 @@ project "Stellar Engine"
 		"dxguid",
 
 		"rpcrt4",
+
+		"DirectXTex.lib",
 	}
 
 	defines

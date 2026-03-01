@@ -8,6 +8,7 @@
 #include <map>
 #include <format>
 #include <algorithm>
+#include <filesystem>
 
 #include <GLFW/glfw3.h>
 #ifdef SE_PLATFORM_WINDOWS
@@ -26,6 +27,8 @@
 #include <dxgi1_6.h>
 #include <d3dcompiler.h>
 #include <DirectX 12/d3dx12.h>
+
+#include <DirectXTex/DirectXTex.h>
 
 #include <imgui.h>
 #include <imgui_internal.h>
