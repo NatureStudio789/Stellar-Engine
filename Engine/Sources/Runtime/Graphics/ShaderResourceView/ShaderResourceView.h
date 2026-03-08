@@ -20,11 +20,12 @@ namespace SE
 
 		virtual void Apply() override;
 
+		const CD3DX12_GPU_DESCRIPTOR_HANDLE& GetGPUDescriptor() const noexcept;
 		const unsigned int& GetRootParameterIndex() const noexcept;
 		std::shared_ptr<GDescriptorHandle> GetDescriptorHandle();
 		const bool& GetAllocated() const noexcept;
 
-	private:
+	protected:
 		unsigned int RootParameterIndex;
 		std::shared_ptr<GDescriptorHandle> DescriptorHandle;
 		bool IsDescriptorAllocated;

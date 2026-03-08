@@ -4,6 +4,8 @@
 
 namespace SE
 {
+	class GTexture;
+
 	class EEditorRenderPass : public GRenderPass
 	{
 	public:
@@ -13,6 +15,7 @@ namespace SE
 
 	private:
 		GResourcePackage FramebufferPackage;
+		std::shared_ptr<GTexture> texture;
 	};
 }
 

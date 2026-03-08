@@ -7,12 +7,12 @@
 
 namespace SE
 {
-	class GRootRignature : public GContextDependent
+	class GRootSignature : public GContextDependent
 	{
 	public:
-		GRootRignature();
-		GRootRignature(const GRootRignature& other);
-		~GRootRignature();
+		GRootSignature();
+		GRootSignature(const GRootSignature& other);
+		~GRootSignature();
 
 		unsigned int AddParameter(const GRootParameter& parameter);
 		unsigned int AddSamplerDescription(const GStaticSamplerDescription& description);

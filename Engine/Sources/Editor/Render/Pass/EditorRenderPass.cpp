@@ -1,5 +1,6 @@
 #include <Core.h>
 #include "../../Runtime/Graphics/Framebuffer/Framebuffer.h"
+#include "../../Runtime/Graphics/Texture/Texture.h"
 #include "EditorRenderPass.h"
 
 namespace SE
@@ -7,6 +8,8 @@ namespace SE
 	EEditorRenderPass::EEditorRenderPass(const std::string& name) : GRenderPass(name)
 	{
 		this->AddInflow(GInflow::Create("EditorFramebuffer", this->FramebufferPackage));
+
+		this->texture = GTexture::Create("Engine/Assets/Textures/Vinewood.jpg");
 	}
 
 	void EEditorRenderPass::Execute()
@@ -79,7 +82,13 @@ namespace SE
 
 		ImGui::DockSpace(ImGui::GetID("MyDockspace"));
 
+		{
+			ImGui::Begin("Texture");
 
+			ImGui::Image((ImTextureID)this->texture->GetGPUDescriptor().ptr, ImVec2(1280, 720));
+
+			ImGui::End();
+		}
 		
 		ImGui::End();
 

@@ -3,7 +3,7 @@
 
 namespace SE
 {
-	GRootRignature::GRootRignature() : GContextDependent()
+	GRootSignature::GRootSignature() : GContextDependent()
 	{
 		this->IsInitialized = false;
 
@@ -11,7 +11,7 @@ namespace SE
 		this->SamplerDescriptionList.clear();
 	}
 
-	GRootRignature::GRootRignature(const GRootRignature& other) : GContextDependent(other)
+	GRootSignature::GRootSignature(const GRootSignature& other) : GContextDependent(other)
 	{
 		this->RootSignatureInstance = other.RootSignatureInstance;
 		this->IsInitialized = other.IsInitialized;
@@ -20,7 +20,7 @@ namespace SE
 		this->SamplerDescriptionList = other.SamplerDescriptionList;
 	}
 
-	GRootRignature::~GRootRignature()
+	GRootSignature::~GRootSignature()
 	{
 		this->IsInitialized = false;
 
@@ -28,7 +28,7 @@ namespace SE
 		this->SamplerDescriptionList.clear();
 	}
 
-	unsigned int GRootRignature::AddParameter(const GRootParameter& parameter)
+	unsigned int GRootSignature::AddParameter(const GRootParameter& parameter)
 	{
 		if (this->IsInitialized)
 		{
@@ -41,7 +41,7 @@ namespace SE
 		return CurrentIndex;
 	}
 
-	unsigned int GRootRignature::AddSamplerDescription(const GStaticSamplerDescription& description)
+	unsigned int GRootSignature::AddSamplerDescription(const GStaticSamplerDescription& description)
 	{
 		if (this->IsInitialized)
 		{
@@ -54,7 +54,7 @@ namespace SE
 		return CurrentIndex;
 	}
 
-	void GRootRignature::Initialize()
+	void GRootSignature::Initialize()
 	{
 		std::vector<CD3DX12_ROOT_PARAMETER> D3DParameterList;
 		for (const auto& parameter : this->ParameterList)
@@ -118,12 +118,12 @@ namespace SE
 		this->IsInitialized = true;
 	}
 
-	WRL::ComPtr<ID3D12RootSignature> GRootRignature::GetInstance()
+	WRL::ComPtr<ID3D12RootSignature> GRootSignature::GetInstance()
 	{
 		return this->RootSignatureInstance;
 	}
 
-	unsigned int GRootRignature::GetRootParameterIndex(const GRootParameter& parameter) const
+	unsigned int GRootSignature::GetRootParameterIndex(const GRootParameter& parameter) const
 	{
 		int Index = -1;
 		for (UINT i = 0; i < (UINT)this->ParameterList.size(); i++)
@@ -144,7 +144,7 @@ namespace SE
 		return (unsigned int)Index;
 	}
 
-	unsigned int GRootRignature::GetSamplerDescriptionIndex(const GStaticSamplerDescription& description) const
+	unsigned int GRootSignature::GetSamplerDescriptionIndex(const GStaticSamplerDescription& description) const
 	{
 		int Index = -1;
 		for (UINT i = 0; i < (UINT)this->SamplerDescriptionList.size(); i++)
@@ -165,7 +165,7 @@ namespace SE
 		return (unsigned int)Index;
 	}
 
-	const bool& GRootRignature::GetInitialized() const noexcept
+	const bool& GRootSignature::GetInitialized() const noexcept
 	{
 		return this->IsInitialized;
 	}

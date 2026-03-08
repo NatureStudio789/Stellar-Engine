@@ -49,6 +49,11 @@ namespace SE
 			SetGraphicsRootDescriptorTable(this->RootParameterIndex, this->DescriptorHandle->GPUHandle);
 	}
 
+	const CD3DX12_GPU_DESCRIPTOR_HANDLE& GShaderResourceView::GetGPUDescriptor() const noexcept
+	{
+		return this->DescriptorHandle->GPUHandle;
+	}
+
 	const unsigned int& GShaderResourceView::GetRootParameterIndex() const noexcept
 	{
 		return this->RootParameterIndex;
