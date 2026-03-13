@@ -8,6 +8,16 @@ namespace SE
 
 	}
 
+	GRenderer::GRenderer(const std::string& name)
+	{
+		this->SetName(name);
+
+		this->RendererCommandList = GCommandList::Create(
+			this->GetContext()->GetDevice(), GCommandList::SE_COMMAND_LIST_DIRECT);
+		this->RendererCommandList->SetName(this->GetName());
+		SCommandListRegistry::Register(this->RendererCommandList);
+	}
+
 	GRenderer::~GRenderer()
 	{
 
@@ -15,21 +25,18 @@ namespace SE
 
 	void GRenderer::Execute()
 	{
-		std::vector<ID3D12GraphicsCommandList*> GraphicsCommandLists;
+		SCommandListRegistry::SetCurrentInstance(this->GetName());
 
 		for (auto& renderPass : this->RenderPassList)
 		{
 			this->LinkPassInflows(renderPass);
 
 			renderPass->Execute();
-
-			GraphicsCommandLists.push_back(
-				renderPass->PassCommandList->GetInstance().Get());
 		}
 
 		this->LinkGlobalInflows();
 
-		this->GetContext()->ExecuteCommandLists(GraphicsCommandLists);
+		this->GetContext()->ExecuteCommandLists({ this->RendererCommandList->GetInstance().Get() });
 
 		this->GetContext()->Flush();
 	}

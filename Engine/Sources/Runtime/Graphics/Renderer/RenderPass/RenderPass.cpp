@@ -12,11 +12,6 @@ namespace SE
 	GRenderPass::GRenderPass(const std::string& name)
 	{
 		this->RenderPassName = name;
-		
-		this->PassCommandList = GCommandList::Create(
-			this->GetContext()->GetDevice(), GCommandList::SE_COMMAND_LIST_DIRECT);
-		this->PassCommandList->SetName(this->RenderPassName);
-		SCommandListRegistry::Register(this->PassCommandList);
 	}
 
 	GRenderPass::GRenderPass(const GRenderPass& other)
@@ -107,11 +102,6 @@ namespace SE
 		SMessageHandler::Instance->SetFatal("Graphics",
 			std::format("No outflow named '{}' found in the {} Pass", name, this->RenderPassName));
 		return null;
-	}
-
-	void GRenderPass::ActivateCommandList()
-	{
-		SCommandListRegistry::SetCurrentInstance(this->RenderPassName);
 	}
 
 	void GRenderPass::AddInflow(std::shared_ptr<GInflow> inflow)

@@ -10,6 +10,7 @@ namespace SE
 	{
 	public:
 		GRenderer();
+		GRenderer(const std::string& name);
 		virtual ~GRenderer();
 
 		virtual void Execute();
@@ -24,9 +25,13 @@ namespace SE
 
 		std::vector<std::shared_ptr<GRenderPass>> RenderPassList;
 
+		friend class GRenderStage;
+
 	private:
 		void LinkPassInflows(std::shared_ptr<GRenderPass> renderPass);
 		void LinkGlobalInflows();
+
+		std::shared_ptr<GCommandList> RendererCommandList;
 
 		std::vector<std::shared_ptr<GInflow>> GlobalInflowList;
 		std::vector<std::shared_ptr<GOutflow>> GlobalOutflowList;

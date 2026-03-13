@@ -28,17 +28,12 @@ namespace SE
 		std::shared_ptr<GOutflow> GetOutflow(const std::string& name);
 
 	protected:
-		// This function must be called in any execution function.
-		void ActivateCommandList();
-
 		void AddInflow(std::shared_ptr<GInflow> inflow);
 		void AddOutflow(std::shared_ptr<GOutflow> outflow);
 
 		std::shared_ptr<GFramebuffer> GetFramebufferInstance(const GResourcePackage& package);
 
 		std::string RenderPassName;
-
-		std::shared_ptr<GCommandList> PassCommandList;
 
 		std::vector<std::shared_ptr<GInflow>> InflowList;
 		std::vector<std::shared_ptr<GOutflow>> OutflowList;

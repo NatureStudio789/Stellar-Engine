@@ -14,8 +14,6 @@ namespace SE
 
 	void EEditorRenderPass::Execute()
 	{
-		this->ActivateCommandList();
-
 		ImGui_ImplDX12_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();

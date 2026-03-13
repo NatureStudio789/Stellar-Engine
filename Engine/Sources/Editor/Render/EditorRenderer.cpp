@@ -4,10 +4,8 @@
 
 namespace SE
 {
-	EEditorRenderer::EEditorRenderer(const std::string& name)
+	EEditorRenderer::EEditorRenderer(const std::string& name) : GRenderer(name)
 	{
-		this->SetName(name);
-
 		this->EditorMainFramebuffer = GFramebuffer::Create(SGraphicsContextRegistry::GetMainInstance()->GetSwapChain());
 		this->EditorMainFramebuffer->SetName("EditorMainFramebuffer");
 		SFramebufferRegistry::Register(this->EditorMainFramebuffer);
