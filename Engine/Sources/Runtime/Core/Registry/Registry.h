@@ -13,6 +13,9 @@ namespace SE
 		static std::shared_ptr<RegType> GetInstance(std::string name);
 		static std::shared_ptr<RegType> GetInstance(SUUID uuid);
 
+		static bool HasInstance(std::string name);
+		static bool HasInstance(SUUID uuid);
+
 		static std::map<SUUID, std::shared_ptr<RegType>> GetInstanceList();
 
 		static std::string MainInstanceName;
@@ -70,6 +73,26 @@ namespace SE
 		}
 
 		return RegisteredInstanceList[uuid];
+	}
+
+	template<typename RegType>
+	inline bool SRegistry<RegType>::HasInstance(std::string name)
+	{
+		for (auto& [uuid, instance] : RegisteredInstanceList)
+		{
+			if (instance->GetName() == name)
+			{
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	template<typename RegType>
+	inline bool SRegistry<RegType>::HasInstance(SUUID uuid)
+	{
+		return RegisteredInstanceList.count(uuid) == 1;
 	}
 
 	template<typename RegType>

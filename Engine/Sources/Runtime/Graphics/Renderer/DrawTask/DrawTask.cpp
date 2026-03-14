@@ -1,4 +1,5 @@
 #include <Core.h>
+#include "../../Context/GraphicsContext.h"
 #include "../Renderable/Renderable.h"
 #include "DrawTask.h"
 
@@ -36,6 +37,15 @@ namespace SE
 		this->Renderable->Apply();
 		this->RenderStage->Apply();
 
-		// TO DO: To do draw call aftering actually implementing the renderable.
+		if (this->Renderable->HasIndexBuffer())
+		{
+			SCommandListRegistry::GetCurrentInstance()->GetInstance()->DrawIndexedInstanced(
+				this->Renderable->GetIndicesCount(), 1, 0, 0, 0);
+		}
+		else
+		{
+			SCommandListRegistry::GetCurrentInstance()->GetInstance()->DrawInstanced(
+				this->Renderable->GetVerticesCount(), 1, 0, 0);
+		}
 	}
 }

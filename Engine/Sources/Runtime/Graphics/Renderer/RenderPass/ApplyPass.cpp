@@ -1,4 +1,5 @@
 #include <Core.h>
+#include "../../Framebuffer/Framebuffer.h"
 #include "ApplyPass.h"
 
 namespace SE
@@ -38,7 +39,10 @@ namespace SE
 
 	void GApplyPass::Apply()
 	{
-		this->GetFramebufferInstance(this->FramebufferPackage);
+		if (SFramebufferRegistry::HasInstance(this->FramebufferPackage.GetResourceIdentifier().GetUUID()))
+		{
+			this->GetFramebufferInstance(this->FramebufferPackage)->Apply();
+		}
 
 		for (auto& applicable : this->ApplicableList)
 		{

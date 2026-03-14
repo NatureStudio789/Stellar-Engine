@@ -52,7 +52,10 @@ namespace SE
 
 	void GRenderStage::SetParent(const GRenderable& renderable)
 	{
-		// TO DO: Set parent for applicable after implementing the SetParent function in applicable.
+		for (auto& applicable : this->ApplicableList)
+		{
+			applicable->SetParent(renderable);
+		}
 	}
 
 	void GRenderStage::Apply()

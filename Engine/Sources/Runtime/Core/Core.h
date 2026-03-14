@@ -61,6 +61,7 @@ namespace SE
 		"S" - Core module's classes, which is low-level.
 		"F" - Function classes.
 		"G" - Graphics module's classes.
+		"E" - Editor classes.
 
 - Platform Defines:
 	Windows: SE_PLATFORM_WINDOWS

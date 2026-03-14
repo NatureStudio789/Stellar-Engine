@@ -1,6 +1,7 @@
 #ifndef _SE_RENDERQUEUEPASS_H_
 #define _SE_RENDERQUEUEPASS_H_
 #include "ApplyPass.h"
+#include "../DrawTask/DrawTask.h"
 
 namespace SE
 {
