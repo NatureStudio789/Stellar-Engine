@@ -9,7 +9,7 @@ namespace SE
 	{
 		this->AddInflow(GInflow::Create("EditorFramebuffer", this->FramebufferPackage));
 
-		this->texture = GTexture::Create("Engine/Assets/Textures/Vinewood.jpg");
+		this->texture = GTexture::Create("Engine/Assets/Textures/Morgen.jpg");
 	}
 
 	void EEditorRenderPass::Execute()
@@ -83,7 +83,7 @@ namespace SE
 		{
 			ImGui::Begin("Texture");
 
-			ImGui::Image((ImTextureID)this->texture->GetGPUDescriptor().ptr, ImVec2(1280, 720));
+			ImGui::Image((ImTextureID)this->texture->GetGPUDescriptor().ptr, ImVec2(540, 631));
 
 			ImGui::End();
 		}

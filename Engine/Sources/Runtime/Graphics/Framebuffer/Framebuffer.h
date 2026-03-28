@@ -14,13 +14,15 @@ namespace SE
 	{
 	public:
 		GFramebuffer();
-		GFramebuffer(const glm::uvec2& size);
+		GFramebuffer(const glm::uvec2& size, unsigned int multipleRenderTargetCount = 1);
 		GFramebuffer(std::shared_ptr<GSwapChain> bufferSwapChain);
 		GFramebuffer(const GFramebuffer& other);
 		~GFramebuffer();
 
-		void Initialize(const glm::uvec2& size);
+		void Initialize(const glm::uvec2& size, unsigned int multipleRenderTargetCount = 1);
 		void Initialize(std::shared_ptr<GSwapChain> bufferSwapChain);
+
+		void SetCurrentBuffer(unsigned int multipleRenderTargetBufferIndex);
 
 		void Clear(const glm::vec4& color);
 		void Apply();
@@ -39,7 +41,8 @@ namespace SE
 		bool IsPresentingFramebuffer;
 		std::shared_ptr<GSwapChain> RTBufferSwapChain;
 
-		WRL::ComPtr<ID3D12Resource> RenderTargetBuffer;
+		std::vector<WRL::ComPtr<ID3D12Resource>> RenderTargetBufferList;
+		unsigned int CurrentBufferIndex;
 		std::shared_ptr<GDescriptorHandle> RTVDescriptorHandle;
 
 		WRL::ComPtr<ID3D12Resource> DepthStencilBuffer;

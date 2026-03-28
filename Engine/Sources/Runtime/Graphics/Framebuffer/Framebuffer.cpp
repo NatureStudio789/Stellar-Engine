@@ -12,9 +12,9 @@ namespace SE
 		this->RTBufferSwapChain = null;
 	}
 
-	GFramebuffer::GFramebuffer(const glm::uvec2& size)
+	GFramebuffer::GFramebuffer(const glm::uvec2& size, unsigned int multipleRenderTargetCount)
 	{
-		this->Initialize(size);
+		this->Initialize(size, multipleRenderTargetCount);
 	}
 
 	GFramebuffer::GFramebuffer(std::shared_ptr<GSwapChain> bufferSwapChain)
@@ -31,13 +31,15 @@ namespace SE
 	{
 	}
 
-	void GFramebuffer::Initialize(const glm::uvec2& size)
+	void GFramebuffer::Initialize(const glm::uvec2& size, unsigned int multipleRenderTargetCount)
 	{
 		this->IsPresentingFramebuffer = false;
 
 		this->Size = size;
 
-		this->RTVDescriptorHandle = this->GetContext()->GetRTVDescriptorHeap()->Allocate();
+		this->RTVDescriptorHandle = this->GetContext()->GetRTVDescriptorHeap()->Allocate(multipleRenderTargetCount);
+		this->RenderTargetBufferList.resize(multipleRenderTargetCount);
+		this->CurrentBufferIndex = 0;
 
 		D3D12_CLEAR_VALUE ClearValue;
 		STELLAR_CLEAR_MEMORY(ClearValue);
@@ -46,17 +48,22 @@ namespace SE
 		ClearValue.Color[2] = 0.1f;
 		ClearValue.Color[3] = 1.0f;
 
-		SMessageHandler::Instance->Check(this->GetDeviceInstance()->
-			CreateCommittedResource(&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
-				D3D12_HEAP_FLAG_NONE,
-				&CD3DX12_RESOURCE_DESC::Tex2D(DXGI_FORMAT_R8G8B8A8_UNORM,
-					this->Size.x, this->Size.y, 1, 1, 1, 0,
-					D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET),
-				D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE | D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,
-				&ClearValue, __uuidof(ID3D12Resource), (void**)this->RenderTargetBuffer.GetAddressOf()));
+		CD3DX12_CPU_DESCRIPTOR_HANDLE RTVHandle = this->RTVDescriptorHandle->CPUHandle;
+		for (UINT i = 0; i < multipleRenderTargetCount; i++)
+		{
+			SMessageHandler::Instance->Check(this->GetDeviceInstance()->
+				CreateCommittedResource(&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
+					D3D12_HEAP_FLAG_NONE,
+					&CD3DX12_RESOURCE_DESC::Tex2D(DXGI_FORMAT_R8G8B8A8_UNORM,
+						this->Size.x, this->Size.y, 1, 1, 1, 0,
+						D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET),
+					D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE | D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,
+					&ClearValue, __uuidof(ID3D12Resource), (void**)this->RenderTargetBufferList[i].GetAddressOf()));
 
-		this->GetDeviceInstance()->CreateRenderTargetView(
-			this->RenderTargetBuffer.Get(), null, this->RTVDescriptorHandle->CPUHandle);
+			this->GetDeviceInstance()->CreateRenderTargetView(
+				this->RenderTargetBufferList[i].Get(), null, RTVHandle);
+			RTVHandle.Offset(1, this->GetContext()->GetRTVDescriptorHeap()->GetIncrementSize());
+		}
 
 		this->DSVDescriptorHandle = this->GetContext()->GetDSVDescriptorHeap()->Allocate();
 
@@ -178,6 +185,16 @@ namespace SE
 		this->Activate();
 	}
 
+	void GFramebuffer::SetCurrentBuffer(unsigned int multipleRenderTargetBufferIndex)
+	{
+		if (multipleRenderTargetBufferIndex >= (unsigned int)this->RenderTargetBufferList.size())
+		{
+			SMessageHandler::Instance->SetFatal("Graphics", "The buffer index of framebuffer is out of its buffer list range!");
+		}
+
+		this->CurrentBufferIndex = multipleRenderTargetBufferIndex;
+	}
+
 	void GFramebuffer::Clear(const glm::vec4& color)
 	{
 		float fcolor[4] = { color.r, color.g, color.b, color.a };
@@ -218,11 +235,6 @@ namespace SE
 		}
 		else
 		{
-			if (this->RenderTargetBuffer)
-			{
-				this->RenderTargetBuffer.Reset();
-			}
-
 			D3D12_CLEAR_VALUE ClearValue;
 			STELLAR_CLEAR_MEMORY(ClearValue);
 			ClearValue.Color[0] = 0.1f;
@@ -230,17 +242,27 @@ namespace SE
 			ClearValue.Color[2] = 0.1f;
 			ClearValue.Color[3] = 1.0f;
 
-			SMessageHandler::Instance->Check(this->GetDeviceInstance()->
-				CreateCommittedResource(&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
-					D3D12_HEAP_FLAG_NONE,
-					&CD3DX12_RESOURCE_DESC::Tex2D(DXGI_FORMAT_R8G8B8A8_UNORM,
-						this->Size.x, this->Size.y, 1, 1, 1, 0,
-						D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET),
-					D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE | D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,
-					&ClearValue, __uuidof(ID3D12Resource), (void**)this->RenderTargetBuffer.GetAddressOf()));
+			CD3DX12_CPU_DESCRIPTOR_HANDLE RTVHandle = this->RTVDescriptorHandle->CPUHandle;
+			for (auto& renderTargetBuffer : this->RenderTargetBufferList)
+			{
+				if (renderTargetBuffer)
+				{
+					renderTargetBuffer.Reset();
+				}
 
-			this->GetDeviceInstance()->CreateRenderTargetView(
-				this->RenderTargetBuffer.Get(), null, this->RTVDescriptorHandle->CPUHandle);
+				SMessageHandler::Instance->Check(this->GetDeviceInstance()->
+					CreateCommittedResource(&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
+						D3D12_HEAP_FLAG_NONE,
+						&CD3DX12_RESOURCE_DESC::Tex2D(DXGI_FORMAT_R8G8B8A8_UNORM,
+							this->Size.x, this->Size.y, 1, 1, 1, 0,
+							D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET),
+						D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE | D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,
+						&ClearValue, __uuidof(ID3D12Resource), (void**)renderTargetBuffer.GetAddressOf()));
+
+				this->GetDeviceInstance()->CreateRenderTargetView(
+					renderTargetBuffer.Get(), null, RTVHandle);
+				RTVHandle.Offset(1, this->GetContext()->GetRTVDescriptorHeap()->GetIncrementSize());
+			}
 		}
 
 		if (this->DepthStencilBuffer)
@@ -308,7 +330,7 @@ namespace SE
 		else
 		{
 			SCommandListRegistry::GetCurrentInstance()->GetInstance()->ResourceBarrier(1,
-				&CD3DX12_RESOURCE_BARRIER::Transition(this->RenderTargetBuffer.Get(),
+				&CD3DX12_RESOURCE_BARRIER::Transition(this->RenderTargetBufferList[this->CurrentBufferIndex].Get(),
 					D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE | D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,
 					D3D12_RESOURCE_STATE_RENDER_TARGET));
 		}
@@ -325,7 +347,7 @@ namespace SE
 		else
 		{
 			SCommandListRegistry::GetCurrentInstance()->GetInstance()->ResourceBarrier(1,
-				&CD3DX12_RESOURCE_BARRIER::Transition(this->RenderTargetBuffer.Get(),
+				&CD3DX12_RESOURCE_BARRIER::Transition(this->RenderTargetBufferList[this->CurrentBufferIndex].Get(),
 					D3D12_RESOURCE_STATE_RENDER_TARGET,
 					D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE | D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE));
 		}
@@ -338,17 +360,17 @@ namespace SE
 
 	D3D12_CPU_DESCRIPTOR_HANDLE GFramebuffer::GetRTVDescriptorHandleInstance()
 	{
+		auto Handle = this->RTVDescriptorHandle->CPUHandle;
 		if (this->IsPresentingFramebuffer)
 		{
-			auto Handle = this->RTVDescriptorHandle->CPUHandle;
 			Handle.Offset(this->RTBufferSwapChain->GetPresentBuffer()->CurrentBufferIndex, 
 				this->GetContext()->GetRTVDescriptorHeap()->GetIncrementSize());
-
-			return Handle;
 		}
 		else
 		{
-			return this->RTVDescriptorHandle->CPUHandle;
+			Handle.Offset(this->CurrentBufferIndex, this->GetContext()->GetRTVDescriptorHeap()->GetIncrementSize());
 		}
+
+		return Handle;
 	}
 }
