@@ -22,13 +22,12 @@ namespace SE
 		void Initialize(const glm::uvec2& size, unsigned int multipleRenderTargetCount = 1);
 		void Initialize(std::shared_ptr<GSwapChain> bufferSwapChain);
 
-		void SetCurrentBuffer(unsigned int multipleRenderTargetBufferIndex);
-
-		void Clear(const glm::vec4& color);
-		void Apply();
 		void Resize(const glm::uvec2& newSize);
 
+		void SetCurrentBuffer(unsigned int multipleRenderTargetBufferIndex);
 		void Begin();
+		void Clear(const glm::vec4& color);
+		void Apply();
 		void End();
 
 		GResourcePackage GetResourcePackage() const noexcept;

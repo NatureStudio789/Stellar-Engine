@@ -185,36 +185,6 @@ namespace SE
 		this->Activate();
 	}
 
-	void GFramebuffer::SetCurrentBuffer(unsigned int multipleRenderTargetBufferIndex)
-	{
-		if (multipleRenderTargetBufferIndex >= (unsigned int)this->RenderTargetBufferList.size())
-		{
-			SMessageHandler::Instance->SetFatal("Graphics", "The buffer index of framebuffer is out of its buffer list range!");
-		}
-
-		this->CurrentBufferIndex = multipleRenderTargetBufferIndex;
-	}
-
-	void GFramebuffer::Clear(const glm::vec4& color)
-	{
-		float fcolor[4] = { color.r, color.g, color.b, color.a };
-		SCommandListRegistry::GetCurrentInstance()->GetInstance()->
-			ClearRenderTargetView(this->GetRTVDescriptorHandleInstance(), fcolor, 0, null);
-
-		SCommandListRegistry::GetCurrentInstance()->GetInstance()->
-			ClearDepthStencilView(this->DSVDescriptorHandle->CPUHandle,
-				D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, null);
-	}
-
-	void GFramebuffer::Apply()
-	{
-		SCommandListRegistry::GetCurrentInstance()->GetInstance()->RSSetScissorRects(1, &this->ViewportScissorRect);
-		SCommandListRegistry::GetCurrentInstance()->GetInstance()->RSSetViewports(1, &this->ViewportInstance);
-
-		SCommandListRegistry::GetCurrentInstance()->GetInstance()->
-			OMSetRenderTargets(1, &this->GetRTVDescriptorHandleInstance(), true, &this->DSVDescriptorHandle->CPUHandle);
-	}
-
 	void GFramebuffer::Resize(const glm::uvec2& newSize)
 	{
 		this->Size = newSize;
@@ -319,6 +289,16 @@ namespace SE
 		this->ViewportScissorRect.bottom = (long)this->Size.y;
 	}
 
+	void GFramebuffer::SetCurrentBuffer(unsigned int multipleRenderTargetBufferIndex)
+	{
+		if (multipleRenderTargetBufferIndex >= (unsigned int)this->RenderTargetBufferList.size())
+		{
+			SMessageHandler::Instance->SetFatal("Graphics", "The buffer index of framebuffer is out of its buffer list range!");
+		}
+
+		this->CurrentBufferIndex = multipleRenderTargetBufferIndex;
+	}
+
 	void GFramebuffer::Begin()
 	{
 		if (this->IsPresentingFramebuffer)
@@ -334,6 +314,26 @@ namespace SE
 					D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE | D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,
 					D3D12_RESOURCE_STATE_RENDER_TARGET));
 		}
+	}
+
+	void GFramebuffer::Clear(const glm::vec4& color)
+	{
+		float fcolor[4] = { color.r, color.g, color.b, color.a };
+		SCommandListRegistry::GetCurrentInstance()->GetInstance()->
+			ClearRenderTargetView(this->GetRTVDescriptorHandleInstance(), fcolor, 0, null);
+
+		SCommandListRegistry::GetCurrentInstance()->GetInstance()->
+			ClearDepthStencilView(this->DSVDescriptorHandle->CPUHandle,
+				D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, null);
+	}
+
+	void GFramebuffer::Apply()
+	{
+		SCommandListRegistry::GetCurrentInstance()->GetInstance()->RSSetScissorRects(1, &this->ViewportScissorRect);
+		SCommandListRegistry::GetCurrentInstance()->GetInstance()->RSSetViewports(1, &this->ViewportInstance);
+
+		SCommandListRegistry::GetCurrentInstance()->GetInstance()->
+			OMSetRenderTargets(1, &this->GetRTVDescriptorHandleInstance(), true, &this->DSVDescriptorHandle->CPUHandle);
 	}
 
 	void GFramebuffer::End()
