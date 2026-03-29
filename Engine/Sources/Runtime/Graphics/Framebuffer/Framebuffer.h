@@ -5,6 +5,7 @@
 #include "../SwapChain/SwapChain.h"
 #include "../Descriptor/DescriptorHandle.h"
 #include "../../Core/Registry/Registry.h"
+#include "../ShaderResourceView/ShaderResourceView.h"
 
 namespace SE
 {
@@ -30,6 +31,7 @@ namespace SE
 		void Apply();
 		void End();
 
+		std::shared_ptr<GShaderResourceView> GetRTShaderResourceView(unsigned int multipleRenderTargetBufferIndex);
 		GResourcePackage GetResourcePackage() const noexcept;
 
 	private:
@@ -41,6 +43,7 @@ namespace SE
 		std::shared_ptr<GSwapChain> RTBufferSwapChain;
 
 		std::vector<WRL::ComPtr<ID3D12Resource>> RenderTargetBufferList;
+		std::vector<std::shared_ptr<GShaderResourceView>> RTShaderResourceViewList;
 		unsigned int CurrentBufferIndex;
 		std::shared_ptr<GDescriptorHandle> RTVDescriptorHandle;
 

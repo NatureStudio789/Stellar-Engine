@@ -39,6 +39,7 @@ namespace SE
 
 		this->RTVDescriptorHandle = this->GetContext()->GetRTVDescriptorHeap()->Allocate(multipleRenderTargetCount);
 		this->RenderTargetBufferList.resize(multipleRenderTargetCount);
+		this->RTShaderResourceViewList.resize(multipleRenderTargetCount);
 		this->CurrentBufferIndex = 0;
 
 		D3D12_CLEAR_VALUE ClearValue;
@@ -63,6 +64,10 @@ namespace SE
 			this->GetDeviceInstance()->CreateRenderTargetView(
 				this->RenderTargetBufferList[i].Get(), null, RTVHandle);
 			RTVHandle.Offset(1, this->GetContext()->GetRTVDescriptorHeap()->GetIncrementSize());
+
+			this->RTShaderResourceViewList[i] = std::make_shared<GShaderResourceView>(i);
+			this->GetDeviceInstance()->CreateShaderResourceView(
+				this->RenderTargetBufferList[i].Get(), null, this->RTShaderResourceViewList[i]->GetDescriptorHandle()->CPUHandle);
 		}
 
 		this->DSVDescriptorHandle = this->GetContext()->GetDSVDescriptorHeap()->Allocate();
@@ -213,12 +218,14 @@ namespace SE
 			ClearValue.Color[3] = 1.0f;
 
 			CD3DX12_CPU_DESCRIPTOR_HANDLE RTVHandle = this->RTVDescriptorHandle->CPUHandle;
-			for (auto& renderTargetBuffer : this->RenderTargetBufferList)
+			for (UINT i = 0; i < (UINT)this->RenderTargetBufferList.size(); i++)
 			{
+				auto& renderTargetBuffer = this->RenderTargetBufferList[i];
 				if (renderTargetBuffer)
 				{
 					renderTargetBuffer.Reset();
 				}
+				auto& shaderResourceView = this->RTShaderResourceViewList[i];
 
 				SMessageHandler::Instance->Check(this->GetDeviceInstance()->
 					CreateCommittedResource(&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
@@ -232,6 +239,9 @@ namespace SE
 				this->GetDeviceInstance()->CreateRenderTargetView(
 					renderTargetBuffer.Get(), null, RTVHandle);
 				RTVHandle.Offset(1, this->GetContext()->GetRTVDescriptorHeap()->GetIncrementSize());
+
+				this->GetDeviceInstance()->CreateShaderResourceView(
+					renderTargetBuffer.Get(), null, shaderResourceView->GetDescriptorHandle()->CPUHandle);
 			}
 		}
 
@@ -351,6 +361,21 @@ namespace SE
 					D3D12_RESOURCE_STATE_RENDER_TARGET,
 					D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE | D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE));
 		}
+	}
+
+	std::shared_ptr<GShaderResourceView> GFramebuffer::GetRTShaderResourceView(unsigned int multipleRenderTargetBufferIndex)
+	{
+		if (this->IsPresentingFramebuffer)
+		{
+			SMessageHandler::Instance->SetFatal("Graphics", "This framebuffer is presenting framebuffer! Cannot get a shader resource view from it!");
+		}
+
+		if (multipleRenderTargetBufferIndex >= (unsigned int)this->RenderTargetBufferList.size())
+		{
+			SMessageHandler::Instance->SetFatal("Graphics", "The buffer index of framebuffer is out of its buffer list range!");
+		}
+
+		return this->RTShaderResourceViewList[multipleRenderTargetBufferIndex];
 	}
 
 	GResourcePackage GFramebuffer::GetResourcePackage() const noexcept
