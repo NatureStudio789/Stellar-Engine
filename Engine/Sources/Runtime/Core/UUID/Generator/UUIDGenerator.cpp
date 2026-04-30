@@ -13,8 +13,16 @@ namespace SE
 		}
 
 		RPC_CSTR UuidString = null;
-		UuidToStringA(&Uuid, &UuidString);
+		Status = UuidToStringA(&Uuid, &UuidString);
+		if (Status != RPC_S_OK)
+		{
+			SMessageHandler::Instance->SetFatal("Core", "Failed to convert UUID to string!");
+		}
+
 		std::string Result(reinterpret_cast<const char*>(UuidString));
+
+		RpcStringFreeA(&UuidString);
+		std::cout << Result << std::endl;
 
 		return Result;
 	}

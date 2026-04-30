@@ -1,5 +1,7 @@
 #include <Core.h>
 #include "Renderer/Renderer.h"
+#include "Renderer/DeferredRenderer.h"
+#include "PipelineState/PipelineState.h"
 #include "RenderEngine.h"
 
 namespace SE
@@ -19,6 +21,12 @@ namespace SE
 			SWindowRegistry::GetMainInstance()->GetWindowSize());
 		this->MainGraphicsContext->SetName(SGraphicsContextRegistry::MainInstanceName);
 		SGraphicsContextRegistry::Register(this->MainGraphicsContext);
+
+		SPipelineStateRegistry::InitializeRegistry();
+
+		auto& DeferredRenderer = std::make_shared<GDeferredRenderer>("MainDeferredRenderer");
+		DeferredRenderer->Compile();
+		SRendererRegistry::Register(DeferredRenderer);
 	}
 
 	void RenderEngine::Execute()

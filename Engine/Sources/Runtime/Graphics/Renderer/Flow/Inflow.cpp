@@ -9,13 +9,21 @@ namespace SE
 		CheckNameAvailable(name);
 
 		this->InflowName = name;
+		this->IsLinked = false;
+		this->IsSource = false;
 	}
 
 	GInflow::GInflow(const GInflow& other) : ResourcePackage(other.ResourcePackage)
 	{
 		this->InflowName = other.InflowName;
+		this->IsLinked = other.IsLinked;
+		this->BelongingPassName = other.BelongingPassName;
+
 		this->TargetPassName = other.TargetPassName;
 		this->LinkingOutflowName = other.LinkingOutflowName;
+
+		this->IsSource = other.IsSource;
+		this->TargetOutflowOfSource = other.TargetOutflowOfSource;
 	}
 
 	GInflow::~GInflow()
@@ -37,12 +45,28 @@ namespace SE
 
 	void GInflow::Apply(std::shared_ptr<GOutflow> outflow)
 	{
-		this->ResourcePackage = outflow->GetResourcePackage();
+		if (this->IsLinked)
+		{
+			SMessageHandler::Instance->SetFatal("Graphics", std::format("This inflow named '{}' has already been linked!", this->InflowName));
+		}
+
+		this->ResourcePackage = outflow->ResourcePackage;
+		this->IsLinked = true;
 	}
 
 	const std::string& GInflow::GetName() const noexcept
 	{
 		return this->InflowName;
+	}
+
+	const bool& GInflow::GetLinked() const noexcept
+	{
+		return this->IsLinked;
+	}
+
+	const std::string& GInflow::GetBelongingPassName() const noexcept
+	{
+		return this->BelongingPassName;
 	}
 
 	const std::string& GInflow::GetTargetPassName() const noexcept

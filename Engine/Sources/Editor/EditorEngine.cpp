@@ -12,7 +12,8 @@ namespace SE
 
 	void EditorEngine::Initialize()
 	{
-		auto EditorRenderer = std::make_shared<EEditorRenderer>("EditorMainRenderer");
+		auto& EditorRenderer = std::make_shared<EEditorRenderer>("EditorMainRenderer");
+		EditorRenderer->Compile();
 		SRendererRegistry::Register(EditorRenderer);
 	}
 

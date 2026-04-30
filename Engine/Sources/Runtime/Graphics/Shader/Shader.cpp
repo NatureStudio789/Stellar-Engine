@@ -99,7 +99,7 @@ namespace SE
 			HRESULT hr = D3DCompileFromFile(std::wstring(filePath.begin(), filePath.end()).c_str(), null,
 				D3D_COMPILE_STANDARD_FILE_INCLUDE, "main", CompileTarget.c_str(), CompileFlags, 0,
 				CompileResult.GetAddressOf(), ErrorBuffer.GetAddressOf());
-			if (FAILED(hr))
+			if (FAILED(hr) && ErrorBuffer)
 			{
 #ifdef SE_DEBUG
 				::OutputDebugStringA((char*)ErrorBuffer->GetBufferPointer());

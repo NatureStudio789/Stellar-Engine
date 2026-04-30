@@ -23,18 +23,134 @@ namespace SE
 
 	}
 
+	void GRenderer::Compile()
+	{
+		std::map<std::string, std::vector<std::shared_ptr<GInflow>>> TargetPassOrderedInflowList;
+		std::map<std::string, std::shared_ptr<GOutflow>> PassSourceOutflowList;
+		for (auto& pass : this->RenderPassList)
+		{
+			for (auto& inflow : pass->InflowList)
+			{
+				TargetPassOrderedInflowList[inflow->GetTargetPassName()].push_back(inflow);
+			}
+
+			for (auto& outflow : pass->OutflowList)
+			{
+				if (outflow->IsSource())
+				{
+					PassSourceOutflowList[outflow->BelongingPassName + "." + outflow->GetName()] = outflow;
+				}
+			}
+		}
+
+		for (auto& globalOutflow : this->GlobalOutflowList)
+		{
+			std::shared_ptr<GFlowChain> FlowChain = std::make_shared<GFlowChain>();
+			FlowChain->IsDynamic = globalOutflow->IsDynamicFlowing;
+
+			std::pair<std::shared_ptr<GOutflow>, std::shared_ptr<GInflow>> FlowNode;
+			FlowNode.first = globalOutflow;
+
+			for (auto& inflow : TargetPassOrderedInflowList["$"])
+			{
+				if (inflow->GetLinkingOutflowName() == globalOutflow->GetName())
+				{
+					FlowNode.second = inflow;
+					FlowChain->FlowList.push_back(FlowNode);
+
+					// Iterator the following linking nodes.
+					if (inflow->IsSource)
+					{
+						this->BuildFlowChain(FlowChain, this->GetRenderPass(inflow->BelongingPassName)->GetOutflow(inflow->TargetOutflowOfSource), 
+							TargetPassOrderedInflowList);
+					}
+
+					break;
+				}
+			}
+
+			if (FlowChain->IsDynamic)
+			{
+				this->DynamicFlowChainList.push_back(FlowChain);
+			}
+			else
+			{
+				this->StaticFlowChainList.push_back(FlowChain);
+			}
+		}
+
+		for (auto& [name, outflow] : PassSourceOutflowList)
+		{
+			std::shared_ptr<GFlowChain> FlowChain = std::make_shared<GFlowChain>();
+			FlowChain->IsDynamic = outflow->IsDynamicFlowing;
+
+			this->BuildFlowChain(FlowChain, outflow, TargetPassOrderedInflowList);
+
+			if (FlowChain->IsDynamic)
+			{
+				this->DynamicFlowChainList.push_back(FlowChain);
+			}
+			else
+			{
+				this->StaticFlowChainList.push_back(FlowChain);
+			}
+		}
+
+		for (auto& staticFlowChain : this->StaticFlowChainList)
+		{
+			staticFlowChain->Link();
+		}
+		for (auto& dynamicFlowChain : this->DynamicFlowChainList)
+		{
+			dynamicFlowChain->Link();
+		}
+
+		this->IsCompiled = true;
+	}
+
+	void GRenderer::BuildFlowChain(std::shared_ptr<GFlowChain> flowChain, std::shared_ptr<GOutflow> outflow,
+		std::map<std::string, std::vector<std::shared_ptr<GInflow>>> targetPassOrderedInflowList)
+	{
+		std::pair<std::shared_ptr<GOutflow>, std::shared_ptr<GInflow>> FlowNode;
+		FlowNode.first = outflow;
+
+		for (auto& inflow : targetPassOrderedInflowList[outflow->BelongingPassName])
+		{
+			if (inflow->GetLinkingOutflowName() == outflow->GetName())
+			{
+				FlowNode.second = inflow;
+				flowChain->FlowList.push_back(FlowNode);
+
+				// Iterator the following linking nodes.
+				if (inflow->IsSource)
+				{
+					this->BuildFlowChain(flowChain, this->GetRenderPass(inflow->BelongingPassName)->GetOutflow(inflow->TargetOutflowOfSource), 
+						targetPassOrderedInflowList);
+				}
+
+				break;
+			}
+		}
+	}
+
 	void GRenderer::Execute()
 	{
+		if (!this->IsCompiled)
+		{
+			SMessageHandler::Instance->SetFatal("Graphics", std::format("The renderer named '{}' is NOT compiled before execution!", this->GetName()));
+		}
+
 		SCommandListRegistry::SetCurrentInstance(this->GetName());
 
 		for (auto& renderPass : this->RenderPassList)
 		{
-			this->LinkPassInflows(renderPass);
-
 			renderPass->Execute();
 		}
 
-		this->LinkGlobalInflows();
+		for (auto& dynamicFlowChain : this->DynamicFlowChainList)
+		{
+			dynamicFlowChain->Link();
+		}
 
 		this->GetContext()->ExecuteCommandLists({ this->RendererCommandList->GetInstance().Get() });
 
@@ -97,6 +213,7 @@ namespace SE
 			}
 		}
 
+		inflow->BelongingPassName = "$";
 		this->GlobalInflowList.push_back(inflow);
 	}
 
@@ -112,6 +229,7 @@ namespace SE
 			}
 		}
 
+		outflow->BelongingPassName = "$";
 		this->GlobalOutflowList.push_back(outflow);
 	}
 
@@ -145,49 +263,78 @@ namespace SE
 		return null;
 	}
 
-	void GRenderer::LinkPassInflows(std::shared_ptr<GRenderPass> renderPass)
+	void SRendererRegistry::CompileAllRenderer()
 	{
-		for (auto& inflow : renderPass->GetInflowList())
+		for (auto& [name, renderer] : RegisteredInstanceList)
 		{
-			const std::string& InflowTargetPassName = inflow->GetTargetPassName();
-
-			if (InflowTargetPassName == "$")
-			{
-				bool applied = false;
-				for (auto& outflow : this->GlobalOutflowList)
-				{
-					if (outflow->GetName() == inflow->GetLinkingOutflowName())
-					{
-						inflow->Apply(outflow);
-						applied = true;
-						break;
-					}
-				}
-
-				if (!applied)
-				{
-					SMessageHandler::Instance->SetFatal("Graphics",
-						std::format("No global outflow named '{}' found in renderer", inflow->GetLinkingOutflowName()));
-				}
-			}
-			else
-			{
-				auto RenderPass = this->GetRenderPass(InflowTargetPassName);
-
-				auto outflow = RenderPass->GetOutflow(inflow->GetLinkingOutflowName());
-				inflow->Apply(outflow);
-			}
+			renderer->Compile();
 		}
 	}
 
-	void GRenderer::LinkGlobalInflows()
-	{
-		for (auto& inflow : this->GlobalInflowList)
-		{
-			const std::string& InflowTargetPassName = inflow->GetTargetPassName();
-			auto RenderPass = this->GetRenderPass(InflowTargetPassName);
-			auto outflow = RenderPass->GetOutflow(inflow->GetLinkingOutflowName());
-			inflow->Apply(outflow);
-		}
-	}
+	//void GRenderer::LinkPassInflows(std::shared_ptr<GRenderPass> renderPass)
+	//{
+	//	for (auto& inflow : renderPass->GetInflowList())
+	//	{
+	//		if (inflow->GetLinked())
+	//		{
+	//			continue;
+	//		}
+
+	//		const std::string& InflowTargetPassName = inflow->GetTargetPassName();
+
+	//		if (InflowTargetPassName == "$")
+	//		{
+	//			bool applied = false;
+	//			for (auto& outflow : this->GlobalOutflowList)
+	//			{
+	//				if (outflow->GetName() == inflow->GetLinkingOutflowName())
+	//				{
+	//					if (!outflow->IsSource())
+	//					{
+	//						SMessageHandler::Instance->SetFatal("Graphics", std::format("A global outflow must be a source!"));
+	//					}
+
+	//					if (!outflow->GetAvailable())
+	//					{
+	//						SMessageHandler::Instance->SetFatal("Graphics", std::format("The global outflow named '{}' is not available!", outflow->GetName()));
+	//					}
+
+	//					inflow->Apply(outflow);
+	//					applied = true;
+	//					break;
+	//				}
+	//			}
+
+	//			if (!applied)
+	//			{
+	//				SMessageHandler::Instance->SetFatal("Graphics",
+	//					std::format("No global outflow named '{}' found in renderer", inflow->GetLinkingOutflowName()));
+	//			}
+	//		}
+	//		else
+	//		{
+	//			auto RenderPass = this->GetRenderPass(InflowTargetPassName);
+
+	//			auto outflow = RenderPass->GetOutflow(inflow->GetLinkingOutflowName());
+	//			if (!outflow->IsSource())
+	//			{
+	//				RenderPass->GetInflow(outflow->SourceInflowName);
+
+	//			}
+
+	//			inflow->Apply(outflow);
+	//		}
+	//	}
+	//}
+
+	//void GRenderer::LinkGlobalInflows()
+	//{
+	//	for (auto& inflow : this->GlobalInflowList)
+	//	{
+	//		const std::string& InflowTargetPassName = inflow->GetTargetPassName();
+	//		auto RenderPass = this->GetRenderPass(InflowTargetPassName);
+	//		auto outflow = RenderPass->GetOutflow(inflow->GetLinkingOutflowName());
+	//		inflow->Apply(outflow);
+	//	}
+	//}
 }

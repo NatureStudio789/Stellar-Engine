@@ -39,7 +39,7 @@ namespace SE
 
 	bool SUUID::operator<(const SUUID& other) const
 	{
-		return this->UUID[0] < other.UUID[0];
+		return this->UUID < other.UUID;
 	}
 
 	bool SUUID::GetAvailable() const noexcept

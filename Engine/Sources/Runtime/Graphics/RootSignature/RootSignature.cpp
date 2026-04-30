@@ -41,6 +41,32 @@ namespace SE
 		return CurrentIndex;
 	}
 
+	unsigned int GRootSignature::AttachParameterList(const std::vector<GRootParameter>& parameterList)
+	{
+		if (this->IsInitialized)
+		{
+			SMessageHandler::Instance->SetFatal("Graphics", "Cannot add new parameter into an initialized root signature!");
+		}
+
+		unsigned int CurrentIndexForHead = (unsigned int)this->ParameterList.size();
+		for (const auto& parameter : parameterList)
+		{
+			this->ParameterList.push_back(parameter);
+		}
+		
+		return CurrentIndexForHead;
+	}
+
+	void GRootSignature::SetParameterList(const std::vector<GRootParameter>& parameterList)
+	{
+		if (this->IsInitialized)
+		{
+			SMessageHandler::Instance->SetFatal("Graphics", "Cannot add new parameter into an initialized root signature!");
+		}
+
+		this->ParameterList = parameterList;
+	}
+
 	unsigned int GRootSignature::AddSamplerDescription(const GStaticSamplerDescription& description)
 	{
 		if (this->IsInitialized)
@@ -61,7 +87,7 @@ namespace SE
 		{
 			CD3DX12_ROOT_PARAMETER Parameter;
 
-			switch (Parameter.ParameterType)
+			switch (parameter.ParameterType)
 			{
 				case GRootParameter::SE_PARAMETER_CBV:
 				{

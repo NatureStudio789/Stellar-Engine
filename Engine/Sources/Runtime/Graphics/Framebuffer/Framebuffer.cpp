@@ -48,6 +48,7 @@ namespace SE
 		ClearValue.Color[1] = 0.1f;
 		ClearValue.Color[2] = 0.1f;
 		ClearValue.Color[3] = 1.0f;
+		ClearValue.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 
 		CD3DX12_CPU_DESCRIPTOR_HANDLE RTVHandle = this->RTVDescriptorHandle->CPUHandle;
 		for (UINT i = 0; i < multipleRenderTargetCount; i++)
@@ -216,6 +217,7 @@ namespace SE
 			ClearValue.Color[1] = 0.1f;
 			ClearValue.Color[2] = 0.1f;
 			ClearValue.Color[3] = 1.0f;
+			ClearValue.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 
 			CD3DX12_CPU_DESCRIPTOR_HANDLE RTVHandle = this->RTVDescriptorHandle->CPUHandle;
 			for (UINT i = 0; i < (UINT)this->RenderTargetBufferList.size(); i++)

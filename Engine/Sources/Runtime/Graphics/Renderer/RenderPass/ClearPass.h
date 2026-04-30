@@ -8,7 +8,7 @@ namespace SE
 	{
 	public:
 		GClearPass();
-		GClearPass(const std::string& name);
+		GClearPass(const std::string& name, std::vector<unsigned int> multipleRenderTargetClearingList = {});
 		GClearPass(const GClearPass& other);
 		~GClearPass() override;
 
@@ -16,6 +16,8 @@ namespace SE
 
 	private:
 		GResourcePackage ClearingFramebufferPackage;
+
+		std::vector<unsigned int> MultipleRenderTargetClearingList;
 	};
 }
 

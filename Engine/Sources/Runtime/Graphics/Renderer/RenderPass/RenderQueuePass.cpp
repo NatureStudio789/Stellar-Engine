@@ -1,4 +1,5 @@
 #include <Core.h>
+#include "../../Framebuffer/Framebuffer.h"
 #include "RenderQueuePass.h"
 
 namespace SE
@@ -11,14 +12,18 @@ namespace SE
 	void GRenderQueuePass::Execute()
 	{
 		SCommandListRegistry::GetCurrentInstance()->Open();
-		this->GetContext()->ApplyDescriptorHeaps();
 
+		this->GetFramebufferInstance(this->FramebufferPackage)->Begin();
+
+		this->GetContext()->ApplyDescriptorHeaps();
 		this->Apply();
 
 		for (auto& task : this->TaskList)
 		{
 			task->Execute();
 		}
+
+		this->GetFramebufferInstance(this->FramebufferPackage)->End();
 
 		SCommandListRegistry::GetCurrentInstance()->Close();
 

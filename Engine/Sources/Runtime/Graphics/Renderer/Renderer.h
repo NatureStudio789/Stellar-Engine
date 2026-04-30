@@ -13,6 +13,8 @@ namespace SE
 		GRenderer(const std::string& name);
 		virtual ~GRenderer();
 
+		void Compile();
+
 		virtual void Execute();
 
 	protected:
@@ -28,16 +30,32 @@ namespace SE
 		friend class GRenderStage;
 
 	private:
-		void LinkPassInflows(std::shared_ptr<GRenderPass> renderPass);
-		void LinkGlobalInflows();
+		//void LinkPassInflows(std::shared_ptr<GRenderPass> renderPass);
+		//void LinkGlobalInflows();
+
+		void BuildFlowChain(std::shared_ptr<GFlowChain> flowChain, std::shared_ptr<GOutflow> outflow, 
+			std::map<std::string, std::vector<std::shared_ptr<GInflow>>> targetPassOrderedInflowList);
 
 		std::shared_ptr<GCommandList> RendererCommandList;
 
 		std::vector<std::shared_ptr<GInflow>> GlobalInflowList;
 		std::vector<std::shared_ptr<GOutflow>> GlobalOutflowList;
+
+		std::vector<std::shared_ptr<GFlowChain>> StaticFlowChainList;
+		std::vector<std::shared_ptr<GFlowChain>> DynamicFlowChainList;
+		bool IsCompiled = false;
 	};
 
-	STELLAR_MAKE_DEFAULT_REGISTRY(GRenderer, RendererRegistry)
+	class SRendererRegistry : public SRegistry<GRenderer> 
+	{
+	public: 
+		static void CompileAllRenderer();
+
+		static std::shared_ptr<GRenderer> GetMainInstance() 
+		{
+			return GetInstance(MainInstanceName);
+		}
+	};
 }
 
 #endif

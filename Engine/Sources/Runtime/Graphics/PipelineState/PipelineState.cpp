@@ -4,7 +4,7 @@
 
 namespace SE
 {
-	GPipelineState::GPipelineState()
+	GPipelineState::GPipelineState() : SAddressable()
 	{
 		this->RootSignature = std::make_shared<GRootSignature>();
 		this->IsInitialized = false;
@@ -15,7 +15,7 @@ namespace SE
 		this->SetName(name);
 	}
 
-	GPipelineState::GPipelineState(const GPipelineState& other)
+	GPipelineState::GPipelineState(const GPipelineState& other) : SAddressable(other)
 	{
 		this->PipelineStateInstance = other.PipelineStateInstance;
 
@@ -203,14 +203,143 @@ namespace SE
 
 	void SPipelineStateRegistry::InitializeRegistry()
 	{
+		std::vector<GRootParameter> LightingRootParameterList;
+
+		GRootParameter AlbedoParameter;
+		AlbedoParameter.ParameterType = GRootParameter::SE_PARAMETER_SRV;
+		AlbedoParameter.DescriptorCount = 1;
+		AlbedoParameter.ShaderRegisterIndex = 0;
+		LightingRootParameterList.push_back(AlbedoParameter);
+
+		GRootParameter MetallicParameter;
+		MetallicParameter.ParameterType = GRootParameter::SE_PARAMETER_SRV;
+		MetallicParameter.DescriptorCount = 1;
+		MetallicParameter.ShaderRegisterIndex = 1;
+		LightingRootParameterList.push_back(MetallicParameter);
+
+		GRootParameter RoughnessParameter;
+		RoughnessParameter.ParameterType = GRootParameter::SE_PARAMETER_SRV;
+		RoughnessParameter.DescriptorCount = 1;
+		RoughnessParameter.ShaderRegisterIndex = 2;
+		LightingRootParameterList.push_back(RoughnessParameter);
+
+		GRootParameter NormalParameter;
+		NormalParameter.ParameterType = GRootParameter::SE_PARAMETER_SRV;
+		NormalParameter.DescriptorCount = 1;
+		NormalParameter.ShaderRegisterIndex = 3;
+		LightingRootParameterList.push_back(NormalParameter);
+
+
+		GStaticSamplerDescription DefaultSampler;
+		DefaultSampler.ShaderRegister = 0;
+		DefaultSampler.Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;
+		DefaultSampler.AddressU = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+		DefaultSampler.AddressV = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+		DefaultSampler.AddressW = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+
 		// TO DO: Implement all the pipeline state which is needed.
+
+		{
+			auto AlbedoPipelineState = GPipelineState::Create(GRenderGroup::ALBEDO_GROUP);
+
+			AlbedoPipelineState->AddShader(GShader::Create(GShader::SE_VERTEX_SHADER, "Engine/Shaders/AlbedoVS.seshader"));
+			AlbedoPipelineState->AddShader(GShader::Create(GShader::SE_PIXEL_SHADER, "Engine/Shaders/AlbedoPS.seshader"));
+
+			AlbedoPipelineState->SetTopology(GTopology::Create(GTopology::SE_TOPOLOGY_TRIANGLELIST));
+
+			AlbedoPipelineState->SetRasterizerState(GPipelineState::RasterizerState(D3D12_CULL_MODE_BACK, D3D12_FILL_MODE_SOLID));
+
+			D3D12_INPUT_ELEMENT_DESC AlbedoInputLayout[] =
+			{
+				{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
+				{"TEXTURECOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
+			};
+			AlbedoPipelineState->SetInputLayout(GPipelineState::InputLayout(AlbedoInputLayout, ARRAYSIZE(AlbedoInputLayout)));
+
+			AlbedoPipelineState->GetRootSignature()->AddParameter(AlbedoParameter);
+			AlbedoPipelineState->GetRootSignature()->AddSamplerDescription(DefaultSampler);
+
+			AlbedoPipelineState->Initialize();
+			Register(AlbedoPipelineState);
+		}
+
+		{
+			auto MetallicPipelineState = GPipelineState::Create(GRenderGroup::METALLIC_GROUP);
+
+			MetallicPipelineState->AddShader(GShader::Create(GShader::SE_VERTEX_SHADER, "Engine/Shaders/MetallicVS.seshader"));
+			MetallicPipelineState->AddShader(GShader::Create(GShader::SE_PIXEL_SHADER, "Engine/Shaders/MetallicPS.seshader"));
+
+			MetallicPipelineState->SetTopology(GTopology::Create(GTopology::SE_TOPOLOGY_TRIANGLELIST));
+
+			MetallicPipelineState->SetRasterizerState(GPipelineState::RasterizerState(D3D12_CULL_MODE_BACK, D3D12_FILL_MODE_SOLID));
+
+			D3D12_INPUT_ELEMENT_DESC MetallicInputLayout[] =
+			{
+				{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
+				{"TEXTURECOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
+			};
+			MetallicPipelineState->SetInputLayout(GPipelineState::InputLayout(MetallicInputLayout, ARRAYSIZE(MetallicInputLayout)));
+
+			MetallicPipelineState->GetRootSignature()->AddParameter(MetallicParameter);
+			MetallicPipelineState->GetRootSignature()->AddSamplerDescription(DefaultSampler);
+
+			MetallicPipelineState->Initialize();
+			Register(MetallicPipelineState);
+		}
+
+		{
+			auto RoughnessPipelineState = GPipelineState::Create(GRenderGroup::ROUGHNESS_GROUP);
+
+			RoughnessPipelineState->AddShader(GShader::Create(GShader::SE_VERTEX_SHADER, "Engine/Shaders/RoughnessVS.seshader"));
+			RoughnessPipelineState->AddShader(GShader::Create(GShader::SE_PIXEL_SHADER, "Engine/Shaders/RoughnessPS.seshader"));
+
+			RoughnessPipelineState->SetTopology(GTopology::Create(GTopology::SE_TOPOLOGY_TRIANGLELIST));
+
+			RoughnessPipelineState->SetRasterizerState(GPipelineState::RasterizerState(D3D12_CULL_MODE_BACK, D3D12_FILL_MODE_SOLID));
+
+			D3D12_INPUT_ELEMENT_DESC RoughnessInputLayout[] =
+			{
+				{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
+				{"TEXTURECOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
+			};
+			RoughnessPipelineState->SetInputLayout(GPipelineState::InputLayout(RoughnessInputLayout, ARRAYSIZE(RoughnessInputLayout)));
+
+			RoughnessPipelineState->GetRootSignature()->AddParameter(RoughnessParameter);
+			RoughnessPipelineState->GetRootSignature()->AddSamplerDescription(DefaultSampler);
+
+			RoughnessPipelineState->Initialize();
+			Register(RoughnessPipelineState);
+		}
+
+		{
+			auto NormalPipelineState = GPipelineState::Create(GRenderGroup::NORMAL_GROUP);
+
+			NormalPipelineState->AddShader(GShader::Create(GShader::SE_VERTEX_SHADER, "Engine/Shaders/NormalVS.seshader"));
+			NormalPipelineState->AddShader(GShader::Create(GShader::SE_PIXEL_SHADER, "Engine/Shaders/NormalPS.seshader"));
+
+			NormalPipelineState->SetTopology(GTopology::Create(GTopology::SE_TOPOLOGY_TRIANGLELIST));
+
+			NormalPipelineState->SetRasterizerState(GPipelineState::RasterizerState(D3D12_CULL_MODE_BACK, D3D12_FILL_MODE_SOLID));
+
+			D3D12_INPUT_ELEMENT_DESC NormalInputLayout[] =
+			{
+				{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
+				{"TEXTURECOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
+			};
+			NormalPipelineState->SetInputLayout(GPipelineState::InputLayout(NormalInputLayout, ARRAYSIZE(NormalInputLayout)));
+
+			NormalPipelineState->GetRootSignature()->AddParameter(NormalParameter);
+			NormalPipelineState->GetRootSignature()->AddSamplerDescription(DefaultSampler);
+
+			NormalPipelineState->Initialize();
+			Register(NormalPipelineState);
+		}
 
 		{
 			auto LightingPipelineState = GPipelineState::Create(GRenderGroup::LIGHTING_GROUP);
 
 			LightingPipelineState->AddShader(GShader::Create(GShader::SE_VERTEX_SHADER, "Engine/Shaders/LightingVS.seshader"));
 			LightingPipelineState->AddShader(GShader::Create(GShader::SE_PIXEL_SHADER, "Engine/Shaders/LightingPS.seshader"));
-
 		}
 	}
 }

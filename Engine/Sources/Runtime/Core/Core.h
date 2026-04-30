@@ -10,6 +10,7 @@
 #include <format>
 #include <algorithm>
 #include <filesystem>
+#include <random>
 
 #include <GLFW/glfw3.h>
 #ifdef SE_PLATFORM_WINDOWS

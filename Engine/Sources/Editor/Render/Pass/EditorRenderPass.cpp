@@ -87,6 +87,15 @@ namespace SE
 
 			ImGui::End();
 		}
+
+		{
+			ImGui::Begin("Albedo");
+
+			ImGui::Image((ImTextureID)SFramebufferRegistry::GetInstance("GBufferFramebuffer")->GetRTShaderResourceView(0)->GetGPUDescriptor().ptr,
+				ImVec2(1600, 900));
+
+			ImGui::End();
+		}
 		
 		ImGui::End();
 

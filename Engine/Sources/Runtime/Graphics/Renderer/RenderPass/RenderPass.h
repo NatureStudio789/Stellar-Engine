@@ -2,8 +2,7 @@
 #define _SE_RENDERPASS_H_
 #include "../../Context/GraphicsContext.h"
 #include "../../ContextDependent/ContextDependent.h"
-#include "../Flow/Inflow.h"
-#include "../Flow/Outflow.h"
+#include "../Flow/FlowChain.h"
 #include "../ResourcePackage/ResourcePackage.h"
 
 namespace SE

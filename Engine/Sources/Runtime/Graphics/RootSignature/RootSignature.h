@@ -15,6 +15,8 @@ namespace SE
 		~GRootSignature();
 
 		unsigned int AddParameter(const GRootParameter& parameter);
+		unsigned int AttachParameterList(const std::vector<GRootParameter>& parameterList);
+		void SetParameterList(const std::vector<GRootParameter>& parameterList);
 		unsigned int AddSamplerDescription(const GStaticSamplerDescription& description);
 		void Initialize();
 

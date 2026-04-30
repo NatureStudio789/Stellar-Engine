@@ -9,9 +9,13 @@ namespace SE
 
 	}
 
-	GClearPass::GClearPass(const std::string& name) : GRenderPass(name)
+	GClearPass::GClearPass(const std::string& name, std::vector<unsigned int> multipleRenderTargetClearingList) : GRenderPass(name)
 	{
-		
+		auto& FramebufferInflow = GInflow::Create("ClearingFramebuffer", this->ClearingFramebufferPackage);
+		this->AddInflow(FramebufferInflow);
+		this->AddOutflow(GOutflow::Create("ClearingFramebuffer", FramebufferInflow));
+
+		this->MultipleRenderTargetClearingList = multipleRenderTargetClearingList;
 	}
 
 	GClearPass::GClearPass(const GClearPass & other)
@@ -28,8 +32,26 @@ namespace SE
 	{
 		auto& Framebuffer = SFramebufferRegistry::GetInstance(this->ClearingFramebufferPackage.GetResourceIdentifier().GetUUID()); 
 		
-		Framebuffer->Begin();
-		Framebuffer->Clear({ 0.1f, 0.1f, 0.1f, 1.0f });
-		Framebuffer->End();
+		SCommandListRegistry::GetCurrentInstance()->Open();
+
+		if (this->MultipleRenderTargetClearingList.empty())
+		{
+			Framebuffer->Begin();
+			Framebuffer->Clear({ 0.1f, 0.1f, 0.1f, 1.0f });
+			Framebuffer->End();
+		}
+		else
+		{
+			for (const auto index : this->MultipleRenderTargetClearingList)
+			{
+				Framebuffer->SetCurrentBuffer(index);
+
+				Framebuffer->Begin();
+				Framebuffer->Clear({ 0.1f, 0.1f, 0.1f, 1.0f });
+				Framebuffer->End();
+			}
+		}
+
+		SCommandListRegistry::GetCurrentInstance()->Close();
 	}
 }

@@ -116,6 +116,7 @@ namespace SE
 			}
 		}
 
+		inflow->BelongingPassName = this->RenderPassName;
 		this->InflowList.push_back(inflow);
 	}
 
@@ -131,6 +132,7 @@ namespace SE
 			}
 		}
 
+		outflow->BelongingPassName = this->RenderPassName;
 		this->OutflowList.push_back(outflow);
 	}
 

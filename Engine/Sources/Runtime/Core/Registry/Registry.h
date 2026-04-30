@@ -66,7 +66,7 @@ namespace SE
 	template<typename RegType>
 	inline std::shared_ptr<RegType> SRegistry<RegType>::GetInstance(SUUID uuid)
 	{
-		if (RegisteredInstanceList.count(uuid) < 0)
+		if (RegisteredInstanceList.count(uuid) <= 0)
 		{
 			SMessageHandler::Instance->SetFatal("Core",
 				std::format("No instance with id : '{}' found in registry!", (const std::string&)uuid));

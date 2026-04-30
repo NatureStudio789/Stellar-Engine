@@ -20,6 +20,8 @@ namespace SE
 		void Apply(std::shared_ptr<GOutflow> outflow);
 
 		const std::string& GetName() const noexcept;
+		const bool& GetLinked() const noexcept;
+		const std::string& GetBelongingPassName() const noexcept;
 		const std::string& GetTargetPassName() const noexcept;
 		const std::string& GetLinkingOutflowName() const noexcept;
 
@@ -27,11 +29,23 @@ namespace SE
 		static void CheckNameAvailable(const std::string& name);
 
 		std::string InflowName;
+		bool IsLinked;
+		std::string BelongingPassName;
 
 		std::string TargetPassName;
 		std::string LinkingOutflowName;
 
+		bool IsSource;
+		/* This is for the name of the outflow which requires resource package of this inflow 
+		when this inflow is source.*/
+		std::string TargetOutflowOfSource;
+
 		GResourcePackage& ResourcePackage;
+
+		friend class GRenderPass;
+		friend class GFlowChain;
+		friend class GOutflow;
+		friend class GRenderer;
 	};
 
 	/* Description of Inflow and Outflow System :
