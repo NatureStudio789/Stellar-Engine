@@ -1,7 +1,10 @@
 #ifndef _SE_DEFERREDRENDERER_H_
 #define _SE_DEFERREDRENDERER_H_
-#include "RenderPass/DeferredRendering/AlbedoPass.h"
 #include "RenderPass/ClearPass.h"
+#include "RenderPass/DeferredRendering/AlbedoPass.h"
+#include "RenderPass/DeferredRendering/MetallicPass.h"
+#include "RenderPass/DeferredRendering/RoughnessPass.h"
+#include "RenderPass/DeferredRendering/NormalPass.h"
 #include "Renderer.h"
 
 namespace SE

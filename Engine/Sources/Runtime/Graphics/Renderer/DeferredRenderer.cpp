@@ -26,6 +26,27 @@ namespace SE
             this->AppendRenderPass(AlbedoPass);
         }
 
+        //{
+        //    auto MetallicPass = std::make_shared<GMetallicPass>("MetallicBuffer");
+        //    MetallicPass->SetLinkage("GBufferFramebuffer", "AlbedoBuffer.GBufferFramebuffer");
+
+        //    this->AppendRenderPass(MetallicPass);
+        //}
+
+        //{
+        //    auto RoughnessPass = std::make_shared<GRoughnessPass>("RoughnessBuffer");
+        //    RoughnessPass->SetLinkage("GBufferFramebuffer", "MetallicBuffer.GBufferFramebuffer");
+
+        //    this->AppendRenderPass(RoughnessPass);
+        //}
+
+        //{
+        //    auto NormalPass = std::make_shared<GNormalPass>("NormalBuffer");
+        //    NormalPass->SetLinkage("GBufferFramebuffer", "RoughnessBuffer.GBufferFramebuffer");
+
+        //    this->AppendRenderPass(NormalPass);
+        //}
+
         this->Activate();
     }
 }

@@ -9,7 +9,7 @@ namespace SE
 	{
 	public:
 		GIndexBuffer();
-		GIndexBuffer(void* bufferData, unsigned int dataSize, unsigned int dataStride);
+		GIndexBuffer(unsigned int* bufferData, unsigned int dataSize);
 		GIndexBuffer(const GIndexBuffer& other);
 
 		void Apply() override;

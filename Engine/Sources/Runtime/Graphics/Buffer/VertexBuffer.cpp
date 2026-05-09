@@ -29,7 +29,7 @@ namespace SE
 		VertexBufferView.StrideInBytes = this->DataStride;
 
 		SCommandListRegistry::GetCurrentInstance()->GetInstance()->
-			IASetVertexBuffers(1, 1, &VertexBufferView);
+			IASetVertexBuffers(0, 1, &VertexBufferView);
 	}
 
 	const unsigned int& GVertexBuffer::GetVerticesCount() const noexcept

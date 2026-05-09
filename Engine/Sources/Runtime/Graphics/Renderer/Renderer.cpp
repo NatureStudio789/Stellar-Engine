@@ -142,19 +142,19 @@ namespace SE
 
 		SCommandListRegistry::SetCurrentInstance(this->GetName());
 
+		this->RendererCommandList->Open();
+
 		for (auto& renderPass : this->RenderPassList)
 		{
 			renderPass->Execute();
 		}
 
+		this->RendererCommandList->Close();
+
 		for (auto& dynamicFlowChain : this->DynamicFlowChainList)
 		{
 			dynamicFlowChain->Link();
 		}
-
-		this->GetContext()->ExecuteCommandLists({ this->RendererCommandList->GetInstance().Get() });
-
-		this->GetContext()->Flush();
 	}
 
 	void GRenderer::SetInflowTarget(const std::string& inflowName, const std::string& target)

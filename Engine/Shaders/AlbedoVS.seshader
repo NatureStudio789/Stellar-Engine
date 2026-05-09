@@ -1,5 +1,22 @@
-float4 main() : SV_Position
+struct Input
 {
+    float3 Position : POSITION;
+    float2 TextureCoord : TEXTURECOORD;
+    float3 Normal : NORMAL;
+};
 
-    return float4(1.0f, 1.0f, 1.0f, 1.0f);
+struct Output
+{
+    float4 Position : SV_POSITION;
+    float2 TextureCoord : TEXTURECOORD;
+};
+
+Output main(Input input)
+{
+    Output output;
+
+    output.Position = float4(input.Position, 1.0f);
+    output.TextureCoord = input.TextureCoord;
+
+    return output;
 }

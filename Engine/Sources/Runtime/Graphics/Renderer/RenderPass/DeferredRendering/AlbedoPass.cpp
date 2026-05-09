@@ -30,7 +30,9 @@ namespace SE
 	{
 		this->RenderPassName = name;
 
-		this->AddInflow(GInflow::Create("GBufferFramebuffer", this->FramebufferPackage));
+		auto& GBufferInflow = GInflow::Create("GBufferFramebuffer", this->FramebufferPackage);
+		this->AddInflow(GBufferInflow);
+		this->AddOutflow(GOutflow::Create("GBufferFramebuffer", GBufferInflow));
 
 		this->AddApplicable(SPipelineStateRegistry::GetInstance(GRenderGroup::ALBEDO_GROUP));
 	}

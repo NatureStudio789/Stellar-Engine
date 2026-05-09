@@ -98,7 +98,7 @@ namespace SE
 		STELLAR_CLEAR_MEMORY(PipelineStateDesc);
 
 		PipelineStateDesc.pRootSignature = this->RootSignature->GetInstance().Get();
-		PipelineStateDesc.InputLayout = { this->InputLayoutInstance.InputElementList, this->InputLayoutInstance.ElementCount };
+		PipelineStateDesc.InputLayout = { this->InputLayoutInstance.InputElementList.data(), (UINT)this->InputLayoutInstance.InputElementList.size()};
 
 		PipelineStateDesc.VS =
 		{
@@ -249,12 +249,13 @@ namespace SE
 
 			AlbedoPipelineState->SetRasterizerState(GPipelineState::RasterizerState(D3D12_CULL_MODE_BACK, D3D12_FILL_MODE_SOLID));
 
-			D3D12_INPUT_ELEMENT_DESC AlbedoInputLayout[] =
+			std::vector<D3D12_INPUT_ELEMENT_DESC> AlbedoInputLayout =
 			{
 				{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
 				{"TEXTURECOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
+				{"NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 20, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
 			};
-			AlbedoPipelineState->SetInputLayout(GPipelineState::InputLayout(AlbedoInputLayout, ARRAYSIZE(AlbedoInputLayout)));
+			AlbedoPipelineState->SetInputLayout(GPipelineState::InputLayout(AlbedoInputLayout));
 
 			AlbedoPipelineState->GetRootSignature()->AddParameter(AlbedoParameter);
 			AlbedoPipelineState->GetRootSignature()->AddSamplerDescription(DefaultSampler);
@@ -273,12 +274,13 @@ namespace SE
 
 			MetallicPipelineState->SetRasterizerState(GPipelineState::RasterizerState(D3D12_CULL_MODE_BACK, D3D12_FILL_MODE_SOLID));
 
-			D3D12_INPUT_ELEMENT_DESC MetallicInputLayout[] =
+			std::vector<D3D12_INPUT_ELEMENT_DESC> MetallicInputLayout =
 			{
 				{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
 				{"TEXTURECOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
+				{"NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 20, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
 			};
-			MetallicPipelineState->SetInputLayout(GPipelineState::InputLayout(MetallicInputLayout, ARRAYSIZE(MetallicInputLayout)));
+			MetallicPipelineState->SetInputLayout(GPipelineState::InputLayout(MetallicInputLayout));
 
 			MetallicPipelineState->GetRootSignature()->AddParameter(MetallicParameter);
 			MetallicPipelineState->GetRootSignature()->AddSamplerDescription(DefaultSampler);
@@ -297,12 +299,13 @@ namespace SE
 
 			RoughnessPipelineState->SetRasterizerState(GPipelineState::RasterizerState(D3D12_CULL_MODE_BACK, D3D12_FILL_MODE_SOLID));
 
-			D3D12_INPUT_ELEMENT_DESC RoughnessInputLayout[] =
+			std::vector<D3D12_INPUT_ELEMENT_DESC> RoughnessInputLayout =
 			{
 				{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
 				{"TEXTURECOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
+				{"NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 20, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
 			};
-			RoughnessPipelineState->SetInputLayout(GPipelineState::InputLayout(RoughnessInputLayout, ARRAYSIZE(RoughnessInputLayout)));
+			RoughnessPipelineState->SetInputLayout(GPipelineState::InputLayout(RoughnessInputLayout));
 
 			RoughnessPipelineState->GetRootSignature()->AddParameter(RoughnessParameter);
 			RoughnessPipelineState->GetRootSignature()->AddSamplerDescription(DefaultSampler);
@@ -321,12 +324,13 @@ namespace SE
 
 			NormalPipelineState->SetRasterizerState(GPipelineState::RasterizerState(D3D12_CULL_MODE_BACK, D3D12_FILL_MODE_SOLID));
 
-			D3D12_INPUT_ELEMENT_DESC NormalInputLayout[] =
+			std::vector<D3D12_INPUT_ELEMENT_DESC> NormalInputLayout =
 			{
 				{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
 				{"TEXTURECOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
+				{"NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 20, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
 			};
-			NormalPipelineState->SetInputLayout(GPipelineState::InputLayout(NormalInputLayout, ARRAYSIZE(NormalInputLayout)));
+			NormalPipelineState->SetInputLayout(GPipelineState::InputLayout(NormalInputLayout));
 
 			NormalPipelineState->GetRootSignature()->AddParameter(NormalParameter);
 			NormalPipelineState->GetRootSignature()->AddSamplerDescription(DefaultSampler);

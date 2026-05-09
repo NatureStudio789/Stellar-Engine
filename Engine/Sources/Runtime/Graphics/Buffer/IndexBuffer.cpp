@@ -9,8 +9,8 @@ namespace SE
 
 	}
 
-	GIndexBuffer::GIndexBuffer(void* bufferData, 
-		unsigned int dataSize, unsigned int dataStride) : GBuffer(bufferData, dataSize, dataStride)
+	GIndexBuffer::GIndexBuffer(unsigned int* bufferData, unsigned int dataSize) : 
+		GBuffer((void*)bufferData, dataSize, (unsigned int)sizeof(unsigned int))
 	{
 		
 	}

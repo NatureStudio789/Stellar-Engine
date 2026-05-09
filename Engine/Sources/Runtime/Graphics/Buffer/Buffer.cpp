@@ -51,7 +51,7 @@ namespace SE
 			D3D12_RESOURCE_STATE_COMMON, null, __uuidof(ID3D12Resource), (void**)this->GPUBuffer.GetAddressOf()));
 
 		SMessageHandler::Instance->Check(this->GetDeviceInstance()->CreateCommittedResource(
-			&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT), D3D12_HEAP_FLAG_NONE,
+			&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD), D3D12_HEAP_FLAG_NONE,
 			&CD3DX12_RESOURCE_DESC::Buffer((UINT64)(this->DataSize * this->DataStride)),
 			D3D12_RESOURCE_STATE_GENERIC_READ, null, __uuidof(ID3D12Resource), (void**)this->UploadBuffer.GetAddressOf()));
 

@@ -25,6 +25,20 @@ namespace SE
 	GFramebuffer::GFramebuffer(const GFramebuffer& other) : SAddressable(other)
 	{
 		this->Size = other.Size;
+
+		this->IsPresentingFramebuffer = other.IsPresentingFramebuffer;
+		this->RTBufferSwapChain = other.RTBufferSwapChain;
+
+		this->RenderTargetBufferList = other.RenderTargetBufferList;
+		this->RTShaderResourceViewList = other.RTShaderResourceViewList;
+		this->CurrentBufferIndex = other.CurrentBufferIndex;
+		this->RTVDescriptorHandle = other.RTVDescriptorHandle;
+
+		this->DepthStencilBuffer = other.DepthStencilBuffer;
+		this->DSVDescriptorHandle = other.DSVDescriptorHandle;
+
+		this->ViewportInstance = other.ViewportInstance;
+		this->ViewportScissorRect = other.ViewportScissorRect;
 	}
 
 	GFramebuffer::~GFramebuffer()

@@ -1,5 +1,6 @@
 #ifndef _SE_RENDERTECHNIQUE_H_
 #define _SE_RENDERTECHNIQUE_H_
+#include "../../../Core/Registry/Registry.h"
 #include "../RenderStage/RenderStage.h"
 
 namespace SE

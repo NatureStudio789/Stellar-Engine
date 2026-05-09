@@ -11,9 +11,8 @@ namespace SE
 
 	void GRenderQueuePass::Execute()
 	{
-		SCommandListRegistry::GetCurrentInstance()->Open();
-
-		this->GetFramebufferInstance(this->FramebufferPackage)->Begin();
+		auto& Framebuffer = this->GetFramebufferInstance(this->FramebufferPackage);
+		Framebuffer->Begin();
 
 		this->GetContext()->ApplyDescriptorHeaps();
 		this->Apply();
@@ -23,9 +22,7 @@ namespace SE
 			task->Execute();
 		}
 
-		this->GetFramebufferInstance(this->FramebufferPackage)->End();
-
-		SCommandListRegistry::GetCurrentInstance()->Close();
+		Framebuffer->End();
 
 		this->TaskList.clear();
 	}

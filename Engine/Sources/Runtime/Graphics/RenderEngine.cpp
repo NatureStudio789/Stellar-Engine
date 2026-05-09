@@ -16,6 +16,8 @@ namespace SE
 
 	void RenderEngine::Initialize()
 	{
+		GRenderConfiguration::InitializeConfiguration();
+
 		this->MainGraphicsContext = GGraphicsContext::Create(
 			SWindowRegistry::GetMainInstance()->GetWindowHandle(),
 			SWindowRegistry::GetMainInstance()->GetWindowSize());
@@ -27,14 +29,50 @@ namespace SE
 		auto& DeferredRenderer = std::make_shared<GDeferredRenderer>("MainDeferredRenderer");
 		DeferredRenderer->Compile();
 		SRendererRegistry::Register(DeferredRenderer);
+
+		{
+			GMeshItem::Data data;
+			data.Vertices =
+			{
+				GMeshItem::Vertex{{0.5f, 0.5f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}},
+				GMeshItem::Vertex{{0.5f, -0.5f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}},
+				GMeshItem::Vertex{{-0.5f, -0.5f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}}
+			};
+			data.Indices = { 0, 1, 2 };
+			this->test = std::make_shared<GMeshItem>("test", data);
+			this->test->LinkTechnique("MainDeferredRenderer");
+		}
+
+		{
+			GMeshItem::Data data;
+			data.Vertices =
+			{
+				GMeshItem::Vertex{{0.5f, 0.5f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}},
+				GMeshItem::Vertex{{-0.5f, -0.5f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}},
+				GMeshItem::Vertex{{-0.5f, 0.5f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}},
+			};
+			data.Indices = { 0, 1, 2 };
+			this->test1 = std::make_shared<GMeshItem>("test1", data);
+			this->test1->LinkTechnique("MainDeferredRenderer");
+		}
 	}
 
 	void RenderEngine::Execute()
 	{
+		this->test->Submit("main");
+		this->test1->Submit("main");
+
 		for (auto& [uuid, renderer] : SRendererRegistry::GetInstanceList())
 		{
 			renderer->Execute();
 		}
+
+		std::vector<ID3D12GraphicsCommandList*> ExecutingCommandList;
+		for (auto& [uuid, commandList] : SCommandListRegistry::GetInstanceList())
+		{
+			ExecutingCommandList.push_back(commandList->GetInstance().Get());
+		}
+		SGraphicsContextRegistry::GetMainInstance()->ExecuteCommandLists(ExecutingCommandList);
 
 		SGraphicsContextRegistry::GetMainInstance()->Present(true);
 	}

@@ -20,15 +20,13 @@ namespace SE
 		struct InputLayout
 		{
 			InputLayout() = default;
-			InputLayout(D3D12_INPUT_ELEMENT_DESC* inputElementList, unsigned int elementCount) :
-				InputElementList(inputElementList), ElementCount(elementCount)
+			InputLayout(std::vector<D3D12_INPUT_ELEMENT_DESC> inputElementList) : InputElementList(inputElementList)
 			{
 
 			}
 			InputLayout(const InputLayout& ) = default;
 
-			D3D12_INPUT_ELEMENT_DESC* InputElementList;
-			unsigned int ElementCount;
+			std::vector<D3D12_INPUT_ELEMENT_DESC> InputElementList;
 		};
 
 		struct RasterizerState

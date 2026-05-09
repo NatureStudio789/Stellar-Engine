@@ -101,7 +101,6 @@ namespace SE
 
 
 		ImGui::Render();
-		SCommandListRegistry::GetCurrentInstance()->Open();
 
 		this->GetFramebufferInstance(this->FramebufferPackage)->Begin();
 		
@@ -120,7 +119,5 @@ namespace SE
 			ImGui::UpdatePlatformWindows();
 			ImGui::RenderPlatformWindowsDefault(null, (void*)SCommandListRegistry::GetCurrentInstance()->GetInstance().Get());
 		}
-
-		SCommandListRegistry::GetCurrentInstance()->Close();
 	}
 }

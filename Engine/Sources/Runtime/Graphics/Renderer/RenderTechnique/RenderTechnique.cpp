@@ -1,4 +1,5 @@
 #include <Core.h>
+#include "../../RenderConfiguration/RenderConfiguration.h"
 #include "../../../Core/MessageHandler/MessageHandler.h"
 #include "RenderTechnique.h"
 

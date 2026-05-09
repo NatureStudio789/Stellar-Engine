@@ -4,7 +4,7 @@
 
 namespace SE
 {
-	class GRoughessPass : public GRenderPass
+	class GRoughnessPass : public GRenderPass
 	{
 
 	};

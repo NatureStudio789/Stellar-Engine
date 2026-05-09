@@ -32,8 +32,6 @@ namespace SE
 	{
 		auto& Framebuffer = SFramebufferRegistry::GetInstance(this->ClearingFramebufferPackage.GetResourceIdentifier().GetUUID()); 
 		
-		SCommandListRegistry::GetCurrentInstance()->Open();
-
 		if (this->MultipleRenderTargetClearingList.empty())
 		{
 			Framebuffer->Begin();
@@ -51,7 +49,5 @@ namespace SE
 				Framebuffer->End();
 			}
 		}
-
-		SCommandListRegistry::GetCurrentInstance()->Close();
 	}
 }
