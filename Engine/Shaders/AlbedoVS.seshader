@@ -11,11 +11,16 @@ struct Output
     float2 TextureCoord : TEXTURECOORD;
 };
 
+cbuffer Transform : register(b0)
+{
+    float4x4 WorldMatrix;
+};
+
 Output main(Input input)
 {
     Output output;
 
-    output.Position = float4(input.Position, 1.0f);
+    output.Position = mul(float4(input.Position, 1.0f), WorldMatrix);
     output.TextureCoord = input.TextureCoord;
 
     return output;

@@ -7,5 +7,5 @@ struct Input
 float4 main(Input input) : SV_Target
 {
 
-    return float4(1.0f, 1.0f, 1.0f, 1.0f);
+    return float4(input.TextureCoord, 1.0f, 1.0f);
 }

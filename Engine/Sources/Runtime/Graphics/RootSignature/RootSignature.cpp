@@ -82,6 +82,18 @@ namespace SE
 
 	void GRootSignature::Initialize()
 	{
+		std::vector<CD3DX12_DESCRIPTOR_RANGE> ShaderResourceViewTableList;
+		for (auto& parameter : this->ParameterList)
+		{
+			CD3DX12_DESCRIPTOR_RANGE ShaderResourceViewTable;
+
+			if (parameter.ParameterType == GRootParameter::SE_PARAMETER_SRV)
+			{
+				ShaderResourceViewTable.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, parameter.DescriptorCount, parameter.ShaderRegisterIndex);
+				ShaderResourceViewTableList.push_back(ShaderResourceViewTable);
+			}
+		}
+
 		std::vector<CD3DX12_ROOT_PARAMETER> D3DParameterList;
 		for (const auto& parameter : this->ParameterList)
 		{
@@ -98,10 +110,7 @@ namespace SE
 
 				case GRootParameter::SE_PARAMETER_SRV:
 				{
-					CD3DX12_DESCRIPTOR_RANGE ShaderResourceViewTable;
-					ShaderResourceViewTable.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, parameter.DescriptorCount, parameter.ShaderRegisterIndex);
-
-					Parameter.InitAsDescriptorTable(1, &ShaderResourceViewTable);
+					Parameter.InitAsDescriptorTable(1, &ShaderResourceViewTableList[parameter.ShaderRegisterIndex], D3D12_SHADER_VISIBILITY_PIXEL);
 					break;
 				}
 			}

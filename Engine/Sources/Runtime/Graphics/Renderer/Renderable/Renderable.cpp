@@ -54,12 +54,29 @@ namespace SE
 
 	void GRenderable::AddRenderTechnique(std::shared_ptr<GRenderTechnique> technique)
 	{
+		technique->SetParent(*this);
+
 		this->RenderTechniqueList.push_back(technique);
 	}
 
 	void GRenderable::SetRenderTechniqueList(std::vector<std::shared_ptr<GRenderTechnique>> techniqueList)
 	{
 		this->RenderTechniqueList = techniqueList;
+
+		for (auto& technique : this->RenderTechniqueList)
+		{
+			technique->SetParent(*this);
+		}
+	}
+
+	void GRenderable::SetTransform(const STransform& transform)
+	{
+		this->RenderableTransform = transform;
+	}
+
+	void GRenderable::SetAccumulatedMatrix(const glm::mat4x4& matrix)
+	{
+		this->AccumulatedMatrix = matrix;
 	}
 
 	void GRenderable::Apply()
@@ -122,5 +139,15 @@ namespace SE
 	bool GRenderable::HasIndexBuffer() const noexcept
 	{
 		return this->IndexBuffer != null;
+	}
+
+	const STransform& GRenderable::GetTransform() const noexcept
+	{
+		return this->RenderableTransform;
+	}
+
+	const glm::mat4x4& GRenderable::GetAccumulatedMatrix() const noexcept
+	{
+		return this->AccumulatedMatrix;
 	}
 }

@@ -205,6 +205,12 @@ namespace SE
 	{
 		std::vector<GRootParameter> LightingRootParameterList;
 
+		GRootParameter TransformParameter;
+		TransformParameter.ParameterType = GRootParameter::SE_PARAMETER_CBV;
+		TransformParameter.DescriptorCount = 1;
+		TransformParameter.ShaderRegisterIndex = 0;
+		LightingRootParameterList.push_back(TransformParameter);
+
 		GRootParameter AlbedoParameter;
 		AlbedoParameter.ParameterType = GRootParameter::SE_PARAMETER_SRV;
 		AlbedoParameter.DescriptorCount = 1;
@@ -257,7 +263,7 @@ namespace SE
 			};
 			AlbedoPipelineState->SetInputLayout(GPipelineState::InputLayout(AlbedoInputLayout));
 
-			AlbedoPipelineState->GetRootSignature()->AddParameter(AlbedoParameter);
+			AlbedoPipelineState->GetRootSignature()->SetParameterList(LightingRootParameterList);
 			AlbedoPipelineState->GetRootSignature()->AddSamplerDescription(DefaultSampler);
 
 			AlbedoPipelineState->Initialize();
@@ -282,7 +288,7 @@ namespace SE
 			};
 			MetallicPipelineState->SetInputLayout(GPipelineState::InputLayout(MetallicInputLayout));
 
-			MetallicPipelineState->GetRootSignature()->AddParameter(MetallicParameter);
+			MetallicPipelineState->GetRootSignature()->SetParameterList(LightingRootParameterList);
 			MetallicPipelineState->GetRootSignature()->AddSamplerDescription(DefaultSampler);
 
 			MetallicPipelineState->Initialize();
@@ -307,7 +313,7 @@ namespace SE
 			};
 			RoughnessPipelineState->SetInputLayout(GPipelineState::InputLayout(RoughnessInputLayout));
 
-			RoughnessPipelineState->GetRootSignature()->AddParameter(RoughnessParameter);
+			RoughnessPipelineState->GetRootSignature()->SetParameterList(LightingRootParameterList);
 			RoughnessPipelineState->GetRootSignature()->AddSamplerDescription(DefaultSampler);
 
 			RoughnessPipelineState->Initialize();
@@ -332,7 +338,7 @@ namespace SE
 			};
 			NormalPipelineState->SetInputLayout(GPipelineState::InputLayout(NormalInputLayout));
 
-			NormalPipelineState->GetRootSignature()->AddParameter(NormalParameter);
+			NormalPipelineState->GetRootSignature()->SetParameterList(LightingRootParameterList);
 			NormalPipelineState->GetRootSignature()->AddSamplerDescription(DefaultSampler);
 
 			NormalPipelineState->Initialize();

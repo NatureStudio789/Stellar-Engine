@@ -81,14 +81,6 @@ namespace SE
 		ImGui::DockSpace(ImGui::GetID("MyDockspace"));
 
 		{
-			ImGui::Begin("Texture");
-
-			ImGui::Image((ImTextureID)this->texture->GetGPUDescriptor().ptr, ImVec2(540, 631));
-
-			ImGui::End();
-		}
-
-		{
 			ImGui::Begin("Albedo");
 
 			ImGui::Image((ImTextureID)SFramebufferRegistry::GetInstance("GBufferFramebuffer")->GetRTShaderResourceView(0)->GetGPUDescriptor().ptr,

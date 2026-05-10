@@ -44,6 +44,7 @@ namespace SE
 			auto& AlbedoStage = std::make_shared<GRenderStage>("AlbedoBuffer");
 
 			// Add applicable to stages;
+			AlbedoStage->AddApplicable(GTransformCBuffer::Create(GRenderGroup::ALBEDO_GROUP, 0));
 
 			LightingTechnique->AddRenderStage(AlbedoStage);
 

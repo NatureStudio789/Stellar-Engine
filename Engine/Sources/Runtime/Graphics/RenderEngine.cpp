@@ -34,12 +34,14 @@ namespace SE
 			GMeshItem::Data data;
 			data.Vertices =
 			{
-				GMeshItem::Vertex{{0.5f, 0.5f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}},
-				GMeshItem::Vertex{{0.5f, -0.5f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}},
-				GMeshItem::Vertex{{-0.5f, -0.5f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}}
+				GMeshItem::Vertex{{0.5f, 0.5f, 0.0f}, {1.0f, 0.0f}, {0.0f, 0.0f, 0.0f}},
+				GMeshItem::Vertex{{0.5f, -0.5f, 0.0f}, {1.0f, 1.0f}, {0.0f, 0.0f, 0.0f}},
+				GMeshItem::Vertex{{-0.5f, -0.5f, 0.0f}, {0.0f, 1.0f}, {0.0f, 0.0f, 0.0f}}
 			};
 			data.Indices = { 0, 1, 2 };
 			this->test = std::make_shared<GMeshItem>("test", data);
+
+			this->test->SetTransform({ glm::vec3{0.2f, 0.0f, 0.0f}, glm::quat{}, glm::vec3{1.0f, 1.0f, 1.0f} });
 			this->test->LinkTechnique("MainDeferredRenderer");
 		}
 
@@ -47,12 +49,14 @@ namespace SE
 			GMeshItem::Data data;
 			data.Vertices =
 			{
-				GMeshItem::Vertex{{0.5f, 0.5f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}},
-				GMeshItem::Vertex{{-0.5f, -0.5f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}},
+				GMeshItem::Vertex{{0.5f, 0.5f, 0.0f}, {1.0f, 0.0f}, {0.0f, 0.0f, 0.0f}},
+				GMeshItem::Vertex{{-0.5f, -0.5f, 0.0f}, {0.0f, 1.0f}, {0.0f, 0.0f, 0.0f}},
 				GMeshItem::Vertex{{-0.5f, 0.5f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}},
 			};
 			data.Indices = { 0, 1, 2 };
 			this->test1 = std::make_shared<GMeshItem>("test1", data);
+
+			this->test1->SetTransform({ glm::vec3{-0.2f, 0.0f, 0.0f}, glm::quat{}, glm::vec3{1.0f, 1.0f, 1.0f} });
 			this->test1->LinkTechnique("MainDeferredRenderer");
 		}
 	}

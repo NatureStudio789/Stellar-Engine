@@ -78,7 +78,7 @@ namespace SE
 			&CD3DX12_RESOURCE_DESC::Buffer(this->DataSize), D3D12_RESOURCE_STATE_GENERIC_READ, null,
 			__uuidof(ID3D12Resource), (void**)this->UploadBuffer.GetAddressOf()));
 
-		SMessageHandler::Instance->Check(this->UploadBuffer->Map(0, null, (void**)this->MappedData));
+		SMessageHandler::Instance->Check(this->UploadBuffer->Map(0, null, (void**)&this->MappedData));
 	}
 
 	template<typename DataType>
@@ -92,9 +92,40 @@ namespace SE
 	template<typename DataType>
 	inline void GConstantBuffer<DataType>::Apply()
 	{
-		SCommandListRegistry::GetCurrentInstance()->GetInstance()->SetGraphicsRootDescriptorTable(
+		SCommandListRegistry::GetCurrentInstance()->GetInstance()->SetGraphicsRootConstantBufferView(
 			this->RootParameterIndex, this->UploadBuffer->GetGPUVirtualAddress());
 	}
+
+
+	struct GTransformCBData
+	{
+		GTransformCBData()
+		{
+			this->WorldMatrix = glm::mat4x4(1.0f);
+		}
+		GTransformCBData(const glm::mat4x4& matrix)
+		{
+			this->WorldMatrix = matrix;
+		}
+
+		glm::mat4x4 WorldMatrix;
+	};
+
+	class GTransformCBuffer : public GConstantBuffer<GTransformCBData>, public SCreatable<GTransformCBuffer>
+	{
+	public:
+		GTransformCBuffer();
+		GTransformCBuffer(const std::string& renderGroupName, unsigned int shaderRegisterIndex);
+		GTransformCBuffer(const GTransformCBuffer& other);
+		~GTransformCBuffer() override;
+
+		void SetParent(const GRenderable& parent) override;
+
+		void Apply() override;
+
+	private:
+		const GRenderable* Parent;
+	};
 }
 
 #endif

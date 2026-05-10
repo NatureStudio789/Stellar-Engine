@@ -1,6 +1,7 @@
 #ifndef _SE_MESHITEM_H_
 #define _SE_MESHITEM_H_
 #include "../../RenderTechnique/RenderTechnique.h"
+#include "../../../Buffer/ConstantBuffer.h"
 #include "../Renderable.h"
 
 namespace SE
