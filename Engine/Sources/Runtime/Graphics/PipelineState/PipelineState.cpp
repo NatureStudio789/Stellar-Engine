@@ -211,6 +211,12 @@ namespace SE
 		TransformParameter.ShaderRegisterIndex = 0;
 		LightingRootParameterList.push_back(TransformParameter);
 
+		GRootParameter MaterialParameter;
+		MaterialParameter.ParameterType = GRootParameter::SE_PARAMETER_CBV;
+		MaterialParameter.DescriptorCount = 1;
+		MaterialParameter.ShaderRegisterIndex = 1;
+		LightingRootParameterList.push_back(MaterialParameter);
+
 		GRootParameter AlbedoParameter;
 		AlbedoParameter.ParameterType = GRootParameter::SE_PARAMETER_SRV;
 		AlbedoParameter.DescriptorCount = 1;

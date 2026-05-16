@@ -1,5 +1,6 @@
 #include <Core.h>
 #include "../../../RenderConfiguration/RenderConfiguration.h"
+#include "../../../Material/Material.h"
 #include "MeshItem.h"
 
 namespace SE
@@ -45,6 +46,7 @@ namespace SE
 
 			// Add applicable to stages;
 			AlbedoStage->AddApplicable(GTransformCBuffer::Create(GRenderGroup::ALBEDO_GROUP, 0));
+			AlbedoStage->AddApplicable(SMaterialRegistry::GetInstance(this->ItemData.MaterialId));
 
 			LightingTechnique->AddRenderStage(AlbedoStage);
 

@@ -101,6 +101,12 @@ namespace SE
 		return RegisteredInstanceList;
 	}
 
+#define STELLAR_MAKE_BLANK_REGISTRY(Type, ClassName)\
+	class S##ClassName : public SRegistry<Type>\
+	{\
+	public:\
+	};
+
 #define STELLAR_MAKE_DEFAULT_REGISTRY(Type, ClassName)\
 	class S##ClassName : public SRegistry<Type>\
 	{\

@@ -27,6 +27,7 @@ namespace SE
 
 			std::vector<Vertex> Vertices;
 			std::vector<unsigned int> Indices;
+			SUUID MaterialId;
 		};
 
 	public:

@@ -2,6 +2,7 @@
 #include "Renderer/Renderer.h"
 #include "Renderer/DeferredRenderer.h"
 #include "PipelineState/PipelineState.h"
+#include "Material/StandardMaterial.h"
 #include "RenderEngine.h"
 
 namespace SE
@@ -30,6 +31,9 @@ namespace SE
 		DeferredRenderer->Compile();
 		SRendererRegistry::Register(DeferredRenderer);
 
+		std::shared_ptr<GStandardMaterial> testmat = std::make_shared<GStandardMaterial>("testmat");
+		SMaterialRegistry::Register(testmat);
+
 		{
 			GMeshItem::Data data;
 			data.Vertices =
@@ -39,6 +43,7 @@ namespace SE
 				GMeshItem::Vertex{{-0.5f, -0.5f, 0.0f}, {0.0f, 1.0f}, {0.0f, 0.0f, 0.0f}}
 			};
 			data.Indices = { 0, 1, 2 };
+			data.MaterialId = testmat->GetUUID();
 			this->test = std::make_shared<GMeshItem>("test", data);
 
 			this->test->SetTransform({ glm::vec3{0.2f, 0.0f, 0.0f}, glm::quat{}, glm::vec3{1.0f, 1.0f, 1.0f} });
@@ -54,6 +59,7 @@ namespace SE
 				GMeshItem::Vertex{{-0.5f, 0.5f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}},
 			};
 			data.Indices = { 0, 1, 2 };
+			data.MaterialId = testmat->GetUUID();
 			this->test1 = std::make_shared<GMeshItem>("test1", data);
 
 			this->test1->SetTransform({ glm::vec3{-0.2f, 0.0f, 0.0f}, glm::quat{}, glm::vec3{1.0f, 1.0f, 1.0f} });

@@ -76,6 +76,9 @@ namespace SE
 
 		this->GetContext()->ExecuteInitialization();
 
+		// Set the texture name in file name in default, which is allowed to be changed after initialization.
+		this->SetName(std::filesystem::path(filePath).stem().string());
+
 		this->Activate();
 	}
 
