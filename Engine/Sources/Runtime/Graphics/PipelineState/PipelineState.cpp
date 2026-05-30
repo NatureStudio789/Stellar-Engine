@@ -217,6 +217,12 @@ namespace SE
 		MaterialParameter.ShaderRegisterIndex = 1;
 		LightingRootParameterList.push_back(MaterialParameter);
 
+		GRootParameter CameraParameter;
+		CameraParameter.ParameterType = GRootParameter::SE_PARAMETER_CBV;
+		CameraParameter.DescriptorCount = 1;
+		CameraParameter.ShaderRegisterIndex = 2;
+		LightingRootParameterList.push_back(CameraParameter);
+
 		GRootParameter AlbedoParameter;
 		AlbedoParameter.ParameterType = GRootParameter::SE_PARAMETER_SRV;
 		AlbedoParameter.DescriptorCount = 1;

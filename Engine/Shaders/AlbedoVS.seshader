@@ -8,6 +8,7 @@ struct Input
 struct Output
 {
     float4 Position : SV_POSITION;
+    float3 WorldPosition : WORLDPOSITION;
     float2 TextureCoord : TEXTURECOORD;
 };
 
@@ -16,11 +17,19 @@ cbuffer Transform : register(b0)
     float4x4 WorldMatrix;
 };
 
+cbuffer Camera : register(b2)
+{
+    float4x4 CameraMatrix;
+};
+
 Output main(Input input)
 {
     Output output;
 
-    output.Position = mul(float4(input.Position, 1.0f), WorldMatrix);
+    float4 WorldPosition = mul(float4(input.Position, 1.0f), WorldMatrix);
+    
+    output.WorldPosition = WorldPosition.xyz;
+    output.Position = mul(WorldPosition, CameraMatrix);
     output.TextureCoord = input.TextureCoord;
 
     return output;

@@ -3,6 +3,7 @@
 #include "Renderer/DeferredRenderer.h"
 #include "PipelineState/PipelineState.h"
 #include "Material/StandardMaterial.h"
+#include "../Function/Input/Keyboard/Keyboard.h"
 #include "RenderEngine.h"
 
 namespace SE
@@ -27,12 +28,21 @@ namespace SE
 
 		SPipelineStateRegistry::InitializeRegistry();
 
+		this->TestCamera = std::make_shared<GCamera>();
+		this->TestCamera->SetName("Test");
+		this->TestCamera->SetPosition(0.0f, 0.0f, 2.0f);
+		this->TestCamera->SetNearZ(0.001f);
+		this->TestCamera->SetFarZ(100.0f);
+		SCameraRegistry::Register(this->TestCamera);
+
 		auto& DeferredRenderer = std::make_shared<GDeferredRenderer>("MainDeferredRenderer");
 		DeferredRenderer->Compile();
+		DeferredRenderer->SetMainCamera(this->TestCamera->GetName());
 		SRendererRegistry::Register(DeferredRenderer);
 
 		std::shared_ptr<GStandardMaterial> testmat = std::make_shared<GStandardMaterial>("testmat");
 		SMaterialRegistry::Register(testmat);
+		testmat->SetAlbedo(GTexture::Create("Engine/Assets/Textures/Background.jpeg", 0, GRenderGroup::ALBEDO_GROUP));
 
 		{
 			GMeshItem::Data data;
@@ -46,7 +56,7 @@ namespace SE
 			data.MaterialId = testmat->GetUUID();
 			this->test = std::make_shared<GMeshItem>("test", data);
 
-			this->test->SetTransform({ glm::vec3{0.2f, 0.0f, 0.0f}, glm::quat{}, glm::vec3{1.0f, 1.0f, 1.0f} });
+			this->test->SetTransform({ glm::vec3{0.0f, 0.0f, 0.0f}, glm::quat{}, glm::vec3{1.0f, 1.0f, 1.0f} });
 			this->test->LinkTechnique("MainDeferredRenderer");
 		}
 
@@ -62,7 +72,7 @@ namespace SE
 			data.MaterialId = testmat->GetUUID();
 			this->test1 = std::make_shared<GMeshItem>("test1", data);
 
-			this->test1->SetTransform({ glm::vec3{-0.2f, 0.0f, 0.0f}, glm::quat{}, glm::vec3{1.0f, 1.0f, 1.0f} });
+			this->test1->SetTransform({ glm::vec3{0.0f, 0.0f, 0.0f}, glm::quat{}, glm::vec3{1.0f, 1.0f, 1.0f} });
 			this->test1->LinkTechnique("MainDeferredRenderer");
 		}
 	}
@@ -71,6 +81,31 @@ namespace SE
 	{
 		this->test->Submit("main");
 		this->test1->Submit("main");
+
+		if (FKeyboard::GetKeyPress('W'))
+		{
+			this->TestCamera->Translate(0.0f, 0.0f, -0.1f);
+		}
+		if (FKeyboard::GetKeyPress('S'))
+		{
+			this->TestCamera->Translate(0.0f, 0.0f, 0.1f);
+		}
+		if (FKeyboard::GetKeyPress('A'))
+		{
+			this->TestCamera->Translate(-0.1f, 0.0f, 0.0f);
+		}
+		if (FKeyboard::GetKeyPress('D'))
+		{
+			this->TestCamera->Translate(0.1f, 0.0f, 0.0f);
+		}
+		if (FKeyboard::GetKeyPress('Q'))
+		{
+			this->TestCamera->Rotate({ 0.0f, -2.0f, 0.0f });
+		}
+		if (FKeyboard::GetKeyPress('E'))
+		{
+			this->TestCamera->Rotate({ 0.0f, 2.0f, 0.0f });
+		}
 
 		for (auto& [uuid, renderer] : SRendererRegistry::GetInstanceList())
 		{

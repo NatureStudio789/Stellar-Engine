@@ -1,4 +1,5 @@
 #include <Core.h>
+#include "../Renderer.h"
 #include "../../Framebuffer/Framebuffer.h"
 #include "RenderQueuePass.h"
 
@@ -7,6 +8,13 @@ namespace SE
 	void GRenderQueuePass::Accept(std::shared_ptr<GDrawTask> task)
 	{
 		this->TaskList.push_back(task);
+	}
+
+	void GRenderQueuePass::Apply()
+	{
+		GApplyPass::Apply();
+
+		SCameraRegistry::ApplyCurrentInstance();
 	}
 
 	void GRenderQueuePass::Execute()

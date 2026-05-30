@@ -1,4 +1,5 @@
 #include <Core.h>
+#include "../Renderer.h"
 #include "../../Framebuffer/Framebuffer.h"
 #include "RenderPass.h"
 
@@ -134,6 +135,11 @@ namespace SE
 
 		outflow->BelongingPassName = this->RenderPassName;
 		this->OutflowList.push_back(outflow);
+	}
+
+	void GRenderPass::SetParent(const GRenderer* parent)
+	{
+
 	}
 
 	std::shared_ptr<GFramebuffer> GRenderPass::GetFramebufferInstance(const GResourcePackage& package)

@@ -65,12 +65,12 @@ namespace SE
 
 	void STransform::SetRotation(const glm::vec3 & eulerRotation)
 	{
-		this->Rotation = glm::quat(eulerRotation);
+		this->Rotation = glm::quat(glm::radians(eulerRotation));
 	}
 
 	void STransform::Rotate(const glm::vec3 & eulerRotation)
 	{
-		this->Rotation *= glm::quat(eulerRotation);
+		this->Rotation *= glm::quat(glm::radians(eulerRotation));
 	}
 
 	void STransform::Rotate(float x, float y, float z)

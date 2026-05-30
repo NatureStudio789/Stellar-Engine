@@ -22,6 +22,7 @@ namespace SE
 
 		std::shared_ptr<GMeshItem> test;
 		std::shared_ptr<GMeshItem> test1;
+		std::shared_ptr<GCamera> TestCamera;
 	};
 }
 

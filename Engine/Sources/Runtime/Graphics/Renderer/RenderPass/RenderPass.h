@@ -4,6 +4,7 @@
 #include "../../ContextDependent/ContextDependent.h"
 #include "../Flow/FlowChain.h"
 #include "../ResourcePackage/ResourcePackage.h"
+#include "../../Camera/Camera.h"
 
 namespace SE
 {
@@ -29,6 +30,8 @@ namespace SE
 	protected:
 		void AddInflow(std::shared_ptr<GInflow> inflow);
 		void AddOutflow(std::shared_ptr<GOutflow> outflow);
+
+		virtual void SetParent(const GRenderer* parent);
 
 		std::shared_ptr<GFramebuffer> GetFramebufferInstance(const GResourcePackage& package);
 

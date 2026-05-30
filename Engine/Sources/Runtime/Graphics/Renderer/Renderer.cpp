@@ -23,6 +23,17 @@ namespace SE
 
 	}
 
+	void GRenderer::SetMainCamera(const std::string& name)
+	{
+		if (!SCameraRegistry::HasInstance(name))
+		{
+			SMessageHandler::Instance->SetFatal("Graphics",
+				std::format("No available camera named '{}' in registry!", name));
+		}
+
+		this->MainCameraName = name;
+	}
+
 	void GRenderer::Compile()
 	{
 		std::map<std::string, std::vector<std::shared_ptr<GInflow>>> TargetPassOrderedInflowList;
@@ -141,6 +152,7 @@ namespace SE
 		}
 
 		SCommandListRegistry::SetCurrentInstance(this->GetName());
+		SCameraRegistry::SetCurrentInstance(this->MainCameraName);
 
 		this->RendererCommandList->Open();
 
@@ -245,6 +257,7 @@ namespace SE
 			}
 		}
 
+		renderPass->SetParent(this);
 		this->RenderPassList.push_back(renderPass);
 	}
 
@@ -270,71 +283,4 @@ namespace SE
 			renderer->Compile();
 		}
 	}
-
-	//void GRenderer::LinkPassInflows(std::shared_ptr<GRenderPass> renderPass)
-	//{
-	//	for (auto& inflow : renderPass->GetInflowList())
-	//	{
-	//		if (inflow->GetLinked())
-	//		{
-	//			continue;
-	//		}
-
-	//		const std::string& InflowTargetPassName = inflow->GetTargetPassName();
-
-	//		if (InflowTargetPassName == "$")
-	//		{
-	//			bool applied = false;
-	//			for (auto& outflow : this->GlobalOutflowList)
-	//			{
-	//				if (outflow->GetName() == inflow->GetLinkingOutflowName())
-	//				{
-	//					if (!outflow->IsSource())
-	//					{
-	//						SMessageHandler::Instance->SetFatal("Graphics", std::format("A global outflow must be a source!"));
-	//					}
-
-	//					if (!outflow->GetAvailable())
-	//					{
-	//						SMessageHandler::Instance->SetFatal("Graphics", std::format("The global outflow named '{}' is not available!", outflow->GetName()));
-	//					}
-
-	//					inflow->Apply(outflow);
-	//					applied = true;
-	//					break;
-	//				}
-	//			}
-
-	//			if (!applied)
-	//			{
-	//				SMessageHandler::Instance->SetFatal("Graphics",
-	//					std::format("No global outflow named '{}' found in renderer", inflow->GetLinkingOutflowName()));
-	//			}
-	//		}
-	//		else
-	//		{
-	//			auto RenderPass = this->GetRenderPass(InflowTargetPassName);
-
-	//			auto outflow = RenderPass->GetOutflow(inflow->GetLinkingOutflowName());
-	//			if (!outflow->IsSource())
-	//			{
-	//				RenderPass->GetInflow(outflow->SourceInflowName);
-
-	//			}
-
-	//			inflow->Apply(outflow);
-	//		}
-	//	}
-	//}
-
-	//void GRenderer::LinkGlobalInflows()
-	//{
-	//	for (auto& inflow : this->GlobalInflowList)
-	//	{
-	//		const std::string& InflowTargetPassName = inflow->GetTargetPassName();
-	//		auto RenderPass = this->GetRenderPass(InflowTargetPassName);
-	//		auto outflow = RenderPass->GetOutflow(inflow->GetLinkingOutflowName());
-	//		inflow->Apply(outflow);
-	//	}
-	//}
 }

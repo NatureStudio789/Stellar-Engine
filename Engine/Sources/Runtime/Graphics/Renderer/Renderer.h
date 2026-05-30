@@ -13,6 +13,8 @@ namespace SE
 		GRenderer(const std::string& name);
 		virtual ~GRenderer();
 
+		void SetMainCamera(const std::string& name);
+
 		void Compile();
 
 		virtual void Execute();
@@ -30,9 +32,6 @@ namespace SE
 		friend class GRenderStage;
 
 	private:
-		//void LinkPassInflows(std::shared_ptr<GRenderPass> renderPass);
-		//void LinkGlobalInflows();
-
 		void BuildFlowChain(std::shared_ptr<GFlowChain> flowChain, std::shared_ptr<GOutflow> outflow, 
 			std::map<std::string, std::vector<std::shared_ptr<GInflow>>> targetPassOrderedInflowList);
 
@@ -44,6 +43,11 @@ namespace SE
 		std::vector<std::shared_ptr<GFlowChain>> StaticFlowChainList;
 		std::vector<std::shared_ptr<GFlowChain>> DynamicFlowChainList;
 		bool IsCompiled = false;
+
+		std::string MainCameraName;
+
+		friend class GRenderPass;
+		friend class GRenderQueuePass;
 	};
 
 	class SRendererRegistry : public SRegistry<GRenderer> 

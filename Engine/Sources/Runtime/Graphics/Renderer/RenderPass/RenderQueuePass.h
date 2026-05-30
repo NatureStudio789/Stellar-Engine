@@ -14,6 +14,7 @@ namespace SE
 
 		virtual void Accept(std::shared_ptr<GDrawTask> task);
 
+		void Apply() override;
 		virtual void Execute() override;
 
 	protected:
