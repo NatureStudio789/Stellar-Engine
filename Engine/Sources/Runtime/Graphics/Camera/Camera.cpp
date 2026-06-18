@@ -126,7 +126,7 @@ namespace SE
 
 	glm::mat4x4 GCamera::GetProjectionMatrix() const noexcept
 	{
-		return glm::perspective(glm::radians(this->FOV), this->Aspect, this->NearZ, this->FarZ);
+		return glm::perspectiveLH_ZO(glm::radians(this->FOV), this->Aspect, this->NearZ, this->FarZ);
 	}
 
 	glm::mat4x4 GCamera::GetViewMatrix() const noexcept
@@ -142,7 +142,7 @@ namespace SE
 			CameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
 		}
 
-		return glm::lookAt(this->Position, CameraFront + this->Position, CameraUp);
+		return glm::lookAtLH(this->Position, CameraFront + this->Position, CameraUp);
 	}
 
 	void GCamera::ApplyToPipeline()

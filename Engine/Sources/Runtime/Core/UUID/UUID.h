@@ -16,6 +16,7 @@ namespace SE
 
 		const std::string& operator()() const noexcept;
 		bool operator<(const SUUID& other) const;
+		bool operator==(const SUUID& other) const noexcept;
 
 		bool GetAvailable() const noexcept;
 

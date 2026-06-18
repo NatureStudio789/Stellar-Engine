@@ -37,6 +37,10 @@
 #include <backends/imgui_impl_dx12.h>
 #include <backends/imgui_impl_glfw.h>
 
+#include <Assimp/Importer.hpp>
+#include <Assimp/scene.h>
+#include <Assimp/postprocess.h>
+
 #include <wrl/client.h>
 using namespace Microsoft;
 

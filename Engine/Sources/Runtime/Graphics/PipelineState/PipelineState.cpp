@@ -8,6 +8,7 @@ namespace SE
 	{
 		this->RootSignature = std::make_shared<GRootSignature>();
 		this->IsInitialized = false;
+		
 	}
 
 	GPipelineState::GPipelineState(const std::string& name) : GPipelineState()

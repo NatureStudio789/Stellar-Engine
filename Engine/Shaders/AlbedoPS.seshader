@@ -3,6 +3,7 @@ struct Input
     float4 Position : SV_POSITION;
     float3 WorldPosition : WORLDPOSITION;
     float2 TextureCoord : TEXTURECOORD;
+    float3 Normal : NORMAL;
 };
 
 SamplerState MaterialSampler : register(s0);
@@ -12,4 +13,5 @@ float4 main(Input input) : SV_Target
 {
     
     return float4(AlbedoTexture.Sample(MaterialSampler, input.TextureCoord).rgb, 1.0f);
+    //return float4(input.Normal, 1.0f);
 }

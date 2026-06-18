@@ -2,7 +2,7 @@
 #define _SE_RENDERENGINE_H_
 #include "../Core/EngineSystem/Engine.h"
 #include "RenderConfiguration/RenderConfiguration.h"
-#include "Renderer/Renderable/Mesh/MeshItem.h"
+#include "Renderer/Renderable/Mesh/StaticMesh.h"
 
 namespace SE
 {
@@ -20,8 +20,10 @@ namespace SE
 	private:
 		std::shared_ptr<GGraphicsContext> MainGraphicsContext;
 
-		std::shared_ptr<GMeshItem> test;
-		std::shared_ptr<GMeshItem> test1;
+		//std::shared_ptr<GMeshItem> test;
+		//std::shared_ptr<GMeshItem> test1;
+		std::shared_ptr<GStaticMesh> testmesh;
+		STransform TestMeshTransform;
 		std::shared_ptr<GCamera> TestCamera;
 	};
 }

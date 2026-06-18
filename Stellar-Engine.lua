@@ -51,12 +51,14 @@ project "Stellar Engine"
 
 		IncludeDependenciesDir,
 		"Third Party/GLFW/include/",
-		"Third Party/imgui/"
+		"Third Party/imgui/",
+		"Third Party/Assimp/",
 	}
 
 	libdirs
 	{
 		LibraryDependenciesDir .. "DirectXTex/%{cfg.buildcfg}/",
+		LibraryDependenciesDir .. "Assimp/%{cfg.buildcfg}/",
 	}
 
 	links
@@ -71,7 +73,9 @@ project "Stellar Engine"
 
 		"rpcrt4",
 
-		"DirectXTex.lib",
+		"DirectXTex",
+
+		"assimp",
 	}
 
 	defines

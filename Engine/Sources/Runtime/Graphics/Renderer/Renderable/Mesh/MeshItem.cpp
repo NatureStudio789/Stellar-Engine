@@ -10,9 +10,9 @@ namespace SE
 		this->ItemData = {};
 	}
 
-	GMeshItem::GMeshItem(const std::string& name, const Data& data)
+	GMeshItem::GMeshItem(const Data& data)
 	{
-		this->Initialize(name, data);
+		this->Initialize(data);
 	}
 
 	GMeshItem::~GMeshItem()
@@ -20,13 +20,13 @@ namespace SE
 
 	}
 
-	void GMeshItem::Initialize(const std::string& name, const Data& data)
+	void GMeshItem::Initialize(const Data& data)
 	{
 		this->ItemData = data;
 
-		GRenderable::Initialize(name, 
+		GRenderable::Initialize(this->ItemData.Name, 
 			GVertexBuffer::Create((void*)this->ItemData.Vertices.data(), (unsigned int)this->ItemData.Vertices.size(), (unsigned int)sizeof(Vertex)), 
-			GIndexBuffer::Create(this->ItemData.Indices.data(), (unsigned int)this->ItemData.Vertices.size()), GTopology::Create(GTopology::SE_TOPOLOGY_TRIANGLELIST));
+			GIndexBuffer::Create(this->ItemData.Indices.data(), (unsigned int)this->ItemData.Indices.size()), GTopology::Create(GTopology::SE_TOPOLOGY_TRIANGLELIST));
 
 		auto& LightingTechnique = std::make_shared<GRenderTechnique>("LightingTechnique", "main");
 

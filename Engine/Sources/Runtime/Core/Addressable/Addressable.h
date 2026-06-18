@@ -41,6 +41,7 @@ namespace SE
 	public:
 		SAddressable();
 		SAddressable(const SAddressable& other);
+		virtual ~SAddressable();
 
 		void SetName(const std::string& name);
 

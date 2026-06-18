@@ -13,6 +13,12 @@ namespace SE
 		this->IdentifierHandle = other.IdentifierHandle;
 	}
 
+	SAddressable::~SAddressable()
+	{
+		this->IdentifierHandle.Name.clear();
+		this->IdentifierHandle.UUID.Destroy();
+	}
+
 	void SAddressable::SetName(const std::string& name)
 	{
 		this->IdentifierHandle.Name = name;

@@ -42,6 +42,11 @@ namespace SE
 		return this->UUID < other.UUID;
 	}
 
+	bool SUUID::operator==(const SUUID& other) const noexcept
+	{
+		return this->UUID == other.UUID;
+	}
+
 	bool SUUID::GetAvailable() const noexcept
 	{
 		return this->IsAvailable;

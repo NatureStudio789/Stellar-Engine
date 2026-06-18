@@ -21,10 +21,13 @@ namespace SE
 			Data() = default;
 			Data(const Data& other)
 			{
+				this->Name = other.Name;
 				this->Vertices = other.Vertices;
 				this->Indices = other.Indices;
+				this->MaterialId = other.MaterialId;
 			}
 
+			std::string Name;
 			std::vector<Vertex> Vertices;
 			std::vector<unsigned int> Indices;
 			SUUID MaterialId;
@@ -32,10 +35,10 @@ namespace SE
 
 	public:
 		GMeshItem();
-		GMeshItem(const std::string& name, const Data& data);
+		GMeshItem(const Data& data);
 		~GMeshItem() override;
 
-		void Initialize(const std::string& name, const Data& data);
+		void Initialize(const Data& data);
 
 		const Data& GetData() const noexcept;
 

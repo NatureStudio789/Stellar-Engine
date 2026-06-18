@@ -75,7 +75,7 @@ namespace SE
 
 	void STransform::Rotate(float x, float y, float z)
 	{
-		this->Rotation *= glm::quat(glm::vec3(x, y, z));
+		this->Rotation *= glm::quat(glm::radians(glm::vec3(x, y, z)));
 	}
 
 	void STransform::SetScale(const glm::vec3 & scale)

@@ -36,6 +36,7 @@ namespace SE
 
 	private:
 		D3D12_CPU_DESCRIPTOR_HANDLE GetRTVDescriptorHandleInstance();
+		D3D12_CPU_DESCRIPTOR_HANDLE GetDSVDescriptorHandleInstance();
 
 		glm::uvec2 Size;
 
@@ -47,7 +48,7 @@ namespace SE
 		unsigned int CurrentBufferIndex;
 		std::shared_ptr<GDescriptorHandle> RTVDescriptorHandle;
 
-		WRL::ComPtr<ID3D12Resource> DepthStencilBuffer;
+		std::vector<WRL::ComPtr<ID3D12Resource>> DepthStencilBufferList;
 		std::shared_ptr<GDescriptorHandle> DSVDescriptorHandle;
 
 		D3D12_VIEWPORT ViewportInstance;

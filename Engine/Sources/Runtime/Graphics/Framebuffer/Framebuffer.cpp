@@ -34,7 +34,7 @@ namespace SE
 		this->CurrentBufferIndex = other.CurrentBufferIndex;
 		this->RTVDescriptorHandle = other.RTVDescriptorHandle;
 
-		this->DepthStencilBuffer = other.DepthStencilBuffer;
+		this->DepthStencilBufferList = other.DepthStencilBufferList;
 		this->DSVDescriptorHandle = other.DSVDescriptorHandle;
 
 		this->ViewportInstance = other.ViewportInstance;
@@ -52,7 +52,9 @@ namespace SE
 		this->Size = size;
 
 		this->RTVDescriptorHandle = this->GetContext()->GetRTVDescriptorHeap()->Allocate(multipleRenderTargetCount);
+		this->DSVDescriptorHandle = this->GetContext()->GetDSVDescriptorHeap()->Allocate(multipleRenderTargetCount);
 		this->RenderTargetBufferList.resize(multipleRenderTargetCount);
+		this->DepthStencilBufferList.resize(multipleRenderTargetCount);
 		this->RTShaderResourceViewList.resize(multipleRenderTargetCount);
 		this->CurrentBufferIndex = 0;
 
@@ -65,6 +67,7 @@ namespace SE
 		ClearValue.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 
 		CD3DX12_CPU_DESCRIPTOR_HANDLE RTVHandle = this->RTVDescriptorHandle->CPUHandle;
+		CD3DX12_CPU_DESCRIPTOR_HANDLE DSVHandle = this->DSVDescriptorHandle->CPUHandle;
 		for (UINT i = 0; i < multipleRenderTargetCount; i++)
 		{
 			SMessageHandler::Instance->Check(this->GetDeviceInstance()->
@@ -83,42 +86,43 @@ namespace SE
 			this->RTShaderResourceViewList[i] = std::make_shared<GShaderResourceView>(i);
 			this->GetDeviceInstance()->CreateShaderResourceView(
 				this->RenderTargetBufferList[i].Get(), null, this->RTShaderResourceViewList[i]->GetDescriptorHandle()->CPUHandle);
+			
+			D3D12_RESOURCE_DESC DepthStencilBufferDesc;
+			STELLAR_CLEAR_MEMORY(DepthStencilBufferDesc);
+
+			DepthStencilBufferDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+			DepthStencilBufferDesc.Alignment = 0;
+			DepthStencilBufferDesc.Width = this->Size.x;
+			DepthStencilBufferDesc.Height = this->Size.y;
+			DepthStencilBufferDesc.DepthOrArraySize = 1;
+			DepthStencilBufferDesc.MipLevels = 1;
+			DepthStencilBufferDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+			DepthStencilBufferDesc.SampleDesc.Count = 1;
+			DepthStencilBufferDesc.SampleDesc.Quality = 0;
+			DepthStencilBufferDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
+			DepthStencilBufferDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
+
+			D3D12_CLEAR_VALUE OptimizedClear;
+			STELLAR_CLEAR_MEMORY(OptimizedClear);
+			OptimizedClear.Format = DepthStencilBufferDesc.Format;
+			OptimizedClear.DepthStencil.Depth = 1.0f;
+			OptimizedClear.DepthStencil.Stencil = 0;
+
+			SMessageHandler::Instance->Check(this->GetDeviceInstance()->
+				CreateCommittedResource(&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT), D3D12_HEAP_FLAG_NONE,
+					&DepthStencilBufferDesc, D3D12_RESOURCE_STATE_COMMON,
+					&OptimizedClear, __uuidof(ID3D12Resource), (void**)this->DepthStencilBufferList[i].GetAddressOf()));
+
+			this->GetDeviceInstance()->CreateDepthStencilView(
+				this->DepthStencilBufferList[i].Get(), null, DSVHandle);
+			DSVHandle.Offset(1, this->GetContext()->GetDSVDescriptorHeap()->GetIncrementSize());
+
+			this->GetInitializationCommandListInstance()->ResourceBarrier(1,
+				&CD3DX12_RESOURCE_BARRIER::Transition(this->DepthStencilBufferList[i].Get(),
+					D3D12_RESOURCE_STATE_COMMON, D3D12_RESOURCE_STATE_DEPTH_WRITE));
 		}
 
-		this->DSVDescriptorHandle = this->GetContext()->GetDSVDescriptorHeap()->Allocate();
 
-		D3D12_RESOURCE_DESC DepthStencilBufferDesc;
-		STELLAR_CLEAR_MEMORY(DepthStencilBufferDesc);
-
-		DepthStencilBufferDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
-		DepthStencilBufferDesc.Alignment = 0;
-		DepthStencilBufferDesc.Width = this->Size.x;
-		DepthStencilBufferDesc.Height = this->Size.y;
-		DepthStencilBufferDesc.DepthOrArraySize = 1;
-		DepthStencilBufferDesc.MipLevels = 1;
-		DepthStencilBufferDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
-		DepthStencilBufferDesc.SampleDesc.Count = 1;
-		DepthStencilBufferDesc.SampleDesc.Quality = 0;
-		DepthStencilBufferDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
-		DepthStencilBufferDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
-
-		D3D12_CLEAR_VALUE OptimizedClear;
-		STELLAR_CLEAR_MEMORY(OptimizedClear);
-		OptimizedClear.Format = DepthStencilBufferDesc.Format;
-		OptimizedClear.DepthStencil.Depth = 1.0f;
-		OptimizedClear.DepthStencil.Stencil = 0;
-
-		SMessageHandler::Instance->Check(this->GetDeviceInstance()->
-			CreateCommittedResource(&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT), D3D12_HEAP_FLAG_NONE,
-				&DepthStencilBufferDesc, D3D12_RESOURCE_STATE_COMMON,
-				&OptimizedClear, __uuidof(ID3D12Resource), (void**)this->DepthStencilBuffer.GetAddressOf()));
-
-		this->GetDeviceInstance()->CreateDepthStencilView(
-			this->DepthStencilBuffer.Get(), null, this->DSVDescriptorHandle->CPUHandle);
-
-		this->GetInitializationCommandListInstance()->ResourceBarrier(1,
-			&CD3DX12_RESOURCE_BARRIER::Transition(this->DepthStencilBuffer.Get(),
-				D3D12_RESOURCE_STATE_COMMON, D3D12_RESOURCE_STATE_DEPTH_WRITE));
 		this->GetContext()->ExecuteInitialization();
 
 		this->ViewportInstance.Width = (float)this->Size.x;
@@ -155,6 +159,7 @@ namespace SE
 		}
 
 		this->DSVDescriptorHandle = this->GetContext()->GetDSVDescriptorHeap()->Allocate();
+		this->DepthStencilBufferList.resize(1);
 
 		D3D12_RESOURCE_DESC DepthStencilBufferDesc;
 		STELLAR_CLEAR_MEMORY(DepthStencilBufferDesc);
@@ -180,13 +185,13 @@ namespace SE
 		SMessageHandler::Instance->Check(this->GetDeviceInstance()->
 			CreateCommittedResource(&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT), D3D12_HEAP_FLAG_NONE,
 				&DepthStencilBufferDesc, D3D12_RESOURCE_STATE_COMMON,
-				&OptimizedClear, __uuidof(ID3D12Resource), (void**)this->DepthStencilBuffer.GetAddressOf()));
+				&OptimizedClear, __uuidof(ID3D12Resource), (void**)this->DepthStencilBufferList[0].GetAddressOf()));
 
 		this->GetDeviceInstance()->CreateDepthStencilView(
-			this->DepthStencilBuffer.Get(), null, this->DSVDescriptorHandle->CPUHandle);
+			this->DepthStencilBufferList[0].Get(), null, this->DSVDescriptorHandle->CPUHandle);
 
 		this->GetInitializationCommandListInstance()->ResourceBarrier(1,
-			&CD3DX12_RESOURCE_BARRIER::Transition(this->DepthStencilBuffer.Get(),
+			&CD3DX12_RESOURCE_BARRIER::Transition(this->DepthStencilBufferList[0].Get(),
 				D3D12_RESOURCE_STATE_COMMON, D3D12_RESOURCE_STATE_DEPTH_WRITE));
 		this->GetContext()->ExecuteInitialization();
 
@@ -222,6 +227,44 @@ namespace SE
 					this->RTBufferSwapChain->GetPresentBuffer()->BufferList[i].Get(), null, RTV);
 				RTV.Offset(1, this->GetContext()->GetRTVDescriptorHeap()->GetIncrementSize());
 			}
+
+			if (this->DepthStencilBufferList[0])
+			{
+				this->DepthStencilBufferList[0].Reset();
+			}
+
+			D3D12_RESOURCE_DESC DepthStencilBufferDesc;
+			STELLAR_CLEAR_MEMORY(DepthStencilBufferDesc);
+
+			DepthStencilBufferDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+			DepthStencilBufferDesc.Alignment = 0;
+			DepthStencilBufferDesc.Width = this->Size.x;
+			DepthStencilBufferDesc.Height = this->Size.y;
+			DepthStencilBufferDesc.DepthOrArraySize = 1;
+			DepthStencilBufferDesc.MipLevels = 1;
+			DepthStencilBufferDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+			DepthStencilBufferDesc.SampleDesc.Count = 1;
+			DepthStencilBufferDesc.SampleDesc.Quality = 0;
+			DepthStencilBufferDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
+			DepthStencilBufferDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
+
+			D3D12_CLEAR_VALUE OptimizedClear;
+			STELLAR_CLEAR_MEMORY(OptimizedClear);
+			OptimizedClear.Format = DepthStencilBufferDesc.Format;
+			OptimizedClear.DepthStencil.Depth = 1.0f;
+			OptimizedClear.DepthStencil.Stencil = 0;
+
+			SMessageHandler::Instance->Check(this->GetDeviceInstance()->
+				CreateCommittedResource(&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT), D3D12_HEAP_FLAG_NONE,
+					&DepthStencilBufferDesc, D3D12_RESOURCE_STATE_COMMON,
+					&OptimizedClear, __uuidof(ID3D12Resource), (void**)this->DepthStencilBufferList[0].GetAddressOf()));
+
+			this->GetDeviceInstance()->CreateDepthStencilView(
+				this->DepthStencilBufferList[0].Get(), null, this->DSVDescriptorHandle->CPUHandle);
+
+			this->GetInitializationCommandListInstance()->ResourceBarrier(1,
+				&CD3DX12_RESOURCE_BARRIER::Transition(this->DepthStencilBufferList[0].Get(),
+					D3D12_RESOURCE_STATE_COMMON, D3D12_RESOURCE_STATE_DEPTH_WRITE));
 		}
 		else
 		{
@@ -234,6 +277,7 @@ namespace SE
 			ClearValue.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 
 			CD3DX12_CPU_DESCRIPTOR_HANDLE RTVHandle = this->RTVDescriptorHandle->CPUHandle;
+			CD3DX12_CPU_DESCRIPTOR_HANDLE DSVHandle = this->DSVDescriptorHandle->CPUHandle;
 			for (UINT i = 0; i < (UINT)this->RenderTargetBufferList.size(); i++)
 			{
 				auto& renderTargetBuffer = this->RenderTargetBufferList[i];
@@ -258,46 +302,48 @@ namespace SE
 
 				this->GetDeviceInstance()->CreateShaderResourceView(
 					renderTargetBuffer.Get(), null, shaderResourceView->GetDescriptorHandle()->CPUHandle);
+
+				auto& depthStencilBuffer = this->DepthStencilBufferList[i];
+				if (depthStencilBuffer)
+				{
+					depthStencilBuffer.Reset();
+				}
+
+				D3D12_RESOURCE_DESC DepthStencilBufferDesc;
+				STELLAR_CLEAR_MEMORY(DepthStencilBufferDesc);
+
+				DepthStencilBufferDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+				DepthStencilBufferDesc.Alignment = 0;
+				DepthStencilBufferDesc.Width = this->Size.x;
+				DepthStencilBufferDesc.Height = this->Size.y;
+				DepthStencilBufferDesc.DepthOrArraySize = 1;
+				DepthStencilBufferDesc.MipLevels = 1;
+				DepthStencilBufferDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+				DepthStencilBufferDesc.SampleDesc.Count = 1;
+				DepthStencilBufferDesc.SampleDesc.Quality = 0;
+				DepthStencilBufferDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
+				DepthStencilBufferDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
+
+				D3D12_CLEAR_VALUE OptimizedClear;
+				STELLAR_CLEAR_MEMORY(OptimizedClear);
+				OptimizedClear.Format = DepthStencilBufferDesc.Format;
+				OptimizedClear.DepthStencil.Depth = 1.0f;
+				OptimizedClear.DepthStencil.Stencil = 0;
+
+				SMessageHandler::Instance->Check(this->GetDeviceInstance()->
+					CreateCommittedResource(&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT), D3D12_HEAP_FLAG_NONE,
+						&DepthStencilBufferDesc, D3D12_RESOURCE_STATE_COMMON,
+						&OptimizedClear, __uuidof(ID3D12Resource), (void**)depthStencilBuffer.GetAddressOf()));
+
+				this->GetDeviceInstance()->CreateDepthStencilView(depthStencilBuffer.Get(), null, DSVHandle);
+				DSVHandle.Offset(1, this->GetContext()->GetDSVDescriptorHeap()->GetIncrementSize());
+
+				this->GetInitializationCommandListInstance()->ResourceBarrier(1,
+					&CD3DX12_RESOURCE_BARRIER::Transition(depthStencilBuffer.Get(),
+						D3D12_RESOURCE_STATE_COMMON, D3D12_RESOURCE_STATE_DEPTH_WRITE));
 			}
 		}
 
-		if (this->DepthStencilBuffer)
-		{
-			this->DepthStencilBuffer.Reset();
-		}
-
-		D3D12_RESOURCE_DESC DepthStencilBufferDesc;
-		STELLAR_CLEAR_MEMORY(DepthStencilBufferDesc);
-
-		DepthStencilBufferDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
-		DepthStencilBufferDesc.Alignment = 0;
-		DepthStencilBufferDesc.Width = this->Size.x;
-		DepthStencilBufferDesc.Height = this->Size.y;
-		DepthStencilBufferDesc.DepthOrArraySize = 1;
-		DepthStencilBufferDesc.MipLevels = 1;
-		DepthStencilBufferDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
-		DepthStencilBufferDesc.SampleDesc.Count = 1;
-		DepthStencilBufferDesc.SampleDesc.Quality = 0;
-		DepthStencilBufferDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
-		DepthStencilBufferDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
-
-		D3D12_CLEAR_VALUE OptimizedClear;
-		STELLAR_CLEAR_MEMORY(OptimizedClear);
-		OptimizedClear.Format = DepthStencilBufferDesc.Format;
-		OptimizedClear.DepthStencil.Depth = 1.0f;
-		OptimizedClear.DepthStencil.Stencil = 0;
-
-		SMessageHandler::Instance->Check(this->GetDeviceInstance()->
-			CreateCommittedResource(&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT), D3D12_HEAP_FLAG_NONE,
-				&DepthStencilBufferDesc, D3D12_RESOURCE_STATE_COMMON,
-				&OptimizedClear, __uuidof(ID3D12Resource), (void**)this->DepthStencilBuffer.GetAddressOf()));
-
-		this->GetDeviceInstance()->CreateDepthStencilView(
-			this->DepthStencilBuffer.Get(), null, this->DSVDescriptorHandle->CPUHandle);
-
-		this->GetInitializationCommandListInstance()->ResourceBarrier(1,
-			&CD3DX12_RESOURCE_BARRIER::Transition(this->DepthStencilBuffer.Get(),
-				D3D12_RESOURCE_STATE_COMMON, D3D12_RESOURCE_STATE_DEPTH_WRITE));
 		this->GetContext()->ExecuteInitialization();
 
 		this->GetContext()->Flush();
@@ -349,7 +395,7 @@ namespace SE
 			ClearRenderTargetView(this->GetRTVDescriptorHandleInstance(), fcolor, 0, null);
 
 		SCommandListRegistry::GetCurrentInstance()->GetInstance()->
-			ClearDepthStencilView(this->DSVDescriptorHandle->CPUHandle,
+			ClearDepthStencilView(this->GetDSVDescriptorHandleInstance(),
 				D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, null);
 	}
 
@@ -359,7 +405,7 @@ namespace SE
 		SCommandListRegistry::GetCurrentInstance()->GetInstance()->RSSetViewports(1, &this->ViewportInstance);
 
 		SCommandListRegistry::GetCurrentInstance()->GetInstance()->
-			OMSetRenderTargets(1, &this->GetRTVDescriptorHandleInstance(), true, &this->DSVDescriptorHandle->CPUHandle);
+			OMSetRenderTargets(1, &this->GetRTVDescriptorHandleInstance(), true, &this->GetDSVDescriptorHandleInstance());
 	}
 
 	void GFramebuffer::End()
@@ -410,6 +456,17 @@ namespace SE
 		else
 		{
 			Handle.Offset(this->CurrentBufferIndex, this->GetContext()->GetRTVDescriptorHeap()->GetIncrementSize());
+		}
+
+		return Handle;
+	}
+
+	D3D12_CPU_DESCRIPTOR_HANDLE GFramebuffer::GetDSVDescriptorHandleInstance()
+	{
+		auto Handle = this->DSVDescriptorHandle->CPUHandle;
+		if (!this->IsPresentingFramebuffer)
+		{
+			Handle.Offset(this->CurrentBufferIndex, this->GetContext()->GetDSVDescriptorHeap()->GetIncrementSize());
 		}
 
 		return Handle;

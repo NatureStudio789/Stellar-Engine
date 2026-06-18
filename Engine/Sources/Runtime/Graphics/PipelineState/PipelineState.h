@@ -45,7 +45,10 @@ namespace SE
 
 		struct BlendState
 		{
-			BlendState() = default;
+			BlendState()
+			{
+				this->EnableBlend = false;
+			}
 			BlendState(bool enableBlend) : EnableBlend(enableBlend)
 			{
 
