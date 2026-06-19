@@ -81,37 +81,23 @@ namespace SE
 		ImGui::DockSpace(ImGui::GetID("MyDockspace"));
 
 		{
-			ImGui::Begin("Albedo");
+			ImGui::Begin("Debug");
 
 			ImGui::Image((ImTextureID)SFramebufferRegistry::GetInstance("GBufferFramebuffer")->GetRTShaderResourceView(0)->GetGPUDescriptor().ptr,
-				ImVec2(1600, 900));
+				ImVec2(800, 450));
 
-			ImGui::End();
-		}
-
-		{
-			ImGui::Begin("Metallic");
+			ImGui::SameLine();
 
 			ImGui::Image((ImTextureID)SFramebufferRegistry::GetInstance("GBufferFramebuffer")->GetRTShaderResourceView(1)->GetGPUDescriptor().ptr,
-				ImVec2(1600, 900));
-
-			ImGui::End();
-		}
-
-		{
-			ImGui::Begin("Roughness");
+				ImVec2(800, 450));
 
 			ImGui::Image((ImTextureID)SFramebufferRegistry::GetInstance("GBufferFramebuffer")->GetRTShaderResourceView(2)->GetGPUDescriptor().ptr,
-				ImVec2(1600, 900));
+				ImVec2(800, 450));
 
-			ImGui::End();
-		}
-
-		{
-			ImGui::Begin("Normal");
+			ImGui::SameLine();
 
 			ImGui::Image((ImTextureID)SFramebufferRegistry::GetInstance("GBufferFramebuffer")->GetRTShaderResourceView(3)->GetGPUDescriptor().ptr,
-				ImVec2(1600, 900));
+				ImVec2(800, 450));
 
 			ImGui::End();
 		}

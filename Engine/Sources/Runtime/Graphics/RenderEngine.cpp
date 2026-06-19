@@ -149,6 +149,9 @@ namespace SE
 
 	void RenderEngine::Release()
 	{
-
+		// Flush the GPU command queue to ensure all in-flight operations complete
+		// before resources are released during engine shutdown. This prevents
+		// D3D12 ERROR #921: OBJECT_DELETED_WHILE_STILL_IN_USE.
+		this->MainGraphicsContext->Flush();
 	}
 }

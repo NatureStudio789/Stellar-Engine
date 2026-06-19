@@ -54,6 +54,10 @@ namespace SE
 
 	void SAPIConfigurator::ShutdownAPI()
 	{
+		ImGui_ImplDX12_Shutdown();
+		ImGui_ImplGlfw_Shutdown();
+		ImGui::DestroyContext();
+
 		glfwTerminate();
 	}
 }
