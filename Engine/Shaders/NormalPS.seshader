@@ -1,5 +1,49 @@
-float4 main() : SV_Target
+struct Input
 {
+    float4 Position : SV_POSITION;
+    float3 WorldPosition : WORLDPOSITION;
+    float2 TextureCoord : TEXTURECOORD;
+    float3 Normal : NORMAL;
+};
 
-    return float4(1.0f, 1.0f, 1.0f, 1.0f);
+SamplerState MaterialSampler : register(s0);
+Texture2D NormalTexture : register(t3);
+
+cbuffer MaterialCBuffer : register(b1)
+{
+    float3 Albedo;
+    float HasAlbedoTexture;
+    float Metallic;
+    float HasMetallicTexture;
+    float Roughness;
+    float HasRoughnessTexture;
+    float HasNormalTexture;
+};
+
+float4 main(Input input) : SV_Target
+{
+    float4 Result;
+
+    if (HasNormalTexture)
+    {
+        float3 TangentNormal = NormalTexture.Sample(MaterialSampler, input.TextureCoord).rgb * 2.0f - 1.0f;
+
+        float3 Q1 = ddx(input.WorldPosition);
+        float3 Q2 = ddy(input.WorldPosition);
+        float2 st1 = ddx(input.TextureCoord);
+        float2 st2 = ddy(input.TextureCoord);
+
+        float3 N = normalize(input.Normal);
+        float3 T = normalize(Q1 * st2.y - Q2 * st1.y);
+        float3 B = -normalize(cross(N, T));
+        float3x3 TBN = float3x3(T, B, N);
+
+        Result = float4(mul(TangentNormal, TBN), 1.0f);
+    }
+    else
+    {
+        Result = float4(input.Normal, 1.0f);
+    }
+
+    return Result;
 }

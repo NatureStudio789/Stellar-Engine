@@ -13,7 +13,7 @@ namespace SE
         this->AddGlobalOutflow(GOutflow::Create("GBufferFramebuffer", this->GBufferFramebuffer->GetResourcePackage()));
 
         {
-            auto ClearingPass = std::make_shared<GClearPass>("ClearingPass", std::vector<unsigned int>{ 0 });
+            auto ClearingPass = std::make_shared<GClearPass>("ClearingPass", std::vector<unsigned int>{ 0, 1, 2, 3 });
             ClearingPass->SetLinkage("ClearingFramebuffer", "$.GBufferFramebuffer");
 
             this->AppendRenderPass(ClearingPass);
@@ -26,26 +26,26 @@ namespace SE
             this->AppendRenderPass(AlbedoPass);
         }
 
-        //{
-        //    auto MetallicPass = std::make_shared<GMetallicPass>("MetallicBuffer");
-        //    MetallicPass->SetLinkage("GBufferFramebuffer", "AlbedoBuffer.GBufferFramebuffer");
+        {
+            auto MetallicPass = std::make_shared<GMetallicPass>("MetallicBuffer");
+            MetallicPass->SetLinkage("GBufferFramebuffer", "AlbedoBuffer.GBufferFramebuffer");
 
-        //    this->AppendRenderPass(MetallicPass);
-        //}
+            this->AppendRenderPass(MetallicPass);
+        }
 
-        //{
-        //    auto RoughnessPass = std::make_shared<GRoughnessPass>("RoughnessBuffer");
-        //    RoughnessPass->SetLinkage("GBufferFramebuffer", "MetallicBuffer.GBufferFramebuffer");
+        {
+            auto RoughnessPass = std::make_shared<GRoughnessPass>("RoughnessBuffer");
+            RoughnessPass->SetLinkage("GBufferFramebuffer", "MetallicBuffer.GBufferFramebuffer");
 
-        //    this->AppendRenderPass(RoughnessPass);
-        //}
+            this->AppendRenderPass(RoughnessPass);
+        }
 
-        //{
-        //    auto NormalPass = std::make_shared<GNormalPass>("NormalBuffer");
-        //    NormalPass->SetLinkage("GBufferFramebuffer", "RoughnessBuffer.GBufferFramebuffer");
+        {
+            auto NormalPass = std::make_shared<GNormalPass>("NormalBuffer");
+            NormalPass->SetLinkage("GBufferFramebuffer", "RoughnessBuffer.GBufferFramebuffer");
 
-        //    this->AppendRenderPass(NormalPass);
-        //}
+            this->AppendRenderPass(NormalPass);
+        }
 
         this->Activate();
     }

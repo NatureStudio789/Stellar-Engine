@@ -21,4 +21,12 @@ namespace SE
 	};
 }
 
+/*
+Deferred Renderer Passes Framebuffer Indexes:
+	Albedo : 0
+	Metallic : 1
+	Roughness : 2
+	Normal : 3
+*/
+
 #endif

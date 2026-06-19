@@ -1,5 +1,35 @@
-float4 main() : SV_Target
+struct Input
 {
+    float4 Position : SV_POSITION;
+    float3 WorldPosition : WORLDPOSITION;
+    float2 TextureCoord : TEXTURECOORD;
+};
 
-    return float4(1.0f, 1.0f, 1.0f, 1.0f);
+SamplerState MaterialSampler : register(s0);
+Texture2D MetallicTexture : register(t1);
+
+cbuffer MaterialCBuffer : register(b1)
+{
+    float3 Albedo;
+    float HasAlbedoTexture;
+    float Metallic;
+    float HasMetallicTexture;
+    float Roughness;
+    float HasRoughnessTexture;
+    float HasNormalTexture;
+};
+
+float4 main(Input input) : SV_Target
+{
+    float4 Result;
+    if (HasMetallicTexture)
+    {
+        Result = float4(MetallicTexture.Sample(MaterialSampler, input.TextureCoord).rrr, 1.0f);
+    }
+    else
+    {
+        Result = float4(Metallic, Metallic, Metallic, 1.0f);
+    }
+    
+    return Result;
 }

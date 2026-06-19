@@ -50,23 +50,29 @@ namespace SE
 
 			LightingTechnique->AddRenderStage(AlbedoStage);
 
-			//auto& MetallicStage = std::make_shared<GRenderStage>("MetallicBuffer");
+			auto& MetallicStage = std::make_shared<GRenderStage>("MetallicBuffer");
 
-			//// Add applicable to stages;
+			// Add applicable to stages;
+			MetallicStage->AddApplicable(GTransformCBuffer::Create(GRenderGroup::METALLIC_GROUP, 0));
+			MetallicStage->AddApplicable(SMaterialRegistry::GetInstance(this->ItemData.MaterialId));
 
-			//LightingTechnique->AddRenderStage(MetallicStage);
+			LightingTechnique->AddRenderStage(MetallicStage);
 
-			//auto& RoughnessStage = std::make_shared<GRenderStage>("RoughnessBuffer");
+			auto& RoughnessStage = std::make_shared<GRenderStage>("RoughnessBuffer");
 
-			//// Add applicable to stages;
+			// Add applicable to stages;
+			RoughnessStage->AddApplicable(GTransformCBuffer::Create(GRenderGroup::ROUGHNESS_GROUP, 0));
+			RoughnessStage->AddApplicable(SMaterialRegistry::GetInstance(this->ItemData.MaterialId));
 
-			//LightingTechnique->AddRenderStage(RoughnessStage);
+			LightingTechnique->AddRenderStage(RoughnessStage);
 
-			//auto& NormalStage = std::make_shared<GRenderStage>("NormalBuffer");
+			auto& NormalStage = std::make_shared<GRenderStage>("NormalBuffer");
 
-			//// Add applicable to stages;
+			// Add applicable to stages;
+			NormalStage->AddApplicable(GTransformCBuffer::Create(GRenderGroup::NORMAL_GROUP, 0));
+			NormalStage->AddApplicable(SMaterialRegistry::GetInstance(this->ItemData.MaterialId));
 
-			//LightingTechnique->AddRenderStage(NormalStage);
+			LightingTechnique->AddRenderStage(NormalStage);
 		}
 
 		this->AddRenderTechnique(LightingTechnique);

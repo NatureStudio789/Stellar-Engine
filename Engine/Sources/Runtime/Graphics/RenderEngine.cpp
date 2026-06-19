@@ -88,39 +88,41 @@ namespace SE
 		//this->test1->Submit("main");
 		this->testmesh->Submit("main");
 
-		if (FKeyboard::GetKeyPress('W'))
-		{
-			this->TestCamera->Translate(0.0f, 0.0f, -0.1f);
-		}
-		if (FKeyboard::GetKeyPress('S'))
-		{
-			this->TestCamera->Translate(0.0f, 0.0f, 0.1f);
-		}
-		if (FKeyboard::GetKeyPress('A'))
-		{
-			this->TestCamera->Translate(-0.1f, 0.0f, 0.0f);
-		}
-		if (FKeyboard::GetKeyPress('D'))
-		{
-			this->TestCamera->Translate(0.1f, 0.0f, 0.0f);
-		}
-		if (FKeyboard::GetKeyPress('Q'))
-		{
-			this->TestCamera->Rotate({ 0.0f, -2.0f, 0.0f });
-		}
-		if (FKeyboard::GetKeyPress('E'))
-		{
-			this->TestCamera->Rotate({ 0.0f, 2.0f, 0.0f });
-		}
+		//if (FKeyboard::GetKeyPress('W'))
+		//{
+		//	this->TestCamera->Translate(0.0f, 0.0f, -0.1f);
+		//}
+		//if (FKeyboard::GetKeyPress('S'))
+		//{
+		//	this->TestCamera->Translate(0.0f, 0.0f, 0.1f);
+		//}
+		//if (FKeyboard::GetKeyPress('A'))
+		//{
+		//	this->TestCamera->Translate(0.1f, 0.0f, 0.0f);
+		//}
+		//if (FKeyboard::GetKeyPress('D'))
+		//{
+		//	this->TestCamera->Translate(-0.1f, 0.0f, 0.0f);
+		//}
+		//if (FKeyboard::GetKeyPress('Q'))
+		//{
+		//	this->TestCamera->Rotate({ 0.0f, -2.0f, 0.0f });
+		//}
+		//if (FKeyboard::GetKeyPress('E'))
+		//{
+		//	this->TestCamera->Rotate({ 0.0f, 2.0f, 0.0f });
+		//}
 
-		if (FKeyboard::GetKeyPress('Z'))
-		{
-			this->TestMeshTransform.Rotate({ 0.0f, -1.0f, 0.0f });
-		}
-		if (FKeyboard::GetKeyPress('X'))
-		{
-			this->TestMeshTransform.Rotate({ 0.0f, 1.0f, 0.0f });
-		}
+		//if (FKeyboard::GetKeyPress('Z'))
+		//{
+		//	this->TestMeshTransform.Rotate({ 0.0f, -1.0f, 0.0f });
+		//}
+		//if (FKeyboard::GetKeyPress('X'))
+		//{
+		//	this->TestMeshTransform.Rotate({ 0.0f, 1.0f, 0.0f });
+		//}
+
+		this->TestMeshTransform.Rotate({ 0.0f, -1.0f, 0.0f });
 
 		this->testmesh->SetTransform(this->TestMeshTransform);
 

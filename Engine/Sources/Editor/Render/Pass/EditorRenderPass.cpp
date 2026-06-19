@@ -88,6 +88,33 @@ namespace SE
 
 			ImGui::End();
 		}
+
+		{
+			ImGui::Begin("Metallic");
+
+			ImGui::Image((ImTextureID)SFramebufferRegistry::GetInstance("GBufferFramebuffer")->GetRTShaderResourceView(1)->GetGPUDescriptor().ptr,
+				ImVec2(1600, 900));
+
+			ImGui::End();
+		}
+
+		{
+			ImGui::Begin("Roughness");
+
+			ImGui::Image((ImTextureID)SFramebufferRegistry::GetInstance("GBufferFramebuffer")->GetRTShaderResourceView(2)->GetGPUDescriptor().ptr,
+				ImVec2(1600, 900));
+
+			ImGui::End();
+		}
+
+		{
+			ImGui::Begin("Normal");
+
+			ImGui::Image((ImTextureID)SFramebufferRegistry::GetInstance("GBufferFramebuffer")->GetRTShaderResourceView(3)->GetGPUDescriptor().ptr,
+				ImVec2(1600, 900));
+
+			ImGui::End();
+		}
 		
 		ImGui::End();
 
