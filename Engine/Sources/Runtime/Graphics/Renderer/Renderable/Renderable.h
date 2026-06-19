@@ -30,7 +30,7 @@ namespace SE
 		void SetAccumulatedMatrix(const glm::mat4x4& matrix);
 
 		void Apply();
-		void Submit(const std::string& channel);
+		void Submit(std::shared_ptr<GRenderable> self, const std::string& channel);
 
 		void LinkTechnique(const std::string& rendererName);
 

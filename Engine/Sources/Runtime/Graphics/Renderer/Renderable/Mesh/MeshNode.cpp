@@ -60,7 +60,7 @@ namespace SE
 			item->SetTransform(this->NodeTransform);
 			item->SetAccumulatedMatrix(accumulatedMatrix);
 
-			item->Submit(channel);
+			item->Submit(item, channel);
 		}
 
 		for (auto& child : this->ChildrenList)

@@ -30,8 +30,8 @@ namespace SE
 
 	void GClearPass::Execute()
 	{
-		auto& Framebuffer = SFramebufferRegistry::GetInstance(this->ClearingFramebufferPackage.GetResourceIdentifier().GetUUID()); 
-		
+		auto& Framebuffer = SFramebufferRegistry::GetInstance(this->ClearingFramebufferPackage.GetResourceIdentifier().GetUUID());
+
 		if (this->MultipleRenderTargetClearingList.empty())
 		{
 			Framebuffer->Begin();
@@ -40,14 +40,16 @@ namespace SE
 		}
 		else
 		{
+			// Batch all MRT buffer transitions into single barrier calls.
+			Framebuffer->BeginMultiple(this->MultipleRenderTargetClearingList);
+
 			for (const auto index : this->MultipleRenderTargetClearingList)
 			{
 				Framebuffer->SetCurrentBuffer(index);
-
-				Framebuffer->Begin();
 				Framebuffer->Clear({ 0.1f, 0.1f, 0.1f, 1.0f });
-				Framebuffer->End();
 			}
+
+			Framebuffer->EndMultiple(this->MultipleRenderTargetClearingList);
 		}
 	}
 }

@@ -84,6 +84,9 @@ namespace SE
 
 	void RenderEngine::Execute()
 	{
+		// Wait for the oldest in-flight frame to complete before recording new commands.
+		SGraphicsContextRegistry::GetMainInstance()->GetSwapChain()->WaitForFrameFence();
+
 		//this->test->Submit("main");
 		//this->test1->Submit("main");
 		this->testmesh->Submit("main");
@@ -139,6 +142,9 @@ namespace SE
 		SGraphicsContextRegistry::GetMainInstance()->ExecuteCommandLists(ExecutingCommandList);
 
 		SGraphicsContextRegistry::GetMainInstance()->Present(true);
+
+		// Signal that this frame's GPU work has been submitted; advance to next frame.
+		SGraphicsContextRegistry::GetMainInstance()->GetSwapChain()->MoveToNextFrame();
 	}
 
 	void RenderEngine::Release()

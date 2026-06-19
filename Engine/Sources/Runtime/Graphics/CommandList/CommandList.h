@@ -11,6 +11,8 @@ namespace SE
 	class GCommandList : public SCreatable<GCommandList>, public SAddressable
 	{
 	public:
+		static constexpr UINT ALLOCATOR_COUNT = 2;
+
 		enum Type
 		{
 			SE_COMMAND_LIST_DIRECT = D3D12_COMMAND_LIST_TYPE_DIRECT,
@@ -38,7 +40,8 @@ namespace SE
 	private:
 		Type CommandListType;
 
-		WRL::ComPtr<ID3D12CommandAllocator> CommandAllocator;
+		WRL::ComPtr<ID3D12CommandAllocator> CommandAllocators[ALLOCATOR_COUNT];
+		UINT CurrentAllocatorIndex = 0;
 		WRL::ComPtr<ID3D12GraphicsCommandList> CommandListInstance;
 	};
 

@@ -66,11 +66,11 @@ namespace SE
 		}
 	}
 
-	void GRenderStage::Submit(std::shared_ptr<GRenderable> renderable)
+	void GRenderStage::Submit(std::shared_ptr<GRenderStage> self, std::shared_ptr<GRenderable> renderable)
 	{
 		for (auto& targetPass : this->TargetPassList)
 		{
-			targetPass->Accept(GDrawTask::Create(std::make_shared<GRenderStage>(*this), renderable));
+			targetPass->Accept(GDrawTask::Create(self, renderable));
 		}
 	}
 

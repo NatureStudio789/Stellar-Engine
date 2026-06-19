@@ -91,11 +91,11 @@ namespace SE
 		this->Topology->Apply();
 	}
 
-	void GRenderable::Submit(const std::string& channel)
+	void GRenderable::Submit(std::shared_ptr<GRenderable> self, const std::string& channel)
 	{
 		for (auto& technique : this->RenderTechniqueList)
 		{
-			technique->Submit(std::make_shared<GRenderable>(*this), channel);
+			technique->Submit(self, channel);
 		}
 	}
 

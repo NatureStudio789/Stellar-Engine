@@ -76,7 +76,7 @@ namespace SE
 		{
 			for (auto& renderStage : this->RenderStageList)
 			{
-				renderStage->Submit(renderable);
+				renderStage->Submit(renderStage, renderable);
 			}
 		}
 	}

@@ -1,5 +1,6 @@
 #include <Core.h>
 #include "../Device/Device.h"
+#include "../Context/GraphicsContext.h"
 #include "SwapChain.h"
 
 namespace SE
@@ -76,6 +77,14 @@ namespace SE
 		this->FenceValue = 0;
 		SMessageHandler::Instance->Check(device->GetInstance()->CreateFence(
 			0, D3D12_FENCE_FLAG_NONE, __uuidof(ID3D12Fence), (void**)this->Fence.GetAddressOf()));
+
+		// Create frame pacing fences (one per in-flight frame).
+		for (UINT i = 0; i < FRAME_COUNT; i++)
+		{
+			this->FrameFenceValues[i] = 0;
+			SMessageHandler::Instance->Check(device->GetInstance()->CreateFence(
+				0, D3D12_FENCE_FLAG_NONE, __uuidof(ID3D12Fence), (void**)this->FrameFences[i].GetAddressOf()));
+		}
 	}
 
 	void GSwapChain::Resize(const glm::uvec2& newSize)
@@ -114,10 +123,38 @@ namespace SE
 	void GSwapChain::Present(std::shared_ptr<GDevice> device, UINT syncInterval)
 	{
 		SMessageHandler::Instance->Check(this->SwapChainInstance->Present(syncInterval, 0));
-		this->PresentBuffer->CurrentBufferIndex = 
+		this->PresentBuffer->CurrentBufferIndex =
 			(this->PresentBuffer->CurrentBufferIndex + 1) % this->PresentBuffer->Count;
+	}
 
-		this->Flush(device);
+	void GSwapChain::WaitForFrameFence()
+	{
+		UINT64 fenceValue = this->FrameFenceValues[this->CurrentFrameIndex];
+		if (fenceValue > 0 && this->FrameFences[this->CurrentFrameIndex]->GetCompletedValue() < fenceValue)
+		{
+			HANDLE eventHandle = CreateEventExA(nullptr, nullptr, 0, EVENT_ALL_ACCESS);
+			if (!eventHandle)
+			{
+				SMessageHandler::Instance->SetFatal("Graphics", "Failed to create frame fence event");
+			}
+
+			SMessageHandler::Instance->Check(
+				this->FrameFences[this->CurrentFrameIndex]->SetEventOnCompletion(fenceValue, eventHandle));
+
+			WaitForSingleObject(eventHandle, INFINITE);
+			CloseHandle(eventHandle);
+		}
+	}
+
+	void GSwapChain::MoveToNextFrame()
+	{
+		this->FrameFenceValues[this->CurrentFrameIndex]++;
+		SMessageHandler::Instance->Check(
+			SGraphicsContextRegistry::GetMainInstance()->GetDevice()->GetGraphicsCommandQueue()->Signal(
+				this->FrameFences[this->CurrentFrameIndex].Get(),
+				this->FrameFenceValues[this->CurrentFrameIndex]));
+
+		this->CurrentFrameIndex = (this->CurrentFrameIndex + 1) % FRAME_COUNT;
 	}
 
 	WRL::ComPtr<IDXGISwapChain> GSwapChain::GetInstance()

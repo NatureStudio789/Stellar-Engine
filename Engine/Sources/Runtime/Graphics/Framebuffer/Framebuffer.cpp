@@ -388,6 +388,36 @@ namespace SE
 		}
 	}
 
+	void GFramebuffer::BeginMultiple(const std::vector<unsigned int>& bufferIndices)
+	{
+		std::vector<D3D12_RESOURCE_BARRIER> barriers;
+		barriers.reserve(bufferIndices.size());
+		for (auto index : bufferIndices)
+		{
+			barriers.push_back(CD3DX12_RESOURCE_BARRIER::Transition(
+				this->RenderTargetBufferList[index].Get(),
+				D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE | D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,
+				D3D12_RESOURCE_STATE_RENDER_TARGET));
+		}
+		SCommandListRegistry::GetCurrentInstance()->GetInstance()->ResourceBarrier(
+			(UINT)barriers.size(), barriers.data());
+	}
+
+	void GFramebuffer::EndMultiple(const std::vector<unsigned int>& bufferIndices)
+	{
+		std::vector<D3D12_RESOURCE_BARRIER> barriers;
+		barriers.reserve(bufferIndices.size());
+		for (auto index : bufferIndices)
+		{
+			barriers.push_back(CD3DX12_RESOURCE_BARRIER::Transition(
+				this->RenderTargetBufferList[index].Get(),
+				D3D12_RESOURCE_STATE_RENDER_TARGET,
+				D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE | D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE));
+		}
+		SCommandListRegistry::GetCurrentInstance()->GetInstance()->ResourceBarrier(
+			(UINT)barriers.size(), barriers.data());
+	}
+
 	void GFramebuffer::Clear(const glm::vec4& color)
 	{
 		float fcolor[4] = { color.r, color.g, color.b, color.a };

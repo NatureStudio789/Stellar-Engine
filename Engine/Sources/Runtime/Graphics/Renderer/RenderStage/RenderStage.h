@@ -23,7 +23,7 @@ namespace SE
 		void SetParent(const GRenderable& renderable);
 
 		void Apply();
-		void Submit(std::shared_ptr<GRenderable> renderable);
+		void Submit(std::shared_ptr<GRenderStage> self, std::shared_ptr<GRenderable> renderable);
 
 		void Link(std::string rendererName);
 

@@ -12,8 +12,10 @@ namespace SE
 	class GSwapChain : public SCreatable<GSwapChain>
 	{
 	public:
+		static constexpr UINT FRAME_COUNT = 2;
+
 		GSwapChain();
-		GSwapChain(std::shared_ptr<GDevice> device, std::shared_ptr<FWindow::Handle> windowHandle, 
+		GSwapChain(std::shared_ptr<GDevice> device, std::shared_ptr<FWindow::Handle> windowHandle,
 			const glm::uvec2& backBufferSize, UINT backBufferCount, bool fullscreen);
 		GSwapChain(const GSwapChain& other);
 		~GSwapChain();
@@ -26,6 +28,9 @@ namespace SE
 		void Flush(std::shared_ptr<GDevice> device);
 		void Present(std::shared_ptr<GDevice> device, UINT syncInterval);
 
+		void WaitForFrameFence();
+		void MoveToNextFrame();
+
 		WRL::ComPtr<IDXGISwapChain> GetInstance();
 		std::shared_ptr<GPresentBuffer> GetPresentBuffer();
 
@@ -37,6 +42,10 @@ namespace SE
 
 		WRL::ComPtr<ID3D12Fence> Fence;
 		UINT FenceValue;
+
+		WRL::ComPtr<ID3D12Fence> FrameFences[FRAME_COUNT];
+		UINT64 FrameFenceValues[FRAME_COUNT] = {};
+		UINT CurrentFrameIndex = 0;
 	};
 }
 

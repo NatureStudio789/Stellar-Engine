@@ -27,9 +27,11 @@ namespace SE
 
 		void SetCurrentBuffer(unsigned int multipleRenderTargetBufferIndex);
 		void Begin();
+		void BeginMultiple(const std::vector<unsigned int>& bufferIndices);
 		void Clear(const glm::vec4& color);
 		void Apply();
 		void End();
+		void EndMultiple(const std::vector<unsigned int>& bufferIndices);
 
 		std::shared_ptr<GShaderResourceView> GetRTShaderResourceView(unsigned int multipleRenderTargetBufferIndex);
 		GResourcePackage GetResourcePackage() const noexcept;

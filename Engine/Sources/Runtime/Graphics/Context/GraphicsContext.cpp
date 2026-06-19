@@ -77,8 +77,6 @@ namespace SE
 	void GGraphicsContext::ExecuteCommandLists(const std::vector<ID3D12GraphicsCommandList*>& graphicsCommandLists)
 	{
 		this->Device->ExecuteCommandLists(graphicsCommandLists);
-
-		this->Flush();
 	}
 
 	void GGraphicsContext::ExecuteInitialization()
