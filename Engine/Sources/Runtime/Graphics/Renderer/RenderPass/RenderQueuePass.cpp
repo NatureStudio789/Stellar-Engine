@@ -14,7 +14,10 @@ namespace SE
 	{
 		GApplyPass::Apply();
 
-		SCameraRegistry::ApplyCurrentInstance();
+		if (this->EnableCamera)
+		{
+			SCameraRegistry::ApplyCurrentInstance();
+		}
 	}
 
 	void GRenderQueuePass::Execute()

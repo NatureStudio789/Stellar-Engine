@@ -33,7 +33,7 @@ namespace SE
 		void End();
 		void EndMultiple(const std::vector<unsigned int>& bufferIndices);
 
-		std::shared_ptr<GShaderResourceView> GetRTShaderResourceView(unsigned int multipleRenderTargetBufferIndex);
+		std::shared_ptr<GShaderResourceView> GetRTShaderResourceView(unsigned int multipleRenderTargetBufferIndex = 0);
 		GResourcePackage GetResourcePackage() const noexcept;
 
 	private:

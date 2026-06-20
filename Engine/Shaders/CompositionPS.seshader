@@ -1,0 +1,16 @@
+struct Input
+{
+    float4 Position : SV_POSITION;
+    float2 TextureCoord : TEXTURECOORD;
+};
+
+SamplerState MaterialSampler : register(s0);
+Texture2D AlbedoBuffer : register(t0);
+Texture2D MetallicBuffer : register(t1);
+Texture2D RoughnessBuffer : register(t2);
+Texture2D NormalBuffer : register(t3);
+
+float4 main(Input input) : SV_Target
+{
+    return float4((AlbedoBuffer.Sample(MaterialSampler, input.TextureCoord).rgb - MetallicBuffer.Sample(MaterialSampler, input.TextureCoord).rgb + RoughnessBuffer.Sample(MaterialSampler, input.TextureCoord).rgb), 1.0f);
+}

@@ -359,6 +359,56 @@ namespace SE
 		}
 
 		{
+			std::vector<GRootParameter> CompositionRootParameterList;
+
+			GRootParameter AlbedoBufferParameter;
+			AlbedoBufferParameter.ParameterType = GRootParameter::SE_PARAMETER_SRV;
+			AlbedoBufferParameter.ShaderRegisterIndex = 0;
+			AlbedoBufferParameter.DescriptorCount = 1;
+			CompositionRootParameterList.push_back(AlbedoBufferParameter);
+
+			GRootParameter MetallicBufferParameter;
+			MetallicBufferParameter.ParameterType = GRootParameter::SE_PARAMETER_SRV;
+			MetallicBufferParameter.ShaderRegisterIndex = 1;
+			MetallicBufferParameter.DescriptorCount = 1;
+			CompositionRootParameterList.push_back(MetallicBufferParameter);
+
+			GRootParameter RoughnessBufferParameter;
+			RoughnessBufferParameter.ParameterType = GRootParameter::SE_PARAMETER_SRV;
+			RoughnessBufferParameter.ShaderRegisterIndex = 2;
+			RoughnessBufferParameter.DescriptorCount = 1;
+			CompositionRootParameterList.push_back(RoughnessBufferParameter);
+
+			GRootParameter NormalBufferParameter;
+			NormalBufferParameter.ParameterType = GRootParameter::SE_PARAMETER_SRV;
+			NormalBufferParameter.ShaderRegisterIndex = 3;
+			NormalBufferParameter.DescriptorCount = 1;
+			CompositionRootParameterList.push_back(NormalBufferParameter);
+
+			auto CompositionPipelineState = GPipelineState::Create(GRenderGroup::COMPOSITION_GROUP);
+
+			CompositionPipelineState->AddShader(GShader::Create(GShader::SE_VERTEX_SHADER, "Engine/Shaders/CompositionVS.seshader"));
+			CompositionPipelineState->AddShader(GShader::Create(GShader::SE_PIXEL_SHADER, "Engine/Shaders/CompositionPS.seshader"));
+
+			CompositionPipelineState->SetTopology(GTopology::Create(GTopology::SE_TOPOLOGY_TRIANGLELIST));
+
+			CompositionPipelineState->SetRasterizerState(GPipelineState::RasterizerState(D3D12_CULL_MODE_BACK, D3D12_FILL_MODE_SOLID));
+
+			std::vector<D3D12_INPUT_ELEMENT_DESC> CompositionInputLayout =
+			{
+				{"POSITION", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
+				{"TEXTURECOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 8, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
+			};
+			CompositionPipelineState->SetInputLayout(GPipelineState::InputLayout(CompositionInputLayout));
+
+			CompositionPipelineState->GetRootSignature()->SetParameterList(CompositionRootParameterList);
+			CompositionPipelineState->GetRootSignature()->AddSamplerDescription(DefaultSampler);
+
+			CompositionPipelineState->Initialize();
+			Register(CompositionPipelineState);
+		}
+
+		{
 			auto LightingPipelineState = GPipelineState::Create(GRenderGroup::LIGHTING_GROUP);
 
 			LightingPipelineState->AddShader(GShader::Create(GShader::SE_VERTEX_SHADER, "Engine/Shaders/LightingVS.seshader"));

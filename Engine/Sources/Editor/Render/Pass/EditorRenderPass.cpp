@@ -81,23 +81,40 @@ namespace SE
 		ImGui::DockSpace(ImGui::GetID("MyDockspace"));
 
 		{
+			ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+
 			ImGui::Begin("Debug");
 
+			ImGui::PopStyleVar();
+
 			ImGui::Image((ImTextureID)SFramebufferRegistry::GetInstance("GBufferFramebuffer")->GetRTShaderResourceView(0)->GetGPUDescriptor().ptr,
-				ImVec2(800, 450));
+				ImVec2(840.0f, 472.5f));
 
 			ImGui::SameLine();
 
 			ImGui::Image((ImTextureID)SFramebufferRegistry::GetInstance("GBufferFramebuffer")->GetRTShaderResourceView(1)->GetGPUDescriptor().ptr,
-				ImVec2(800, 450));
+				ImVec2(840.0f, 472.5f));
 
 			ImGui::Image((ImTextureID)SFramebufferRegistry::GetInstance("GBufferFramebuffer")->GetRTShaderResourceView(2)->GetGPUDescriptor().ptr,
-				ImVec2(800, 450));
+				ImVec2(840.0f, 472.5f));
 
 			ImGui::SameLine();
 
 			ImGui::Image((ImTextureID)SFramebufferRegistry::GetInstance("GBufferFramebuffer")->GetRTShaderResourceView(3)->GetGPUDescriptor().ptr,
-				ImVec2(800, 450));
+				ImVec2(840.0f, 472.5f));
+
+			ImGui::End();
+		}
+
+		{
+			ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+
+			ImGui::Begin("Viewport");
+
+			ImGui::PopStyleVar();
+
+			ImGui::Image((ImTextureID)SFramebufferRegistry::GetInstance("FinalCompositionFramebuffer")->GetRTShaderResourceView()->GetGPUDescriptor().ptr,
+				ImVec2(1600, 900));
 
 			ImGui::End();
 		}

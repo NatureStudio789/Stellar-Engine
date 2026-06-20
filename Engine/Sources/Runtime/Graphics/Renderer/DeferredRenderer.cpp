@@ -6,22 +6,36 @@ namespace SE
 {
     GDeferredRenderer::GDeferredRenderer(const std::string& name) : GRenderer(name)
     {
-        this->GBufferFramebuffer = GFramebuffer::Create(glm::uvec2{ 2560, 1440 }, 4);
+        //The Framebuffer initial size is temperory. It will change according to graphics configuration later.
+        this->GBufferFramebuffer = GFramebuffer::Create(/*will be changed -> */glm::uvec2{ 2560, 1440 }, 4);
         this->GBufferFramebuffer->SetName("GBufferFramebuffer");
         SFramebufferRegistry::Register(this->GBufferFramebuffer);
 
         this->AddGlobalOutflow(GOutflow::Create("GBufferFramebuffer", this->GBufferFramebuffer->GetResourcePackage()));
 
-        {
-            auto ClearingPass = std::make_shared<GClearPass>("ClearingPass", std::vector<unsigned int>{ 0, 1, 2, 3 });
-            ClearingPass->SetLinkage("ClearingFramebuffer", "$.GBufferFramebuffer");
+        this->FinalCompositionFramebuffer = GFramebuffer::Create(/*will be changed -> */glm::uvec2{2560, 1440});
+        this->FinalCompositionFramebuffer->SetName("FinalCompositionFramebuffer");
+        SFramebufferRegistry::Register(this->FinalCompositionFramebuffer);
 
-            this->AppendRenderPass(ClearingPass);
+        this->AddGlobalOutflow(GOutflow::Create("CompositionFramebuffer", this->FinalCompositionFramebuffer->GetResourcePackage()));
+
+        {
+            auto GBufferClearingPass = std::make_shared<GClearPass>("GBufferClearingPass", std::vector<unsigned int>{ 0, 1, 2, 3 });
+            GBufferClearingPass->SetLinkage("ClearingFramebuffer", "$.GBufferFramebuffer");
+
+            this->AppendRenderPass(GBufferClearingPass);
+        }
+
+        {
+            auto CompositionFrameClearingPass = std::make_shared<GClearPass>("CompositionBufferClearingPass");
+            CompositionFrameClearingPass->SetLinkage("ClearingFramebuffer", "$.CompositionFramebuffer");
+
+            this->AppendRenderPass(CompositionFrameClearingPass);
         }
 
         {
             auto AlbedoPass = std::make_shared<GAlbedoPass>("AlbedoBuffer");
-            AlbedoPass->SetLinkage("GBufferFramebuffer", "ClearingPass.ClearingFramebuffer");
+            AlbedoPass->SetLinkage("GBufferFramebuffer", "GBufferClearingPass.ClearingFramebuffer");
 
             this->AppendRenderPass(AlbedoPass);
         }
@@ -45,6 +59,14 @@ namespace SE
             NormalPass->SetLinkage("GBufferFramebuffer", "RoughnessBuffer.GBufferFramebuffer");
 
             this->AppendRenderPass(NormalPass);
+        }
+
+        {
+            auto CompositionPass = std::make_shared<GCompositionPass>("CompositionPass");
+            CompositionPass->SetLinkage("CompositionFramebuffer", "CompositionBufferClearingPass.ClearingFramebuffer");
+            CompositionPass->SetLinkage("GBuffer", "NormalBuffer.GBufferFramebuffer");
+
+            this->AppendRenderPass(CompositionPass);
         }
 
         this->Activate();

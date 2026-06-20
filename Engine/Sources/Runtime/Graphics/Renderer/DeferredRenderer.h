@@ -1,10 +1,13 @@
 #ifndef _SE_DEFERREDRENDERER_H_
 #define _SE_DEFERREDRENDERER_H_
 #include "RenderPass/ClearPass.h"
+
 #include "RenderPass/DeferredRendering/AlbedoPass.h"
 #include "RenderPass/DeferredRendering/MetallicPass.h"
 #include "RenderPass/DeferredRendering/RoughnessPass.h"
 #include "RenderPass/DeferredRendering/NormalPass.h"
+#include "RenderPass/DeferredRendering/CompositionPass.h"
+
 #include "Renderer.h"
 
 namespace SE
@@ -18,6 +21,7 @@ namespace SE
 
 	private:
 		std::shared_ptr<GFramebuffer> GBufferFramebuffer;
+		std::shared_ptr<GFramebuffer> FinalCompositionFramebuffer;
 	};
 }
 
