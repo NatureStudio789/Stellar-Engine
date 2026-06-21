@@ -1,5 +1,16 @@
 #include <Core.h>
+
 #include "../Framebuffer/Framebuffer.h"
+
+#include "RenderPass/ClearPass.h"
+
+#include "RenderPass/DeferredRendering/AlbedoPass.h"
+#include "RenderPass/DeferredRendering/MetallicPass.h"
+#include "RenderPass/DeferredRendering/RoughnessPass.h"
+#include "RenderPass/DeferredRendering/NormalPass.h"
+#include "RenderPass/DeferredRendering/PositionPass.h"
+#include "RenderPass/DeferredRendering/CompositionPass.h"
+
 #include "DeferredRenderer.h"
 
 namespace SE
@@ -7,7 +18,7 @@ namespace SE
     GDeferredRenderer::GDeferredRenderer(const std::string& name) : GRenderer(name)
     {
         //The Framebuffer initial size is temperory. It will change according to graphics configuration later.
-        this->GBufferFramebuffer = GFramebuffer::Create(/*will be changed -> */glm::uvec2{ 2560, 1440 }, 4);
+        this->GBufferFramebuffer = GFramebuffer::Create(/*will be changed -> */glm::uvec2{ 2560, 1440 }, 5);
         this->GBufferFramebuffer->SetName("GBufferFramebuffer");
         SFramebufferRegistry::Register(this->GBufferFramebuffer);
 
@@ -20,7 +31,7 @@ namespace SE
         this->AddGlobalOutflow(GOutflow::Create("CompositionFramebuffer", this->FinalCompositionFramebuffer->GetResourcePackage()));
 
         {
-            auto GBufferClearingPass = std::make_shared<GClearPass>("GBufferClearingPass", std::vector<unsigned int>{ 0, 1, 2, 3 });
+            auto GBufferClearingPass = std::make_shared<GClearPass>("GBufferClearingPass", std::vector<unsigned int>{ 0, 1, 2, 3, 4 });
             GBufferClearingPass->SetLinkage("ClearingFramebuffer", "$.GBufferFramebuffer");
 
             this->AppendRenderPass(GBufferClearingPass);
@@ -62,9 +73,16 @@ namespace SE
         }
 
         {
+            auto PositionPass = std::make_shared<GPositionPass>("PositionBuffer");
+            PositionPass->SetLinkage("GBufferFramebuffer", "NormalBuffer.GBufferFramebuffer");
+
+            this->AppendRenderPass(PositionPass);
+        }
+
+        {
             auto CompositionPass = std::make_shared<GCompositionPass>("CompositionPass");
             CompositionPass->SetLinkage("CompositionFramebuffer", "CompositionBufferClearingPass.ClearingFramebuffer");
-            CompositionPass->SetLinkage("GBuffer", "NormalBuffer.GBufferFramebuffer");
+            CompositionPass->SetLinkage("GBuffer", "PositionBuffer.GBufferFramebuffer");
 
             this->AppendRenderPass(CompositionPass);
         }

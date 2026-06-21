@@ -359,6 +359,31 @@ namespace SE
 		}
 
 		{
+			auto PositionPipelineState = GPipelineState::Create(GRenderGroup::POSITION_GROUP);
+
+			PositionPipelineState->AddShader(GShader::Create(GShader::SE_VERTEX_SHADER, "Engine/Shaders/PositionVS.seshader"));
+			PositionPipelineState->AddShader(GShader::Create(GShader::SE_PIXEL_SHADER, "Engine/Shaders/PositionPS.seshader"));
+
+			PositionPipelineState->SetTopology(GTopology::Create(GTopology::SE_TOPOLOGY_TRIANGLELIST));
+
+			PositionPipelineState->SetRasterizerState(GPipelineState::RasterizerState(D3D12_CULL_MODE_BACK, D3D12_FILL_MODE_SOLID));
+
+			std::vector<D3D12_INPUT_ELEMENT_DESC> PositionInputLayout =
+			{
+				{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
+				{"TEXTURECOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
+				{"NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 20, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
+			};
+			PositionPipelineState->SetInputLayout(GPipelineState::InputLayout(PositionInputLayout));
+
+			PositionPipelineState->GetRootSignature()->SetParameterList(LightingRootParameterList);
+			PositionPipelineState->GetRootSignature()->AddSamplerDescription(DefaultSampler);
+
+			PositionPipelineState->Initialize();
+			Register(PositionPipelineState);
+		}
+
+		{
 			std::vector<GRootParameter> CompositionRootParameterList;
 
 			GRootParameter AlbedoBufferParameter;
@@ -384,6 +409,12 @@ namespace SE
 			NormalBufferParameter.ShaderRegisterIndex = 3;
 			NormalBufferParameter.DescriptorCount = 1;
 			CompositionRootParameterList.push_back(NormalBufferParameter);
+
+			GRootParameter PositionBufferParameter;
+			PositionBufferParameter.ParameterType = GRootParameter::SE_PARAMETER_SRV;
+			PositionBufferParameter.ShaderRegisterIndex = 4;
+			PositionBufferParameter.DescriptorCount = 1;
+			CompositionRootParameterList.push_back(PositionBufferParameter);
 
 			auto CompositionPipelineState = GPipelineState::Create(GRenderGroup::COMPOSITION_GROUP);
 

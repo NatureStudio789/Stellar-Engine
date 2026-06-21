@@ -1,0 +1,14 @@
+struct Input
+{
+    float4 Position : SV_POSITION;
+    float3 WorldPosition : WORLDPOSITION;
+};
+
+float4 main(Input input) : SV_Target
+{
+    float4 Result;
+    
+    Result = float4(input.WorldPosition, 1.0f);
+
+    return Result;
+}

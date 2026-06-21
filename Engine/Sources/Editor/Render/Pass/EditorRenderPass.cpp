@@ -1,6 +1,7 @@
 #include <Core.h>
 #include "../../Runtime/Graphics/Framebuffer/Framebuffer.h"
 #include "../../Runtime/Graphics/Texture/Texture.h"
+#include "../../../Runtime/Function/Input/Input.h"
 #include "EditorRenderPass.h"
 
 namespace SE
@@ -83,25 +84,64 @@ namespace SE
 		{
 			ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
 
-			ImGui::Begin("Debug");
+			ImGui::Begin("Albedo");
 
 			ImGui::PopStyleVar();
 
 			ImGui::Image((ImTextureID)SFramebufferRegistry::GetInstance("GBufferFramebuffer")->GetRTShaderResourceView(0)->GetGPUDescriptor().ptr,
-				ImVec2(840.0f, 472.5f));
+				ImVec2(1600, 900));
 
-			ImGui::SameLine();
+			ImGui::End();
+		}
+
+		{
+			ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+
+			ImGui::Begin("Metallic");
+
+			ImGui::PopStyleVar();
 
 			ImGui::Image((ImTextureID)SFramebufferRegistry::GetInstance("GBufferFramebuffer")->GetRTShaderResourceView(1)->GetGPUDescriptor().ptr,
-				ImVec2(840.0f, 472.5f));
+				ImVec2(1600, 900));
+
+			ImGui::End();
+		}
+
+		{
+			ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+
+			ImGui::Begin("Roughness");
+
+			ImGui::PopStyleVar();
 
 			ImGui::Image((ImTextureID)SFramebufferRegistry::GetInstance("GBufferFramebuffer")->GetRTShaderResourceView(2)->GetGPUDescriptor().ptr,
-				ImVec2(840.0f, 472.5f));
+				ImVec2(1600, 900));
 
-			ImGui::SameLine();
+			ImGui::End();
+		}
+
+		{
+			ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+
+			ImGui::Begin("Normal");
+
+			ImGui::PopStyleVar();
 
 			ImGui::Image((ImTextureID)SFramebufferRegistry::GetInstance("GBufferFramebuffer")->GetRTShaderResourceView(3)->GetGPUDescriptor().ptr,
-				ImVec2(840.0f, 472.5f));
+				ImVec2(1600, 900));
+
+			ImGui::End();
+		}
+
+		{
+			ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+
+			ImGui::Begin("Position");
+
+			ImGui::PopStyleVar();
+
+			ImGui::Image((ImTextureID)SFramebufferRegistry::GetInstance("GBufferFramebuffer")->GetRTShaderResourceView(4)->GetGPUDescriptor().ptr,
+				ImVec2(1600, 900));
 
 			ImGui::End();
 		}
@@ -115,6 +155,54 @@ namespace SE
 
 			ImGui::Image((ImTextureID)SFramebufferRegistry::GetInstance("FinalCompositionFramebuffer")->GetRTShaderResourceView()->GetGPUDescriptor().ptr,
 				ImVec2(1600, 900));
+
+			ImGui::End();
+		}
+
+		{
+			static unsigned int index = 5;
+
+			ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+
+			ImGui::Begin("Goodie");
+
+			ImGui::PopStyleVar();
+
+			if (index < 5)
+			{
+				ImGui::Image((ImTextureID)SFramebufferRegistry::GetInstance("GBufferFramebuffer")->GetRTShaderResourceView(index)->GetGPUDescriptor().ptr,
+					ImVec2(1600, 900));
+			}
+			else
+			{
+				ImGui::Image((ImTextureID)SFramebufferRegistry::GetInstance("FinalCompositionFramebuffer")->GetRTShaderResourceView()->GetGPUDescriptor().ptr,
+					ImVec2(1600, 900));
+			}
+
+			if (FKeyboard::GetKeyPress('X'))
+			{
+				index = 0;
+			}
+			if (FKeyboard::GetKeyPress('C'))
+			{
+				index = 1;
+			}
+			if (FKeyboard::GetKeyPress('V'))
+			{
+				index = 2;
+			}
+			if (FKeyboard::GetKeyPress('B'))
+			{
+				index = 3;
+			}
+			if (FKeyboard::GetKeyPress('N'))
+			{
+				index = 4;
+			}
+			if (FKeyboard::GetKeyPress('M'))
+			{
+				index = 5;
+			}
 
 			ImGui::End();
 		}

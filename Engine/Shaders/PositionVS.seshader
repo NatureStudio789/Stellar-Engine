@@ -9,7 +9,6 @@ struct Output
 {
     float4 Position : SV_POSITION;
     float3 WorldPosition : WORLDPOSITION;
-    float2 TextureCoord : TEXTURECOORD;
 };
 
 cbuffer Transform : register(b0)
@@ -32,7 +31,6 @@ Output main(Input input)
     
     output.WorldPosition = WorldPosition.xyz;
     output.Position = mul(WorldPosition, CameraMatrix);
-    output.TextureCoord = input.TextureCoord;
 
     return output;
 }

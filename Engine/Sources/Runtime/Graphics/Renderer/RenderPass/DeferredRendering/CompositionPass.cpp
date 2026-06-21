@@ -114,10 +114,15 @@ namespace SE
 		NormalSRV->SetRootParameterIndex(SPipelineStateRegistry::GetInstance(GRenderGroup::COMPOSITION_GROUP)->GetRootSignature()->
 			GetRootParameterIndex(GRootParameter(GRootParameter::SE_PARAMETER_SRV, 3)));
 
+		auto& PositionSRV = GBufferFramebuffer->GetRTShaderResourceView(4);
+		PositionSRV->SetRootParameterIndex(SPipelineStateRegistry::GetInstance(GRenderGroup::COMPOSITION_GROUP)->GetRootSignature()->
+			GetRootParameterIndex(GRootParameter(GRootParameter::SE_PARAMETER_SRV, 4)));
+
 		this->AddApplicable(AlbedoSRV);
 		this->AddApplicable(MetallicSRV);
 		this->AddApplicable(RoughnessSRV);
 		this->AddApplicable(NormalSRV);
+		this->AddApplicable(PositionSRV);
 
 		this->FramebufferPresenter->LinkTechnique("MainDeferredRenderer");
 	}

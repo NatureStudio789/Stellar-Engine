@@ -54,12 +54,16 @@ namespace SE
 			{
 				this->CameraMatrix = glm::mat4x4(1.0f);
 			}
-			CBufferData(const glm::mat4x4& camera)
+			CBufferData(const glm::mat4x4& camera, const glm::vec3& position, float farZ)
 			{
 				this->CameraMatrix = camera;
+				this->CameraPosition = position;
+				this->FarZ = farZ;
 			}
 
 			glm::mat4x4 CameraMatrix;
+			glm::vec3 CameraPosition;
+			float FarZ;
 		};
 
 		std::shared_ptr<GConstantBuffer<CBufferData>> CameraCBuffer;

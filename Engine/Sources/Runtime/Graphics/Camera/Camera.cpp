@@ -149,7 +149,7 @@ namespace SE
 	{
 		glm::mat4x4 CameraMatrix = this->GetProjectionMatrix() * this->GetViewMatrix();
 		CameraMatrix = glm::transpose(CameraMatrix);
-		this->CameraCBuffer->UpdateData({ CameraMatrix });
+		this->CameraCBuffer->UpdateData({ CameraMatrix, this->Position, this->FarZ });
 
 		this->CameraCBuffer->Apply();
 	}

@@ -73,6 +73,13 @@ namespace SE
 			NormalStage->AddApplicable(SMaterialRegistry::GetInstance(this->ItemData.MaterialId));
 
 			LightingTechnique->AddRenderStage(NormalStage);
+
+			auto& PositionStage = std::make_shared<GRenderStage>("PositionBuffer");
+
+			// Add applicable to stages;
+			PositionStage->AddApplicable(GTransformCBuffer::Create(GRenderGroup::POSITION_GROUP, 0));
+
+			LightingTechnique->AddRenderStage(PositionStage);
 		}
 
 		this->AddRenderTechnique(LightingTechnique);

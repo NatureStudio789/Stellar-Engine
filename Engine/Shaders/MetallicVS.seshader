@@ -20,6 +20,8 @@ cbuffer Transform : register(b0)
 cbuffer Camera : register(b2)
 {
     float4x4 CameraMatrix;
+    float3 CameraPosition;
+    float FarZ;
 };
 
 Output main(Input input)

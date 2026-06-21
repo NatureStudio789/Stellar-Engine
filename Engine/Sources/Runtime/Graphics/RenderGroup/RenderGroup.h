@@ -17,11 +17,10 @@ namespace SE
 		static std::string METALLIC_GROUP;
 		static std::string ROUGHNESS_GROUP;
 		static std::string NORMAL_GROUP;
+		static std::string POSITION_GROUP;
 		static std::string COMPOSITION_GROUP;
 
 		static std::string FULLSCREEN_GROUP;
-
-		static std::string DEPTH_GROUP;
 
 		static bool CheckAvailable(const std::string& groupName);
 	};
