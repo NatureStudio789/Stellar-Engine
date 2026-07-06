@@ -1,5 +1,6 @@
 #include <Core.h>
 #include "../../../Framebuffer/Framebuffer.h"
+#include "../../../Buffer/ConstantBuffer.h"
 #include "../../../PipelineState/PipelineState.h"
 
 #include "../../Renderable/Renderable.h"
@@ -30,7 +31,7 @@ namespace SE
 	void GCompositionPass::Initialize(const std::string& name)
 	{
 		this->RenderPassName = name;
-		this->EnableCamera = false;
+		this->EnableUniversalCameraForRendering = false;
 
 		auto& CompositionFramebufferInflow = GInflow::Create("CompositionFramebuffer", this->FramebufferPackage);
 		this->AddInflow(CompositionFramebufferInflow);
@@ -73,9 +74,12 @@ namespace SE
 			std::make_shared<GIndexBuffer>(Indices.data(), (unsigned int)Indices.size()), 
 			GTopology::Create(GTopology::SE_TOPOLOGY_TRIANGLELIST));
 
+		this->AttributionCBuffer = std::make_shared<GConstantBuffer<AttriCBufferData>>(GRenderGroup::COMPOSITION_GROUP);
+
 		auto& CompositionTechnique = std::make_shared<GRenderTechnique>("CompositionTechnique", "main");
 
 		auto& CompositionStage = std::make_shared<GRenderStage>(name);
+		CompositionStage->AddApplicable(this->AttributionCBuffer);
 		CompositionTechnique->AddRenderStage(CompositionStage);
 
 		this->FramebufferPresenter->AddRenderTechnique(CompositionTechnique);
@@ -90,6 +94,10 @@ namespace SE
 		}
 
 		this->FramebufferPresenter->Submit(this->FramebufferPresenter, "main");
+		
+		AttriCBufferData data;
+		data.ViewPosition = SCameraRegistry::GetCurrentInstance()->Position;
+		this->AttributionCBuffer->UpdateData(data);
 
 		GRenderQueuePass::Execute();
 	}

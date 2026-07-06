@@ -35,7 +35,7 @@ namespace SE
 		if (this->MultipleRenderTargetClearingList.empty())
 		{
 			Framebuffer->Begin();
-			Framebuffer->Clear({ 0.1f, 0.1f, 0.1f, 1.0f });
+			Framebuffer->Clear({ 0.0f, 0.0f, 0.0f, 1.0f });
 			Framebuffer->End();
 		}
 		else
@@ -46,7 +46,7 @@ namespace SE
 			for (const auto index : this->MultipleRenderTargetClearingList)
 			{
 				Framebuffer->SetCurrentBuffer(index);
-				Framebuffer->Clear({ 0.1f, 0.1f, 0.1f, 1.0f });
+				Framebuffer->Clear({ 0.0f, 0.0f, 0.0f, 1.0f });
 			}
 
 			Framebuffer->EndMultiple(this->MultipleRenderTargetClearingList);

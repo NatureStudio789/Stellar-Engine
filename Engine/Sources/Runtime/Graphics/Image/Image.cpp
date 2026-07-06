@@ -45,8 +45,6 @@ namespace SE
 
 	void GImage::Initialize(unsigned char* data, unsigned long long dataSize)
 	{
-		SMessageHandler::Instance->Check(CoInitializeEx(null, COINIT_MULTITHREADED));
-
 		SMessageHandler::Instance->Check(DirectX::LoadFromWICMemory(
 			data, dataSize, DirectX::WIC_FLAGS_IGNORE_SRGB, null, this->ImageInstance));
 
@@ -62,8 +60,6 @@ namespace SE
 
 	void GImage::Initialize(const std::string& filePath)
 	{
-		SMessageHandler::Instance->Check(CoInitializeEx(null, COINIT_MULTITHREADED));
-
 		SMessageHandler::Instance->Check(DirectX::LoadFromWICFile(std::wstring(filePath.begin(), filePath.end()).c_str(),
 			DirectX::WIC_FLAGS_IGNORE_SRGB, null, this->ImageInstance));
 

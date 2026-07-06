@@ -1,7 +1,21 @@
+#include "Light/Lighting.sesheader"
+
 struct Input
 {
     float4 Position : SV_POSITION;
     float2 TextureCoord : TEXTURECOORD;
+};
+
+cbuffer Camera : register(b0)
+{
+    float3 CameraPosition;
+};
+
+cbuffer LightingBuffer : register(b3)
+{
+    PointLight PointLightList[50];
+    float padding;
+    int PointLightCount;
 };
 
 SamplerState MaterialSampler : register(s0);
@@ -9,9 +23,30 @@ Texture2D AlbedoBuffer : register(t0);
 Texture2D MetallicBuffer : register(t1);
 Texture2D RoughnessBuffer : register(t2);
 Texture2D NormalBuffer : register(t3);
-Texture2D DepthBuffer : register(t4);
+Texture2D PositionBuffer : register(t4);
 
 float4 main(Input input) : SV_Target
 {
-    return float4((AlbedoBuffer.Sample(MaterialSampler, input.TextureCoord).rgb + MetallicBuffer.Sample(MaterialSampler, input.TextureCoord).rgb - RoughnessBuffer.Sample(MaterialSampler, input.TextureCoord).rgb) * DepthBuffer.Sample(MaterialSampler, input.TextureCoord).rgb, 1.0f);
+    LightingMaterial Material;
+
+    Material.Albedo = AlbedoBuffer.Sample(MaterialSampler, input.TextureCoord).rgb;
+    Material.Roughness = RoughnessBuffer.Sample(MaterialSampler, input.TextureCoord).r;
+    Material.Metallic = MetallicBuffer.Sample(MaterialSampler, input.TextureCoord).r;
+    Material.AmbientOcclusion = 1.0f;
+
+    float3 WorldPosition = PositionBuffer.Sample(MaterialSampler, input.TextureCoord).rgb;
+    float3 Normal = NormalBuffer.Sample(MaterialSampler, input.TextureCoord).rgb;
+
+    float3 Result = float3(0.0f, 0.0f, 0.0f);
+
+    [unroll]
+    for (int i = 0; i < PointLightCount; i++)
+    {
+        Result += DirectLighting(PointLightList[i], Material, WorldPosition, CameraPosition, Normal);
+    }
+
+    Result = AmbientLighting(Result, Material);
+
+    return float4(Result, 1.0f);
+    //return float4((AlbedoBuffer.Sample(MaterialSampler, input.TextureCoord).rgb + MetallicBuffer.Sample(MaterialSampler, input.TextureCoord).rgb - RoughnessBuffer.Sample(MaterialSampler, input.TextureCoord).rgb) * PositionBuffer.Sample(MaterialSampler, input.TextureCoord).rgb, 1.0f);
 }

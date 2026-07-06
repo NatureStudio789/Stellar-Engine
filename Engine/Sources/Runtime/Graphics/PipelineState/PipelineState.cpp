@@ -91,6 +91,17 @@ namespace SE
 		this->BlendStateInstance = blendState;
 	}
 
+	void GPipelineState::SetRenderTargetConfiguration(const RenderTargetConfiguration& renderTargetConfiguration)
+	{
+		if (this->IsInitialized)
+		{
+			SMessageHandler::Instance->SetFatal("Graphics", "It is NOT allowed to set this into pipeline state "
+				"when pipeline state has ALREADY been initialized!");
+		}
+
+		this->RenderTargetConfigurationInstance = renderTargetConfiguration;
+	}
+
 	void GPipelineState::Initialize()
 	{
 		this->RootSignature->Initialize();
@@ -158,8 +169,12 @@ namespace SE
 		}
 		PipelineStateDesc.PrimitiveTopologyType = Type;
 
-		PipelineStateDesc.NumRenderTargets = 1;
-		PipelineStateDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
+		PipelineStateDesc.NumRenderTargets = this->RenderTargetConfigurationInstance.RenderTargetCount;
+		for (UINT i = 0; i < PipelineStateDesc.NumRenderTargets; i++)
+		{
+			PipelineStateDesc.RTVFormats[i] = this->RenderTargetConfigurationInstance.RenderTargetFormat[i];
+		}
+
 		PipelineStateDesc.SampleDesc.Count = 1;
 		PipelineStateDesc.SampleDesc.Quality = 0;
 		PipelineStateDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
@@ -223,6 +238,12 @@ namespace SE
 		CameraParameter.DescriptorCount = 1;
 		CameraParameter.ShaderRegisterIndex = 2;
 		LightingRootParameterList.push_back(CameraParameter);
+
+		GRootParameter LightParameter;
+		LightParameter.ParameterType = GRootParameter::SE_PARAMETER_CBV;
+		LightParameter.DescriptorCount = 1;
+		LightParameter.ShaderRegisterIndex = 3;
+		LightingRootParameterList.push_back(LightParameter);
 
 		GRootParameter AlbedoParameter;
 		AlbedoParameter.ParameterType = GRootParameter::SE_PARAMETER_SRV;
@@ -354,6 +375,11 @@ namespace SE
 			NormalPipelineState->GetRootSignature()->SetParameterList(LightingRootParameterList);
 			NormalPipelineState->GetRootSignature()->AddSamplerDescription(DefaultSampler);
 
+			GPipelineState::RenderTargetConfiguration RTConfiguration;
+			RTConfiguration.RenderTargetCount = 1;
+			RTConfiguration.RenderTargetFormat[0] = DXGI_FORMAT_R16G16B16A16_FLOAT;
+			NormalPipelineState->SetRenderTargetConfiguration(RTConfiguration);
+
 			NormalPipelineState->Initialize();
 			Register(NormalPipelineState);
 		}
@@ -379,12 +405,29 @@ namespace SE
 			PositionPipelineState->GetRootSignature()->SetParameterList(LightingRootParameterList);
 			PositionPipelineState->GetRootSignature()->AddSamplerDescription(DefaultSampler);
 
+			GPipelineState::RenderTargetConfiguration RTConfiguration;
+			RTConfiguration.RenderTargetCount = 1;
+			RTConfiguration.RenderTargetFormat[0] = DXGI_FORMAT_R16G16B16A16_FLOAT;
+			PositionPipelineState->SetRenderTargetConfiguration(RTConfiguration);
+
 			PositionPipelineState->Initialize();
 			Register(PositionPipelineState);
 		}
 
 		{
 			std::vector<GRootParameter> CompositionRootParameterList;
+
+			GRootParameter AttributionParameter;
+			AttributionParameter.ParameterType = GRootParameter::SE_PARAMETER_CBV;
+			AttributionParameter.DescriptorCount = 1;
+			AttributionParameter.ShaderRegisterIndex = 0;
+			CompositionRootParameterList.push_back(AttributionParameter);
+
+			GRootParameter LightParameter;
+			LightParameter.ParameterType = GRootParameter::SE_PARAMETER_CBV;
+			LightParameter.DescriptorCount = 1;
+			LightParameter.ShaderRegisterIndex = 3;
+			CompositionRootParameterList.push_back(LightParameter);
 
 			GRootParameter AlbedoBufferParameter;
 			AlbedoBufferParameter.ParameterType = GRootParameter::SE_PARAMETER_SRV;

@@ -11,6 +11,8 @@
 #include "RenderPass/DeferredRendering/PositionPass.h"
 #include "RenderPass/DeferredRendering/CompositionPass.h"
 
+#include "Lighting/PointLight/PointLightRegistry.h"
+
 #include "DeferredRenderer.h"
 
 namespace SE
@@ -18,7 +20,15 @@ namespace SE
     GDeferredRenderer::GDeferredRenderer(const std::string& name) : GRenderer(name)
     {
         //The Framebuffer initial size is temperory. It will change according to graphics configuration later.
-        this->GBufferFramebuffer = GFramebuffer::Create(/*will be changed -> */glm::uvec2{ 2560, 1440 }, 5);
+        std::vector<DXGI_FORMAT> FormatList =
+        {
+            DXGI_FORMAT_R8G8B8A8_UNORM,
+            DXGI_FORMAT_R8G8B8A8_UNORM,
+            DXGI_FORMAT_R8G8B8A8_UNORM,
+            DXGI_FORMAT_R16G16B16A16_FLOAT,
+            DXGI_FORMAT_R16G16B16A16_FLOAT,
+        };
+        this->GBufferFramebuffer = GFramebuffer::Create(/*will be changed -> */glm::uvec2{ 2560, 1440 }, 5, FormatList);
         this->GBufferFramebuffer->SetName("GBufferFramebuffer");
         SFramebufferRegistry::Register(this->GBufferFramebuffer);
 
@@ -80,13 +90,18 @@ namespace SE
         }
 
         {
-            auto CompositionPass = std::make_shared<GCompositionPass>("CompositionPass");
-            CompositionPass->SetLinkage("CompositionFramebuffer", "CompositionBufferClearingPass.ClearingFramebuffer");
-            CompositionPass->SetLinkage("GBuffer", "PositionBuffer.GBufferFramebuffer");
+            this->CompositionPass = std::make_shared<GCompositionPass>("CompositionPass");
+            this->CompositionPass->SetLinkage("CompositionFramebuffer", "CompositionBufferClearingPass.ClearingFramebuffer");
+            this->CompositionPass->SetLinkage("GBuffer", "PositionBuffer.GBufferFramebuffer");
 
-            this->AppendRenderPass(CompositionPass);
+            this->AppendRenderPass(this->CompositionPass);
         }
 
         this->Activate();
+    }
+
+    void GDeferredRenderer::SetLightRegistry(std::shared_ptr<GPointLightRegistry> registry)
+    {
+        this->CompositionPass->AddApplicable(registry->LightCBuffer);
     }
 }

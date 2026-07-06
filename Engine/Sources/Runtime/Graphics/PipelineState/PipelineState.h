@@ -58,6 +58,18 @@ namespace SE
 			bool EnableBlend;
 		};
 
+		struct RenderTargetConfiguration
+		{
+			RenderTargetConfiguration()
+			{
+				this->RenderTargetCount = 1;
+				this->RenderTargetFormat[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
+			}
+
+			unsigned int RenderTargetCount;
+			DXGI_FORMAT RenderTargetFormat[8];
+		};
+
 	public:
 		GPipelineState();
 		GPipelineState(const std::string& name);
@@ -70,6 +82,7 @@ namespace SE
 		void SetTopology(std::shared_ptr<GTopology> topology);
 		void SetRasterizerState(const RasterizerState& rasterizerState);
 		void SetBlendState(const BlendState& blendState);
+		void SetRenderTargetConfiguration(const RenderTargetConfiguration& renderTargetConfiguration);
 
 		void Initialize();
 
@@ -89,6 +102,7 @@ namespace SE
 		std::shared_ptr<GTopology> Topology;
 		RasterizerState RasterizeStateInstance;
 		BlendState BlendStateInstance;
+		RenderTargetConfiguration RenderTargetConfigurationInstance;
 
 		bool IsInitialized;
 	};

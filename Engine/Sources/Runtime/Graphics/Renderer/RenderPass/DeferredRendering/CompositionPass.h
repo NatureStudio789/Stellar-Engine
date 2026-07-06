@@ -9,6 +9,12 @@ namespace SE
 	class GCompositionPass : public GRenderQueuePass
 	{
 	public:
+		struct AttriCBufferData
+		{
+			glm::vec3 ViewPosition;
+		};
+
+	public:
 		GCompositionPass();
 		GCompositionPass(const std::string& name);
 		GCompositionPass(const GCompositionPass& other);
@@ -24,6 +30,7 @@ namespace SE
 		GResourcePackage GBufferPackage;
 
 		std::shared_ptr<GRenderable> FramebufferPresenter;
+		std::shared_ptr<GConstantBuffer<AttriCBufferData>> AttributionCBuffer;
 
 		bool IsSetup = false;
 	};

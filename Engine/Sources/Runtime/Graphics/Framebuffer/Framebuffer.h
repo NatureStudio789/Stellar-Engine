@@ -15,12 +15,14 @@ namespace SE
 	{
 	public:
 		GFramebuffer();
-		GFramebuffer(const glm::uvec2& size, unsigned int multipleRenderTargetCount = 1);
+		GFramebuffer(const glm::uvec2& size, unsigned int multipleRenderTargetCount = 1,
+			std::vector<DXGI_FORMAT> renderTargetFormat = std::vector<DXGI_FORMAT>{ DXGI_FORMAT_R8G8B8A8_UNORM });
 		GFramebuffer(std::shared_ptr<GSwapChain> bufferSwapChain);
 		GFramebuffer(const GFramebuffer& other);
 		~GFramebuffer();
 
-		void Initialize(const glm::uvec2& size, unsigned int multipleRenderTargetCount = 1);
+		void Initialize(const glm::uvec2& size, unsigned int multipleRenderTargetCount = 1,
+			std::vector<DXGI_FORMAT> renderTargetFormat = std::vector<DXGI_FORMAT>{ DXGI_FORMAT_R8G8B8A8_UNORM });
 		void Initialize(std::shared_ptr<GSwapChain> bufferSwapChain);
 
 		void Resize(const glm::uvec2& newSize);
@@ -46,6 +48,7 @@ namespace SE
 		std::shared_ptr<GSwapChain> RTBufferSwapChain;
 
 		std::vector<WRL::ComPtr<ID3D12Resource>> RenderTargetBufferList;
+		std::vector<DXGI_FORMAT> RenderTargetFormat;
 		std::vector<std::shared_ptr<GShaderResourceView>> RTShaderResourceViewList;
 		unsigned int CurrentBufferIndex;
 		std::shared_ptr<GDescriptorHandle> RTVDescriptorHandle;

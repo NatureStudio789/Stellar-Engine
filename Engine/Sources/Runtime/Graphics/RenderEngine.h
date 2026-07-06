@@ -3,6 +3,7 @@
 #include "../Core/EngineSystem/Engine.h"
 #include "RenderConfiguration/RenderConfiguration.h"
 #include "Renderer/Renderable/Mesh/StaticMesh.h"
+#include "Renderer/Lighting/PointLight/PointLightRegistry.h"
 
 namespace SE
 {
@@ -25,6 +26,7 @@ namespace SE
 		std::shared_ptr<GStaticMesh> testmesh;
 		STransform TestMeshTransform;
 		std::shared_ptr<GCamera> TestCamera;
+		std::shared_ptr<GPointLightRegistry> TestRegistry;
 	};
 }
 

@@ -20,7 +20,7 @@ namespace SE
 	protected:
 		std::vector<std::shared_ptr<GDrawTask>> TaskList;
 
-		bool EnableCamera = true;
+		bool EnableUniversalCameraForRendering = true;
 	};
 }
 

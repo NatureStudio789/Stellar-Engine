@@ -7,6 +7,8 @@ namespace SE
 {
 	void SAPIConfigurator::InitializeAPI()
 	{
+		SMessageHandler::Instance->Check(CoInitializeEx(null, COINIT_MULTITHREADED));
+
 		glfwInit();
 		glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);

@@ -14,7 +14,7 @@ namespace SE
 	{
 		GApplyPass::Apply();
 
-		if (this->EnableCamera)
+		if (this->EnableUniversalCameraForRendering)
 		{
 			SCameraRegistry::ApplyCurrentInstance();
 		}

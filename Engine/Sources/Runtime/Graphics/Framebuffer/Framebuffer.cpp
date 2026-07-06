@@ -12,9 +12,9 @@ namespace SE
 		this->RTBufferSwapChain = null;
 	}
 
-	GFramebuffer::GFramebuffer(const glm::uvec2& size, unsigned int multipleRenderTargetCount)
+	GFramebuffer::GFramebuffer(const glm::uvec2& size, unsigned int multipleRenderTargetCount, std::vector<DXGI_FORMAT> renderTargetFormat)
 	{
-		this->Initialize(size, multipleRenderTargetCount);
+		this->Initialize(size, multipleRenderTargetCount, renderTargetFormat);
 	}
 
 	GFramebuffer::GFramebuffer(std::shared_ptr<GSwapChain> bufferSwapChain)
@@ -45,11 +45,12 @@ namespace SE
 	{
 	}
 
-	void GFramebuffer::Initialize(const glm::uvec2& size, unsigned int multipleRenderTargetCount)
+	void GFramebuffer::Initialize(const glm::uvec2& size, unsigned int multipleRenderTargetCount, std::vector<DXGI_FORMAT> renderTargetFormat)
 	{
 		this->IsPresentingFramebuffer = false;
 
 		this->Size = size;
+		this->RenderTargetFormat = renderTargetFormat;
 
 		this->RTVDescriptorHandle = this->GetContext()->GetRTVDescriptorHeap()->Allocate(multipleRenderTargetCount);
 		this->DSVDescriptorHandle = this->GetContext()->GetDSVDescriptorHeap()->Allocate(multipleRenderTargetCount);
@@ -58,22 +59,22 @@ namespace SE
 		this->RTShaderResourceViewList.resize(multipleRenderTargetCount);
 		this->CurrentBufferIndex = 0;
 
-		D3D12_CLEAR_VALUE ClearValue;
-		STELLAR_CLEAR_MEMORY(ClearValue);
-		ClearValue.Color[0] = 0.1f;
-		ClearValue.Color[1] = 0.1f;
-		ClearValue.Color[2] = 0.1f;
-		ClearValue.Color[3] = 1.0f;
-		ClearValue.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-
 		CD3DX12_CPU_DESCRIPTOR_HANDLE RTVHandle = this->RTVDescriptorHandle->CPUHandle;
 		CD3DX12_CPU_DESCRIPTOR_HANDLE DSVHandle = this->DSVDescriptorHandle->CPUHandle;
 		for (UINT i = 0; i < multipleRenderTargetCount; i++)
 		{
+			D3D12_CLEAR_VALUE ClearValue;
+			STELLAR_CLEAR_MEMORY(ClearValue);
+			ClearValue.Color[0] = 0.0f;
+			ClearValue.Color[1] = 0.0f;
+			ClearValue.Color[2] = 0.0f;
+			ClearValue.Color[3] = 1.0f;
+			ClearValue.Format = this->RenderTargetFormat[i];
+
 			SMessageHandler::Instance->Check(this->GetDeviceInstance()->
 				CreateCommittedResource(&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
 					D3D12_HEAP_FLAG_NONE,
-					&CD3DX12_RESOURCE_DESC::Tex2D(DXGI_FORMAT_R8G8B8A8_UNORM,
+					&CD3DX12_RESOURCE_DESC::Tex2D(this->RenderTargetFormat[i],
 						this->Size.x, this->Size.y, 1, 1, 1, 0,
 						D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET),
 					D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE | D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,
@@ -268,18 +269,19 @@ namespace SE
 		}
 		else
 		{
-			D3D12_CLEAR_VALUE ClearValue;
-			STELLAR_CLEAR_MEMORY(ClearValue);
-			ClearValue.Color[0] = 0.1f;
-			ClearValue.Color[1] = 0.1f;
-			ClearValue.Color[2] = 0.1f;
-			ClearValue.Color[3] = 1.0f;
-			ClearValue.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 
 			CD3DX12_CPU_DESCRIPTOR_HANDLE RTVHandle = this->RTVDescriptorHandle->CPUHandle;
 			CD3DX12_CPU_DESCRIPTOR_HANDLE DSVHandle = this->DSVDescriptorHandle->CPUHandle;
 			for (UINT i = 0; i < (UINT)this->RenderTargetBufferList.size(); i++)
 			{
+				D3D12_CLEAR_VALUE ClearValue;
+				STELLAR_CLEAR_MEMORY(ClearValue);
+				ClearValue.Color[0] = 0.1f;
+				ClearValue.Color[1] = 0.1f;
+				ClearValue.Color[2] = 0.1f;
+				ClearValue.Color[3] = 1.0f;
+				ClearValue.Format = this->RenderTargetFormat[i];
+				
 				auto& renderTargetBuffer = this->RenderTargetBufferList[i];
 				if (renderTargetBuffer)
 				{
@@ -290,7 +292,7 @@ namespace SE
 				SMessageHandler::Instance->Check(this->GetDeviceInstance()->
 					CreateCommittedResource(&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
 						D3D12_HEAP_FLAG_NONE,
-						&CD3DX12_RESOURCE_DESC::Tex2D(DXGI_FORMAT_R8G8B8A8_UNORM,
+						&CD3DX12_RESOURCE_DESC::Tex2D(this->RenderTargetFormat[i],
 							this->Size.x, this->Size.y, 1, 1, 1, 0,
 							D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET),
 						D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE | D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,
