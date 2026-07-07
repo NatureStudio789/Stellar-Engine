@@ -2,6 +2,8 @@
 #define _SE_EDITORRENDERPASS_H_
 #include "../../../Runtime/Graphics/Renderer/RenderPass/RenderPass.h"
 
+#include "../../EditorRegistry.h"
+
 namespace SE
 {
 	class GTexture;

@@ -43,6 +43,7 @@ namespace SE
 
 	GFramebuffer::~GFramebuffer()
 	{
+		this->ReleasePendingResources();
 	}
 
 	void GFramebuffer::Initialize(const glm::uvec2& size, unsigned int multipleRenderTargetCount, std::vector<DXGI_FORMAT> renderTargetFormat)
@@ -71,14 +72,18 @@ namespace SE
 			ClearValue.Color[3] = 1.0f;
 			ClearValue.Format = this->RenderTargetFormat[i];
 
-			SMessageHandler::Instance->Check(this->GetDeviceInstance()->
-				CreateCommittedResource(&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
-					D3D12_HEAP_FLAG_NONE,
-					&CD3DX12_RESOURCE_DESC::Tex2D(this->RenderTargetFormat[i],
-						this->Size.x, this->Size.y, 1, 1, 1, 0,
-						D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET),
-					D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE | D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,
-					&ClearValue, __uuidof(ID3D12Resource), (void**)this->RenderTargetBufferList[i].GetAddressOf()));
+			{
+				auto HeapProperties = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
+				auto ResourceDesc = CD3DX12_RESOURCE_DESC::Tex2D(this->RenderTargetFormat[i],
+					this->Size.x, this->Size.y, 1, 1, 1, 0,
+					D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET);
+				SMessageHandler::Instance->Check(this->GetDeviceInstance()->
+					CreateCommittedResource(&HeapProperties,
+						D3D12_HEAP_FLAG_NONE,
+						&ResourceDesc,
+						D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE | D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,
+						&ClearValue, __uuidof(ID3D12Resource), (void**)this->RenderTargetBufferList[i].GetAddressOf()));
+			}
 
 			this->GetDeviceInstance()->CreateRenderTargetView(
 				this->RenderTargetBufferList[i].Get(), null, RTVHandle);
@@ -109,18 +114,23 @@ namespace SE
 			OptimizedClear.DepthStencil.Depth = 1.0f;
 			OptimizedClear.DepthStencil.Stencil = 0;
 
-			SMessageHandler::Instance->Check(this->GetDeviceInstance()->
-				CreateCommittedResource(&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT), D3D12_HEAP_FLAG_NONE,
-					&DepthStencilBufferDesc, D3D12_RESOURCE_STATE_COMMON,
-					&OptimizedClear, __uuidof(ID3D12Resource), (void**)this->DepthStencilBufferList[i].GetAddressOf()));
+			{
+				auto HeapProperties = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
+				SMessageHandler::Instance->Check(this->GetDeviceInstance()->
+					CreateCommittedResource(&HeapProperties, D3D12_HEAP_FLAG_NONE,
+						&DepthStencilBufferDesc, D3D12_RESOURCE_STATE_COMMON,
+						&OptimizedClear, __uuidof(ID3D12Resource), (void**)this->DepthStencilBufferList[i].GetAddressOf()));
+			}
 
 			this->GetDeviceInstance()->CreateDepthStencilView(
 				this->DepthStencilBufferList[i].Get(), null, DSVHandle);
 			DSVHandle.Offset(1, this->GetContext()->GetDSVDescriptorHeap()->GetIncrementSize());
 
-			this->GetInitializationCommandListInstance()->ResourceBarrier(1,
-				&CD3DX12_RESOURCE_BARRIER::Transition(this->DepthStencilBufferList[i].Get(),
-					D3D12_RESOURCE_STATE_COMMON, D3D12_RESOURCE_STATE_DEPTH_WRITE));
+			{
+				auto Barrier = CD3DX12_RESOURCE_BARRIER::Transition(this->DepthStencilBufferList[i].Get(),
+					D3D12_RESOURCE_STATE_COMMON, D3D12_RESOURCE_STATE_DEPTH_WRITE);
+				this->GetInitializationCommandListInstance()->ResourceBarrier(1, &Barrier);
+			}
 		}
 
 
@@ -183,17 +193,22 @@ namespace SE
 		OptimizedClear.DepthStencil.Depth = 1.0f;
 		OptimizedClear.DepthStencil.Stencil = 0;
 
-		SMessageHandler::Instance->Check(this->GetDeviceInstance()->
-			CreateCommittedResource(&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT), D3D12_HEAP_FLAG_NONE,
-				&DepthStencilBufferDesc, D3D12_RESOURCE_STATE_COMMON,
-				&OptimizedClear, __uuidof(ID3D12Resource), (void**)this->DepthStencilBufferList[0].GetAddressOf()));
+		{
+			auto HeapProperties = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
+			SMessageHandler::Instance->Check(this->GetDeviceInstance()->
+				CreateCommittedResource(&HeapProperties, D3D12_HEAP_FLAG_NONE,
+					&DepthStencilBufferDesc, D3D12_RESOURCE_STATE_COMMON,
+					&OptimizedClear, __uuidof(ID3D12Resource), (void**)this->DepthStencilBufferList[0].GetAddressOf()));
+		}
 
 		this->GetDeviceInstance()->CreateDepthStencilView(
 			this->DepthStencilBufferList[0].Get(), null, this->DSVDescriptorHandle->CPUHandle);
 
-		this->GetInitializationCommandListInstance()->ResourceBarrier(1,
-			&CD3DX12_RESOURCE_BARRIER::Transition(this->DepthStencilBufferList[0].Get(),
-				D3D12_RESOURCE_STATE_COMMON, D3D12_RESOURCE_STATE_DEPTH_WRITE));
+		{
+			auto Barrier = CD3DX12_RESOURCE_BARRIER::Transition(this->DepthStencilBufferList[0].Get(),
+				D3D12_RESOURCE_STATE_COMMON, D3D12_RESOURCE_STATE_DEPTH_WRITE);
+			this->GetInitializationCommandListInstance()->ResourceBarrier(1, &Barrier);
+		}
 		this->GetContext()->ExecuteInitialization();
 
 		this->ViewportInstance.Width = (float)this->Size.x;
@@ -217,8 +232,12 @@ namespace SE
 
 		this->GetContext()->Flush();
 
+		/*Release any previously pending resources now that the GPU fence guarantees
+		all submitted work that might have referenced them is complete.*/
+		this->ReleasePendingResources();
+
 		if (this->IsPresentingFramebuffer)
-		{	
+		{
 			this->RTBufferSwapChain->Resize(this->Size);
 
 			auto RTV = this->RTVDescriptorHandle->CPUHandle;
@@ -229,9 +248,12 @@ namespace SE
 				RTV.Offset(1, this->GetContext()->GetRTVDescriptorHeap()->GetIncrementSize());
 			}
 
+			/*Move the old depth-stencil resource to the pending-release queue instead of
+			calling Reset() immediately so it stays alive until the GPU finishes executing
+			the current frame's command lists.*/
 			if (this->DepthStencilBufferList[0])
 			{
-				this->DepthStencilBufferList[0].Reset();
+				this->PendingReleaseDS.push_back(std::move(this->DepthStencilBufferList[0]));
 			}
 
 			D3D12_RESOURCE_DESC DepthStencilBufferDesc;
@@ -255,17 +277,22 @@ namespace SE
 			OptimizedClear.DepthStencil.Depth = 1.0f;
 			OptimizedClear.DepthStencil.Stencil = 0;
 
-			SMessageHandler::Instance->Check(this->GetDeviceInstance()->
-				CreateCommittedResource(&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT), D3D12_HEAP_FLAG_NONE,
-					&DepthStencilBufferDesc, D3D12_RESOURCE_STATE_COMMON,
-					&OptimizedClear, __uuidof(ID3D12Resource), (void**)this->DepthStencilBufferList[0].GetAddressOf()));
+			{
+				auto HeapProperties = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
+				SMessageHandler::Instance->Check(this->GetDeviceInstance()->
+					CreateCommittedResource(&HeapProperties, D3D12_HEAP_FLAG_NONE,
+						&DepthStencilBufferDesc, D3D12_RESOURCE_STATE_COMMON,
+						&OptimizedClear, __uuidof(ID3D12Resource), (void**)this->DepthStencilBufferList[0].GetAddressOf()));
+			}
 
 			this->GetDeviceInstance()->CreateDepthStencilView(
 				this->DepthStencilBufferList[0].Get(), null, this->DSVDescriptorHandle->CPUHandle);
 
-			this->GetInitializationCommandListInstance()->ResourceBarrier(1,
-				&CD3DX12_RESOURCE_BARRIER::Transition(this->DepthStencilBufferList[0].Get(),
-					D3D12_RESOURCE_STATE_COMMON, D3D12_RESOURCE_STATE_DEPTH_WRITE));
+			{
+				auto Barrier = CD3DX12_RESOURCE_BARRIER::Transition(this->DepthStencilBufferList[0].Get(),
+					D3D12_RESOURCE_STATE_COMMON, D3D12_RESOURCE_STATE_DEPTH_WRITE);
+				this->GetInitializationCommandListInstance()->ResourceBarrier(1, &Barrier);
+			}
 		}
 		else
 		{
@@ -276,27 +303,35 @@ namespace SE
 			{
 				D3D12_CLEAR_VALUE ClearValue;
 				STELLAR_CLEAR_MEMORY(ClearValue);
-				ClearValue.Color[0] = 0.1f;
-				ClearValue.Color[1] = 0.1f;
-				ClearValue.Color[2] = 0.1f;
+				ClearValue.Color[0] = 0.0f;
+				ClearValue.Color[1] = 0.0f;
+				ClearValue.Color[2] = 0.0f;
 				ClearValue.Color[3] = 1.0f;
 				ClearValue.Format = this->RenderTargetFormat[i];
-				
+
 				auto& renderTargetBuffer = this->RenderTargetBufferList[i];
+				/*Move the old render-target resource to the pending-release queue instead of
+				calling Reset() immediately so it stays alive until the GPU finishes executing
+				the current frame's command lists (which may have already been recorded to
+				reference these resources before the resize was triggered).*/
 				if (renderTargetBuffer)
 				{
-					renderTargetBuffer.Reset();
+					this->PendingReleaseRT.push_back(std::move(renderTargetBuffer));
 				}
 				auto& shaderResourceView = this->RTShaderResourceViewList[i];
 
-				SMessageHandler::Instance->Check(this->GetDeviceInstance()->
-					CreateCommittedResource(&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
-						D3D12_HEAP_FLAG_NONE,
-						&CD3DX12_RESOURCE_DESC::Tex2D(this->RenderTargetFormat[i],
-							this->Size.x, this->Size.y, 1, 1, 1, 0,
-							D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET),
-						D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE | D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,
-						&ClearValue, __uuidof(ID3D12Resource), (void**)renderTargetBuffer.GetAddressOf()));
+				{
+					auto HeapProperties = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
+					auto ResourceDesc = CD3DX12_RESOURCE_DESC::Tex2D(this->RenderTargetFormat[i],
+						this->Size.x, this->Size.y, 1, 1, 1, 0,
+						D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET);
+					SMessageHandler::Instance->Check(this->GetDeviceInstance()->
+						CreateCommittedResource(&HeapProperties,
+							D3D12_HEAP_FLAG_NONE,
+							&ResourceDesc,
+							D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE | D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,
+							&ClearValue, __uuidof(ID3D12Resource), (void**)renderTargetBuffer.GetAddressOf()));
+				}
 
 				this->GetDeviceInstance()->CreateRenderTargetView(
 					renderTargetBuffer.Get(), null, RTVHandle);
@@ -308,7 +343,7 @@ namespace SE
 				auto& depthStencilBuffer = this->DepthStencilBufferList[i];
 				if (depthStencilBuffer)
 				{
-					depthStencilBuffer.Reset();
+					this->PendingReleaseDS.push_back(std::move(depthStencilBuffer));
 				}
 
 				D3D12_RESOURCE_DESC DepthStencilBufferDesc;
@@ -332,17 +367,22 @@ namespace SE
 				OptimizedClear.DepthStencil.Depth = 1.0f;
 				OptimizedClear.DepthStencil.Stencil = 0;
 
-				SMessageHandler::Instance->Check(this->GetDeviceInstance()->
-					CreateCommittedResource(&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT), D3D12_HEAP_FLAG_NONE,
-						&DepthStencilBufferDesc, D3D12_RESOURCE_STATE_COMMON,
-						&OptimizedClear, __uuidof(ID3D12Resource), (void**)depthStencilBuffer.GetAddressOf()));
+				{
+					auto HeapProperties = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
+					SMessageHandler::Instance->Check(this->GetDeviceInstance()->
+						CreateCommittedResource(&HeapProperties, D3D12_HEAP_FLAG_NONE,
+							&DepthStencilBufferDesc, D3D12_RESOURCE_STATE_COMMON,
+							&OptimizedClear, __uuidof(ID3D12Resource), (void**)depthStencilBuffer.GetAddressOf()));
+				}
 
 				this->GetDeviceInstance()->CreateDepthStencilView(depthStencilBuffer.Get(), null, DSVHandle);
 				DSVHandle.Offset(1, this->GetContext()->GetDSVDescriptorHeap()->GetIncrementSize());
 
-				this->GetInitializationCommandListInstance()->ResourceBarrier(1,
-					&CD3DX12_RESOURCE_BARRIER::Transition(depthStencilBuffer.Get(),
-						D3D12_RESOURCE_STATE_COMMON, D3D12_RESOURCE_STATE_DEPTH_WRITE));
+				{
+					auto Barrier = CD3DX12_RESOURCE_BARRIER::Transition(depthStencilBuffer.Get(),
+						D3D12_RESOURCE_STATE_COMMON, D3D12_RESOURCE_STATE_DEPTH_WRITE);
+					this->GetInitializationCommandListInstance()->ResourceBarrier(1, &Barrier);
+				}
 			}
 		}
 
@@ -377,16 +417,16 @@ namespace SE
 	{
 		if (this->IsPresentingFramebuffer)
 		{
-			SCommandListRegistry::GetCurrentInstance()->GetInstance()->ResourceBarrier(1,
-				&CD3DX12_RESOURCE_BARRIER::Transition(this->RTBufferSwapChain->GetPresentBuffer()->GetCurrentBuffer().Get(),
-					D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET));
+			auto Barrier = CD3DX12_RESOURCE_BARRIER::Transition(this->RTBufferSwapChain->GetPresentBuffer()->GetCurrentBuffer().Get(),
+				D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
+			SCommandListRegistry::GetCurrentInstance()->GetInstance()->ResourceBarrier(1, &Barrier);
 		}
 		else
 		{
-			SCommandListRegistry::GetCurrentInstance()->GetInstance()->ResourceBarrier(1,
-				&CD3DX12_RESOURCE_BARRIER::Transition(this->RenderTargetBufferList[this->CurrentBufferIndex].Get(),
-					D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE | D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,
-					D3D12_RESOURCE_STATE_RENDER_TARGET));
+			auto Barrier = CD3DX12_RESOURCE_BARRIER::Transition(this->RenderTargetBufferList[this->CurrentBufferIndex].Get(),
+				D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE | D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,
+				D3D12_RESOURCE_STATE_RENDER_TARGET);
+			SCommandListRegistry::GetCurrentInstance()->GetInstance()->ResourceBarrier(1, &Barrier);
 		}
 	}
 
@@ -436,24 +476,26 @@ namespace SE
 		SCommandListRegistry::GetCurrentInstance()->GetInstance()->RSSetScissorRects(1, &this->ViewportScissorRect);
 		SCommandListRegistry::GetCurrentInstance()->GetInstance()->RSSetViewports(1, &this->ViewportInstance);
 
+		auto CurrentRTVDesciptorHandleInstance = this->GetRTVDescriptorHandleInstance();
+		auto CurrentDSVDescriptorHandleInstance = this->GetDSVDescriptorHandleInstance();
 		SCommandListRegistry::GetCurrentInstance()->GetInstance()->
-			OMSetRenderTargets(1, &this->GetRTVDescriptorHandleInstance(), true, &this->GetDSVDescriptorHandleInstance());
+			OMSetRenderTargets(1, &CurrentRTVDesciptorHandleInstance, true, &CurrentDSVDescriptorHandleInstance);
 	}
 
 	void GFramebuffer::End()
 	{
 		if (this->IsPresentingFramebuffer)
 		{
-			SCommandListRegistry::GetCurrentInstance()->GetInstance()->ResourceBarrier(1,
-				&CD3DX12_RESOURCE_BARRIER::Transition(this->RTBufferSwapChain->GetPresentBuffer()->GetCurrentBuffer().Get(),
-					D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT));
+			auto Barrier = CD3DX12_RESOURCE_BARRIER::Transition(this->RTBufferSwapChain->GetPresentBuffer()->GetCurrentBuffer().Get(),
+				D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
+			SCommandListRegistry::GetCurrentInstance()->GetInstance()->ResourceBarrier(1, &Barrier);
 		}
 		else
 		{
-			SCommandListRegistry::GetCurrentInstance()->GetInstance()->ResourceBarrier(1,
-				&CD3DX12_RESOURCE_BARRIER::Transition(this->RenderTargetBufferList[this->CurrentBufferIndex].Get(),
-					D3D12_RESOURCE_STATE_RENDER_TARGET,
-					D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE | D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE));
+			auto Barrier = CD3DX12_RESOURCE_BARRIER::Transition(this->RenderTargetBufferList[this->CurrentBufferIndex].Get(),
+				D3D12_RESOURCE_STATE_RENDER_TARGET,
+				D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE | D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
+			SCommandListRegistry::GetCurrentInstance()->GetInstance()->ResourceBarrier(1, &Barrier);
 		}
 	}
 
@@ -475,6 +517,21 @@ namespace SE
 	GResourcePackage GFramebuffer::GetResourcePackage() const noexcept
 	{
 		return GResourcePackage{ this->IdentifierHandle, GResourcePackage::SE_RESOURCE_FRAMEBUFFER };
+	}
+
+	const glm::uvec2& GFramebuffer::GetSize() const noexcept
+	{
+		return this->Size;
+	}
+
+	unsigned int GFramebuffer::GetWidth() const noexcept
+	{
+		return this->Size.x;
+	}
+
+	unsigned int GFramebuffer::GetHeight() const noexcept
+	{
+		return this->Size.y;
 	}
 
 	D3D12_CPU_DESCRIPTOR_HANDLE GFramebuffer::GetRTVDescriptorHandleInstance()
@@ -502,5 +559,20 @@ namespace SE
 		}
 
 		return Handle;
+	}
+
+	void GFramebuffer::ReleasePendingResources()
+	{
+		for (auto& RTBuffer : this->PendingReleaseRT)
+		{
+			RTBuffer.Reset();
+		}
+		this->PendingReleaseRT.clear();
+
+		for (auto& DSBuffer : this->PendingReleaseDS)
+		{
+			DSBuffer.Reset();
+		}
+		this->PendingReleaseDS.clear();
 	}
 }

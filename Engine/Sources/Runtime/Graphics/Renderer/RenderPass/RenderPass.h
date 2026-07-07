@@ -9,6 +9,7 @@
 namespace SE
 {
 	class GFramebuffer;
+	class GRenderer;
 
 	class GRenderPass : public GContextDependent
 	{

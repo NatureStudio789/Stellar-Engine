@@ -17,12 +17,14 @@ namespace SE
 		if (this->EnableUniversalCameraForRendering)
 		{
 			SCameraRegistry::ApplyCurrentInstance();
+			glm::vec2 FramebufferSize = (glm::vec2)this->GetFramebufferInstance(this->FramebufferPackage)->GetSize();
+			SCameraRegistry::GetCurrentInstance()->SetAspect(FramebufferSize.x, FramebufferSize.y);
 		}
 	}
 
 	void GRenderQueuePass::Execute()
 	{
-		auto& Framebuffer = this->GetFramebufferInstance(this->FramebufferPackage);
+		auto Framebuffer = this->GetFramebufferInstance(this->FramebufferPackage);
 		Framebuffer->Begin();
 
 		this->GetContext()->ApplyDescriptorHeaps();

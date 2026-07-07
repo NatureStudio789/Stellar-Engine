@@ -73,10 +73,14 @@ namespace SE
 
 		this->DataSize = sizeof(DataType) + (16 - (sizeof(DataType) % 16));
 
-		SMessageHandler::Instance->Check(this->GetDeviceInstance()->CreateCommittedResource(
-			&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD), D3D12_HEAP_FLAG_NONE,
-			&CD3DX12_RESOURCE_DESC::Buffer(this->DataSize), D3D12_RESOURCE_STATE_GENERIC_READ, null,
-			__uuidof(ID3D12Resource), (void**)this->UploadBuffer.GetAddressOf()));
+		{
+			auto HeapProperties = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
+			auto ResourceDesc = CD3DX12_RESOURCE_DESC::Buffer(this->DataSize);
+			SMessageHandler::Instance->Check(this->GetDeviceInstance()->CreateCommittedResource(
+				&HeapProperties, D3D12_HEAP_FLAG_NONE,
+				&ResourceDesc, D3D12_RESOURCE_STATE_GENERIC_READ, null,
+				__uuidof(ID3D12Resource), (void**)this->UploadBuffer.GetAddressOf()));
+		}
 
 		SMessageHandler::Instance->Check(this->UploadBuffer->Map(0, null, (void**)&this->MappedData));
 	}

@@ -35,12 +35,12 @@ namespace SE
 		this->TestCamera->SetFarZ(100.0f);
 		SCameraRegistry::Register(this->TestCamera);
 
-		auto& DeferredRenderer = std::make_shared<GDeferredRenderer>("MainDeferredRenderer");
+		auto DeferredRenderer = std::make_shared<GDeferredRenderer>("MainDeferredRenderer");
 		DeferredRenderer->Compile();
 		DeferredRenderer->SetMainCamera(this->TestCamera->GetName());
 		SRendererRegistry::Register(DeferredRenderer);
 
-		std::shared_ptr<GPointLight> testlight = std::make_shared<GPointLight>("test", GPointLight::Data({ -2.0f, 8.0f, 1.0f }, 100.0f, { 1.0f, 1.0f, 1.0f }));
+		std::shared_ptr<GPointLight> testlight = std::make_shared<GPointLight>("test", GPointLight::Data({ -2.0f, 8.0f, 1.0f }, 500.0f, { 1.0f, 1.0f, 1.0f }));
 
 		this->TestRegistry = std::make_shared<GPointLightRegistry>();
 		this->TestRegistry->Register(testlight);
@@ -62,6 +62,7 @@ namespace SE
 		// Wait for the oldest in-flight frame to complete before recording new commands.
 		SGraphicsContextRegistry::GetMainInstance()->GetSwapChain()->WaitForFrameFence();
 
+
 		this->testmesh->Submit("main");
 
 		if (FKeyboard::GetKeyPress('W'))
@@ -82,25 +83,17 @@ namespace SE
 		}
 		if (FKeyboard::GetKeyPress('Q'))
 		{
-			this->TestCamera->Rotate({ 0.0f, -2.0f, 0.0f });
+			this->TestCamera->Rotate({ 0.0f, 1.0f, 0.0f });
 		}
 		if (FKeyboard::GetKeyPress('E'))
 		{
-			this->TestCamera->Rotate({ 0.0f, 2.0f, 0.0f });
-		}
-
-		if (FKeyboard::GetKeyPress('Z'))
-		{
-			this->TestMeshTransform.Rotate({ 0.0f, -1.0f, 0.0f });
-		}
-		if (FKeyboard::GetKeyPress('X'))
-		{
-			this->TestMeshTransform.Rotate({ 0.0f, 1.0f, 0.0f });
+			this->TestCamera->Rotate({ 0.0f, -1.0f, 0.0f });
 		}
 
 		this->TestMeshTransform.Rotate({ 0.0f, -0.8f, 0.0f });
 
 		this->testmesh->SetTransform(this->TestMeshTransform);
+
 
 		for (auto& [uuid, renderer] : SRendererRegistry::GetInstanceList())
 		{
@@ -122,9 +115,9 @@ namespace SE
 
 	void RenderEngine::Release()
 	{
-		// Flush the GPU command queue to ensure all in-flight operations complete
-		// before resources are released during engine shutdown. This prevents
-		// D3D12 ERROR #921: OBJECT_DELETED_WHILE_STILL_IN_USE.
+		/*Flush the GPU command queue to ensure all in - flight operations complete
+		before resources are released during engine shutdown. This prevents
+		D3D12 ERROR #921: OBJECT_DELETED_WHILE_STILL_IN_USE.*/
 		this->MainGraphicsContext->Flush();
 	}
 }

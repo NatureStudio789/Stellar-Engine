@@ -29,7 +29,7 @@ float4 main(Input input) : SV_Target
 {
     LightingMaterial Material;
 
-    Material.Albedo = AlbedoBuffer.Sample(MaterialSampler, input.TextureCoord).rgb;
+    Material.Albedo = pow(AlbedoBuffer.Sample(MaterialSampler, input.TextureCoord).rgb, float3(2.2f, 2.2f, 2.2f));
     Material.Roughness = RoughnessBuffer.Sample(MaterialSampler, input.TextureCoord).r;
     Material.Metallic = MetallicBuffer.Sample(MaterialSampler, input.TextureCoord).r;
     Material.AmbientOcclusion = 1.0f;
@@ -48,5 +48,4 @@ float4 main(Input input) : SV_Target
     Result = AmbientLighting(Result, Material);
 
     return float4(Result, 1.0f);
-    //return float4((AlbedoBuffer.Sample(MaterialSampler, input.TextureCoord).rgb + MetallicBuffer.Sample(MaterialSampler, input.TextureCoord).rgb - RoughnessBuffer.Sample(MaterialSampler, input.TextureCoord).rgb) * PositionBuffer.Sample(MaterialSampler, input.TextureCoord).rgb, 1.0f);
 }

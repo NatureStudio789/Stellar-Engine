@@ -37,6 +37,9 @@ namespace SE
 
 		std::shared_ptr<GShaderResourceView> GetRTShaderResourceView(unsigned int multipleRenderTargetBufferIndex = 0);
 		GResourcePackage GetResourcePackage() const noexcept;
+		const glm::uvec2& GetSize() const noexcept;
+		unsigned int GetWidth() const noexcept;
+		unsigned int GetHeight() const noexcept;
 
 	private:
 		D3D12_CPU_DESCRIPTOR_HANDLE GetRTVDescriptorHandleInstance();
@@ -55,6 +58,15 @@ namespace SE
 
 		std::vector<WRL::ComPtr<ID3D12Resource>> DepthStencilBufferList;
 		std::shared_ptr<GDescriptorHandle> DSVDescriptorHandle;
+
+		/*Resources queued for deferred destruction after GPU fence completion.
+		Resize() moves old RT/DS resources here instead of immediately releasing them
+		so they stay alive until the GPU finishes executing command lists that
+		reference them (prevents D3D12 ERROR #921: OBJECT_DELETED_WHILE_STILL_IN_USE).*/
+		std::vector<WRL::ComPtr<ID3D12Resource>> PendingReleaseRT;
+		std::vector<WRL::ComPtr<ID3D12Resource>> PendingReleaseDS;
+
+		void ReleasePendingResources();
 
 		D3D12_VIEWPORT ViewportInstance;
 		D3D12_RECT ViewportScissorRect;

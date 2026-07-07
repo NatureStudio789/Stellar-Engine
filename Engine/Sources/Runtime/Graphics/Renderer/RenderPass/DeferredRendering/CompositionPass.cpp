@@ -33,10 +33,10 @@ namespace SE
 		this->RenderPassName = name;
 		this->EnableUniversalCameraForRendering = false;
 
-		auto& CompositionFramebufferInflow = GInflow::Create("CompositionFramebuffer", this->FramebufferPackage);
+		auto CompositionFramebufferInflow = GInflow::Create("CompositionFramebuffer", this->FramebufferPackage);
 		this->AddInflow(CompositionFramebufferInflow);
 
-		auto& GBufferInflow = GInflow::Create("GBuffer", this->GBufferPackage);
+		auto GBufferInflow = GInflow::Create("GBuffer", this->GBufferPackage);
 		this->AddInflow(GBufferInflow);
 
 		this->AddApplicable(SPipelineStateRegistry::GetInstance(GRenderGroup::COMPOSITION_GROUP));
@@ -76,9 +76,9 @@ namespace SE
 
 		this->AttributionCBuffer = std::make_shared<GConstantBuffer<AttriCBufferData>>(GRenderGroup::COMPOSITION_GROUP);
 
-		auto& CompositionTechnique = std::make_shared<GRenderTechnique>("CompositionTechnique", "main");
+		auto CompositionTechnique = std::make_shared<GRenderTechnique>("CompositionTechnique", "main");
 
-		auto& CompositionStage = std::make_shared<GRenderStage>(name);
+		auto CompositionStage = std::make_shared<GRenderStage>(name);
 		CompositionStage->AddApplicable(this->AttributionCBuffer);
 		CompositionTechnique->AddRenderStage(CompositionStage);
 
@@ -104,25 +104,25 @@ namespace SE
 
 	void GCompositionPass::ExecuteSetup()
 	{
-		auto& GBufferFramebuffer = SFramebufferRegistry::GetInstance(this->GBufferPackage.GetResourceIdentifier().GetUUID());
+		auto GBufferFramebuffer = SFramebufferRegistry::GetInstance(this->GBufferPackage.GetResourceIdentifier().GetUUID());
 
-		auto& AlbedoSRV = GBufferFramebuffer->GetRTShaderResourceView(0);
+		auto AlbedoSRV = GBufferFramebuffer->GetRTShaderResourceView(0);
 		AlbedoSRV->SetRootParameterIndex(SPipelineStateRegistry::GetInstance(GRenderGroup::COMPOSITION_GROUP)->GetRootSignature()->
 			GetRootParameterIndex(GRootParameter(GRootParameter::SE_PARAMETER_SRV, 0)));
 
-		auto& MetallicSRV = GBufferFramebuffer->GetRTShaderResourceView(1);
+		auto MetallicSRV = GBufferFramebuffer->GetRTShaderResourceView(1);
 		MetallicSRV->SetRootParameterIndex(SPipelineStateRegistry::GetInstance(GRenderGroup::COMPOSITION_GROUP)->GetRootSignature()->
 			GetRootParameterIndex(GRootParameter(GRootParameter::SE_PARAMETER_SRV, 1)));
 
-		auto& RoughnessSRV = GBufferFramebuffer->GetRTShaderResourceView(2);
+		auto RoughnessSRV = GBufferFramebuffer->GetRTShaderResourceView(2);
 		RoughnessSRV->SetRootParameterIndex(SPipelineStateRegistry::GetInstance(GRenderGroup::COMPOSITION_GROUP)->GetRootSignature()->
 			GetRootParameterIndex(GRootParameter(GRootParameter::SE_PARAMETER_SRV, 2)));
 
-		auto& NormalSRV = GBufferFramebuffer->GetRTShaderResourceView(3);
+		auto NormalSRV = GBufferFramebuffer->GetRTShaderResourceView(3);
 		NormalSRV->SetRootParameterIndex(SPipelineStateRegistry::GetInstance(GRenderGroup::COMPOSITION_GROUP)->GetRootSignature()->
 			GetRootParameterIndex(GRootParameter(GRootParameter::SE_PARAMETER_SRV, 3)));
 
-		auto& PositionSRV = GBufferFramebuffer->GetRTShaderResourceView(4);
+		auto PositionSRV = GBufferFramebuffer->GetRTShaderResourceView(4);
 		PositionSRV->SetRootParameterIndex(SPipelineStateRegistry::GetInstance(GRenderGroup::COMPOSITION_GROUP)->GetRootSignature()->
 			GetRootParameterIndex(GRootParameter(GRootParameter::SE_PARAMETER_SRV, 4)));
 

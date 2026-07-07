@@ -3,6 +3,8 @@
 #include <EngineSystem/Engine.h>
 #include "Render/EditorRenderer.h"
 
+#include "EditorRegistry.h"
+
 namespace SE
 {
 	class EditorEngine : public SEngine

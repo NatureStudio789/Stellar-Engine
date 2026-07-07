@@ -11,7 +11,7 @@ namespace SE
 
 	GClearPass::GClearPass(const std::string& name, std::vector<unsigned int> multipleRenderTargetClearingList) : GRenderPass(name)
 	{
-		auto& FramebufferInflow = GInflow::Create("ClearingFramebuffer", this->ClearingFramebufferPackage);
+		auto FramebufferInflow = GInflow::Create("ClearingFramebuffer", this->ClearingFramebufferPackage);
 		this->AddInflow(FramebufferInflow);
 		this->AddOutflow(GOutflow::Create("ClearingFramebuffer", FramebufferInflow));
 
@@ -30,7 +30,7 @@ namespace SE
 
 	void GClearPass::Execute()
 	{
-		auto& Framebuffer = SFramebufferRegistry::GetInstance(this->ClearingFramebufferPackage.GetResourceIdentifier().GetUUID());
+		auto Framebuffer = SFramebufferRegistry::GetInstance(this->ClearingFramebufferPackage.GetResourceIdentifier().GetUUID());
 
 		if (this->MultipleRenderTargetClearingList.empty())
 		{

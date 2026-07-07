@@ -76,7 +76,7 @@ namespace SE
 
 	void GRenderStage::Link(std::string rendererName)
 	{
-		auto& Renderer = SRendererRegistry::GetInstance(rendererName);
+		auto Renderer = SRendererRegistry::GetInstance(rendererName);
 
 		if (auto pass = dynamic_cast<GRenderQueuePass*>(Renderer->GetRenderPass(this->TargetPassName).get()))
 		{

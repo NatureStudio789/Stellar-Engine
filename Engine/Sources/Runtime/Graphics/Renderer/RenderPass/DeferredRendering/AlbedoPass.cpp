@@ -30,7 +30,7 @@ namespace SE
 	{
 		this->RenderPassName = name;
 
-		auto& GBufferInflow = GInflow::Create("GBufferFramebuffer", this->FramebufferPackage);
+		auto GBufferInflow = GInflow::Create("GBufferFramebuffer", this->FramebufferPackage);
 		this->AddInflow(GBufferInflow);
 		this->AddOutflow(GOutflow::Create("GBufferFramebuffer", GBufferInflow));
 
@@ -39,7 +39,7 @@ namespace SE
 
 	void GAlbedoPass::Execute()
 	{
-		auto& GBufferFramebuffer = SFramebufferRegistry::GetInstance(this->FramebufferPackage.GetResourceIdentifier().GetUUID());
+		auto GBufferFramebuffer = SFramebufferRegistry::GetInstance(this->FramebufferPackage.GetResourceIdentifier().GetUUID());
 		GBufferFramebuffer->SetCurrentBuffer(0);
 
 		GRenderQueuePass::Execute();

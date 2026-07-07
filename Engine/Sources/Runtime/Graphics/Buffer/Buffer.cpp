@@ -45,15 +45,23 @@ namespace SE
 			(SIZE_T)(this->DataSize * this->DataStride), this->CPUBuffer.GetAddressOf()));
 		CopyMemory(this->CPUBuffer->GetBufferPointer(), this->BufferData, this->DataSize * this->DataStride);
 
-		SMessageHandler::Instance->Check(this->GetDeviceInstance()->CreateCommittedResource(
-			&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT), D3D12_HEAP_FLAG_NONE,
-			&CD3DX12_RESOURCE_DESC::Buffer((UINT64)(this->DataSize * this->DataStride)),
-			D3D12_RESOURCE_STATE_COMMON, null, __uuidof(ID3D12Resource), (void**)this->GPUBuffer.GetAddressOf()));
+		{
+			auto HeapProperties = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
+			auto ResourceDesc = CD3DX12_RESOURCE_DESC::Buffer((UINT64)(this->DataSize * this->DataStride));
+			SMessageHandler::Instance->Check(this->GetDeviceInstance()->CreateCommittedResource(
+				&HeapProperties, D3D12_HEAP_FLAG_NONE,
+				&ResourceDesc,
+				D3D12_RESOURCE_STATE_COMMON, null, __uuidof(ID3D12Resource), (void**)this->GPUBuffer.GetAddressOf()));
+		}
 
-		SMessageHandler::Instance->Check(this->GetDeviceInstance()->CreateCommittedResource(
-			&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD), D3D12_HEAP_FLAG_NONE,
-			&CD3DX12_RESOURCE_DESC::Buffer((UINT64)(this->DataSize * this->DataStride)),
-			D3D12_RESOURCE_STATE_GENERIC_READ, null, __uuidof(ID3D12Resource), (void**)this->UploadBuffer.GetAddressOf()));
+		{
+			auto HeapProperties = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
+			auto ResourceDesc = CD3DX12_RESOURCE_DESC::Buffer((UINT64)(this->DataSize * this->DataStride));
+			SMessageHandler::Instance->Check(this->GetDeviceInstance()->CreateCommittedResource(
+				&HeapProperties, D3D12_HEAP_FLAG_NONE,
+				&ResourceDesc,
+				D3D12_RESOURCE_STATE_GENERIC_READ, null, __uuidof(ID3D12Resource), (void**)this->UploadBuffer.GetAddressOf()));
+		}
 
 		D3D12_SUBRESOURCE_DATA BufferSubresourceData;
 		STELLAR_CLEAR_MEMORY(BufferSubresourceData);
@@ -61,14 +69,18 @@ namespace SE
 		BufferSubresourceData.RowPitch = LONG_PTR(this->DataSize * this->DataStride);
 		BufferSubresourceData.SlicePitch = BufferSubresourceData.RowPitch;
 
-		this->GetInitializationCommandListInstance()->ResourceBarrier(1,
-			&CD3DX12_RESOURCE_BARRIER::Transition(this->GPUBuffer.Get(),
-				D3D12_RESOURCE_STATE_COMMON, D3D12_RESOURCE_STATE_COPY_DEST));
+		{
+			auto Barrier = CD3DX12_RESOURCE_BARRIER::Transition(this->GPUBuffer.Get(),
+				D3D12_RESOURCE_STATE_COMMON, D3D12_RESOURCE_STATE_COPY_DEST);
+			this->GetInitializationCommandListInstance()->ResourceBarrier(1, &Barrier);
+		}
 		UpdateSubresources<1>(this->GetInitializationCommandListInstance().Get(),
 			this->GPUBuffer.Get(), this->UploadBuffer.Get(), 0, 0, 1, &BufferSubresourceData);
-		this->GetInitializationCommandListInstance()->ResourceBarrier(1,
-			&CD3DX12_RESOURCE_BARRIER::Transition(this->GPUBuffer.Get(),
-				D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_GENERIC_READ));
+		{
+			auto Barrier = CD3DX12_RESOURCE_BARRIER::Transition(this->GPUBuffer.Get(),
+				D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_GENERIC_READ);
+			this->GetInitializationCommandListInstance()->ResourceBarrier(1, &Barrier);
+		}
 
 		this->GetContext()->ExecuteInitialization();
 	}
