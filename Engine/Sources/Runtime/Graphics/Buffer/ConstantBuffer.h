@@ -71,7 +71,7 @@ namespace SE
 		this->RootParameterIndex = SPipelineStateRegistry::GetInstance(this->BelongRenderGroup)->
 			GetRootSignature()->GetRootParameterIndex({ GRootParameter::SE_PARAMETER_CBV, shaderRegisterIndex });
 
-		this->DataSize = sizeof(DataType) + (16 - (sizeof(DataType) % 16));
+		this->DataSize = (sizeof(DataType) + 255) & ~255;
 
 		{
 			auto HeapProperties = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);

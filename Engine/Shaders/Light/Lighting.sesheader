@@ -90,7 +90,7 @@ float3 DirectLighting(PointLight light, LightingMaterial material, float3 worldP
 
 float3 AmbientLighting(float3 directLightingColor, LightingMaterial material)
 {
-    float3 Ambient = float3(0.03f, 0.03f, 0.03f) * material.Albedo * material.AmbientOcclusion;
+    float3 Ambient = float3(0.7f, 0.7f, 0.7f) * material.Albedo * material.AmbientOcclusion;
     
     float3 Color = Ambient + directLightingColor;
     Color = Color / (Color + float3(1.0f, 1.0f, 1.0f));

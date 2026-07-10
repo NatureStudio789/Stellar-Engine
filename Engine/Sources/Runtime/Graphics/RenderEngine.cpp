@@ -3,7 +3,7 @@
 #include "Renderer/DeferredRenderer.h"
 #include "PipelineState/PipelineState.h"
 #include "Material/StandardMaterial.h"
-#include "../Function/Input/Keyboard/Keyboard.h"
+#include "../Function/Input/Input.h"
 #include "RenderEngine.h"
 
 namespace SE
@@ -39,6 +39,10 @@ namespace SE
 		DeferredRenderer->Compile();
 		DeferredRenderer->SetMainCamera(this->TestCamera->GetName());
 		SRendererRegistry::Register(DeferredRenderer);
+		FMouse::AddMovementCallback([this](const glm::ivec2& movement)
+		{
+			this->TestCamera->Rotate({ -movement.y * 0.1f, movement.x * 0.1f, 0.0f });
+		});
 
 		std::shared_ptr<GPointLight> testlight = std::make_shared<GPointLight>("test", GPointLight::Data({ -2.0f, 8.0f, 1.0f }, 500.0f, { 1.0f, 1.0f, 1.0f }));
 
@@ -67,28 +71,40 @@ namespace SE
 
 		if (FKeyboard::GetKeyPress('W'))
 		{
-			this->TestCamera->Translate(0.0f, 0.0f, -0.1f);
+			this->TestCamera->Translate(this->TestCamera->Forward * 0.1f);
 		}
 		if (FKeyboard::GetKeyPress('S'))
 		{
-			this->TestCamera->Translate(0.0f, 0.0f, 0.1f);
+			this->TestCamera->Translate(-this->TestCamera->Forward * 0.1f);
 		}
 		if (FKeyboard::GetKeyPress('A'))
 		{
-			this->TestCamera->Translate(0.1f, 0.0f, 0.0f);
+			this->TestCamera->Translate(-this->TestCamera->Right * 0.1f);
 		}
 		if (FKeyboard::GetKeyPress('D'))
 		{
-			this->TestCamera->Translate(-0.1f, 0.0f, 0.0f);
+			this->TestCamera->Translate(this->TestCamera->Right * 0.1f);
 		}
-		if (FKeyboard::GetKeyPress('Q'))
-		{
-			this->TestCamera->Rotate({ 0.0f, 1.0f, 0.0f });
-		}
-		if (FKeyboard::GetKeyPress('E'))
-		{
-			this->TestCamera->Rotate({ 0.0f, -1.0f, 0.0f });
-		}
+		//if (FKeyboard::GetKeyPress('F'))
+		//{
+		//	this->TestCamera->Rotate({ 0.0f, 0.7f, 0.0f });
+		//	//this->TestMeshTransform.Rotate({ 0.0f, 6.0f, 0.0f });
+		//}
+		//if (FKeyboard::GetKeyPress('H'))
+		//{
+		//	this->TestCamera->Rotate({ 0.0f, -0.7f, 0.0f });
+		//	//this->TestMeshTransform.Rotate({ 0.0f, -6.0f, 0.0f });
+		//}
+		//if (FKeyboard::GetKeyPress('T'))
+		//{
+		//	this->TestCamera->Rotate({ 0.7f, 0.0f, 0.0f });
+		//	//this->TestMeshTransform.Rotate({ 6.0f, 0.0f, 0.0f });
+		//}
+		//if (FKeyboard::GetKeyPress('G'))
+		//{
+		//	this->TestCamera->Rotate({ -0.7f, 0.0f, 0.0f });
+		//	//this->TestMeshTransform.Rotate({ -6.0f, 0.0f, 0.0f });
+		//}
 
 		this->TestMeshTransform.Rotate({ 0.0f, -0.8f, 0.0f });
 

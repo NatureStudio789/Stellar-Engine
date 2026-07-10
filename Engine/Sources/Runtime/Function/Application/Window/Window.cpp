@@ -1,10 +1,14 @@
 #include <Core.h>
 #include "../Event/EventDispatcher.h"
 #include "../Event/ApplicationEvent.h"
+
+#include "../../Input/Mouse/Mouse.h"
 #include "Window.h"
 
 namespace SE
 {
+	static WNDPROC OriginalWindowProc = null;
+
 	FWindow::FWindow() : SAddressable()
 	{
 		this->WindowAttribution = {};
@@ -58,6 +62,11 @@ namespace SE
 		}
 
 		this->WindowHandle = std::make_shared<Handle>(_WindowHandle);
+
+		HWND hwnd = this->WindowHandle->GetWin32Handle();
+		OriginalWindowProc = reinterpret_cast<WNDPROC>(
+			SetWindowLongPtr(hwnd, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(RawInputWndProc))
+			);
 
 		glfwSetWindowSizeCallback(this->WindowHandle->Instance, [](GLFWwindow* window, int width, int height)
 			{
@@ -197,5 +206,39 @@ namespace SE
 	std::shared_ptr<FWindow::Handle> FWindow::GetWindowHandle()
 	{
 		return this->WindowHandle;
+	}
+
+	LRESULT CALLBACK FWindow::RawInputWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+	{
+		switch (msg)
+		{
+		case WM_INPUT:
+		{
+			UINT DataSize = 0;
+			GetRawInputData(reinterpret_cast<HRAWINPUT>(lParam), RID_INPUT, null, &DataSize, sizeof(RAWINPUTHEADER));
+
+			if (DataSize > 0)
+			{
+				std::unique_ptr<BYTE[]> RawData = std::make_unique<BYTE[]>(DataSize);
+				if (GetRawInputData(reinterpret_cast<HRAWINPUT>(lParam),
+					RID_INPUT, RawData.get(), &DataSize, sizeof(RAWINPUTHEADER)) == DataSize)
+				{
+					RAWINPUT* Raw = reinterpret_cast<RAWINPUT*>(RawData.get());
+
+					if (Raw->header.dwType == RIM_TYPEMOUSE)
+					{
+						FMouse::CursorMovementList.push({ Raw->data.mouse.lLastX, Raw->data.mouse.lLastY });
+					}
+				}
+			}
+
+			break;
+		}
+
+		default:
+			break;
+		}
+
+		return CallWindowProc(OriginalWindowProc, hwnd, msg, wParam, lParam);
 	}
 }

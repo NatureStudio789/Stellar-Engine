@@ -71,32 +71,38 @@ namespace SE
 
 	void GCamera::Translate(const glm::vec3 & translation)
 	{
-		this->Position += translation * this->Rotation;
+		this->Position += translation;
 	}
 
 	void GCamera::Translate(float x, float y, float z)
 	{
-		this->Position += glm::vec3{ x, y, z } * this->Rotation;
+		this->Position += glm::vec3{ x, y, z };
 	}
 
 	void GCamera::SetRotation(const glm::quat & rotation)
 	{
 		this->Rotation = rotation;
+
+		this->UpdateVectors();
 	}
 
 	void GCamera::SetRotation(const glm::vec3 & eulerRotation)
 	{
 		this->Rotation = glm::quat(glm::radians(eulerRotation));
-	}
 
-	void GCamera::Rotate(const glm::quat & rotation)
-	{
-		this->Rotation *= rotation;
+		this->UpdateVectors();
 	}
 
 	void GCamera::Rotate(const glm::vec3 & eulerRotation)
 	{
-		this->Rotation *= glm::quat(glm::radians(eulerRotation));
+		glm::quat yawQuat = glm::angleAxis(glm::radians(eulerRotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
+
+		glm::vec3 localRight = this->Rotation * glm::vec3(1.0f, 0.0f, 0.0f);
+		glm::quat pitchQuat = glm::angleAxis(glm::radians(eulerRotation.x), localRight);
+
+		this->Rotation = glm::normalize(yawQuat * pitchQuat * this->Rotation);
+
+		this->UpdateVectors();
 	}
 
 	void GCamera::SetFOV(float fov)
@@ -131,11 +137,11 @@ namespace SE
 
 	glm::mat4x4 GCamera::GetViewMatrix() const noexcept
 	{
-		glm::vec3 CameraFront = glm::vec3(0.0f, 0.0f, -1.0f) * this->Rotation;
+		glm::vec3 CameraFront = this->Rotation * glm::vec3(0.0f, 0.0f, -1.0f);
 		glm::vec3 CameraUp;
 		if (this->IsFreeLook)
 		{
-			CameraUp = glm::vec3(0.0f, 1.0f, 0.0f) * this->Rotation;
+			CameraUp = this->Rotation * glm::vec3(0.0f, 1.0f, 0.0f);
 		}
 		else
 		{
@@ -143,6 +149,24 @@ namespace SE
 		}
 
 		return glm::lookAtLH(this->Position, CameraFront + this->Position, CameraUp);
+	}
+
+	void GCamera::UpdateVectors()
+	{
+		glm::vec3 euler = glm::eulerAngles(this->Rotation);
+		glm::quat Pitch = glm::angleAxis(euler.x, glm::vec3(1.0f, 0.0f, 0.0f));
+		glm::quat Yaw = glm::angleAxis(euler.y, glm::vec3(0.0f, 1.0f, 0.0f));
+
+		if (this->IsFreeLook)
+		{
+			this->Forward = (Pitch * Yaw) * glm::vec3(0.0f, 0.0f, -1.0f);
+		}
+		else
+		{
+			this->Forward = Yaw * glm::vec3(0.0f, 0.0f, -1.0f);
+		}
+
+		this->Right = Yaw * glm::vec3(-1.0f, 0.0f, 0.0f);
 	}
 
 	void GCamera::ApplyToPipeline()

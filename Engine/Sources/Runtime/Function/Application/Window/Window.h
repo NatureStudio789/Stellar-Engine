@@ -142,6 +142,8 @@ namespace SE
 		std::shared_ptr<Handle> GetWindowHandle();
 
 	private:
+		static LRESULT CALLBACK RawInputWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
+
 		Attribution WindowAttribution;
 		std::shared_ptr<Handle> WindowHandle;
 

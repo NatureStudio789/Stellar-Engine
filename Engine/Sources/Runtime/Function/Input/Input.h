@@ -1,6 +1,7 @@
 #ifndef _SE_INPUT_H_
 #define _SE_INPUT_H_
 #include "Keyboard/Keyboard.h"
+#include "Mouse/Mouse.h"
 
 namespace SE
 {

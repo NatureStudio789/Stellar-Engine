@@ -23,7 +23,6 @@ namespace SE
 
 		void SetRotation(const glm::quat& rotation);
 		void SetRotation(const glm::vec3& eulerRotation);
-		void Rotate(const glm::quat& rotation);
 		void Rotate(const glm::vec3& eulerRotation);
 
 		void SetFOV(float fov);
@@ -38,6 +37,10 @@ namespace SE
 		glm::vec3 Position;
 		glm::quat Rotation;
 
+		glm::vec3 Forward = { 0.0f, 0.0f, -1.0f };
+		glm::vec3 Right = { -1.0f, 0.0f, 0.0f };
+		glm::vec3 Up = { 0.0f, 1.0f, 0.0f };
+
 		float FOV;
 		float Aspect;
 		float NearZ;
@@ -46,6 +49,8 @@ namespace SE
 		bool IsFreeLook;
 
 	private:
+		void UpdateVectors();
+
 		void ApplyToPipeline();
 
 		struct CBufferData
