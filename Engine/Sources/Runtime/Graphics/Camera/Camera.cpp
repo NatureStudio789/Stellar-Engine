@@ -98,9 +98,9 @@ namespace SE
 		glm::quat yawQuat = glm::angleAxis(glm::radians(eulerRotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
 
 		glm::vec3 localRight = this->Rotation * glm::vec3(1.0f, 0.0f, 0.0f);
-		glm::quat pitchQuat = glm::angleAxis(glm::radians(eulerRotation.x), localRight);
+		glm::quat pitchQuat = glm::normalize(glm::angleAxis(glm::radians(eulerRotation.x), localRight));
 
-		this->Rotation = glm::normalize(yawQuat * pitchQuat * this->Rotation);
+		this->Rotation = glm::normalize(yawQuat * pitchQuat) * this->Rotation;
 
 		this->UpdateVectors();
 	}
@@ -153,20 +153,8 @@ namespace SE
 
 	void GCamera::UpdateVectors()
 	{
-		glm::vec3 euler = glm::eulerAngles(this->Rotation);
-		glm::quat Pitch = glm::angleAxis(euler.x, glm::vec3(1.0f, 0.0f, 0.0f));
-		glm::quat Yaw = glm::angleAxis(euler.y, glm::vec3(0.0f, 1.0f, 0.0f));
-
-		if (this->IsFreeLook)
-		{
-			this->Forward = (Pitch * Yaw) * glm::vec3(0.0f, 0.0f, -1.0f);
-		}
-		else
-		{
-			this->Forward = Yaw * glm::vec3(0.0f, 0.0f, -1.0f);
-		}
-
-		this->Right = Yaw * glm::vec3(-1.0f, 0.0f, 0.0f);
+		this->Forward = this->Rotation * glm::vec3(0.0f, 0.0f, -1.0f);
+		this->Right = this->Rotation * glm::vec3(-1.0f, 0.0f, 0.0f);
 	}
 
 	void GCamera::ApplyToPipeline()

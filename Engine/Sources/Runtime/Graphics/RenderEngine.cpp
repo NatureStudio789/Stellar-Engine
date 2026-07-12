@@ -33,6 +33,7 @@ namespace SE
 		this->TestCamera->SetPosition(0.0f, 0.0f, 16.0f);
 		this->TestCamera->SetNearZ(0.01f);
 		this->TestCamera->SetFarZ(100.0f);
+		this->TestCamera->IsFreeLook = true;
 		SCameraRegistry::Register(this->TestCamera);
 
 		auto DeferredRenderer = std::make_shared<GDeferredRenderer>("MainDeferredRenderer");
