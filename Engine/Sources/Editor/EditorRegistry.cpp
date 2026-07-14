@@ -2,6 +2,7 @@
 #include "EditorRegistry.h"
 
 #include "ViewportEditor/ViewportEditor.h"
+#include "DebugEditor/DebugEditor.h"
 
 namespace SE
 {
@@ -134,5 +135,8 @@ namespace SE
 	{
 		std::shared_ptr<EViewportEditor> ViewportEditor = std::make_shared<EViewportEditor>("Viewport");
 		Register(ViewportEditor);
+
+		std::shared_ptr<EDebugEditor> DebugEditor = std::make_shared<EDebugEditor>("Debug");
+		Register(DebugEditor);
 	}
 }

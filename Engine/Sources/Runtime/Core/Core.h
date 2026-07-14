@@ -12,6 +12,7 @@
 #include <filesystem>
 #include <random>
 #include <queue>
+#include <chrono>
 
 #include <GLFW/glfw3.h>
 #ifdef SE_PLATFORM_WINDOWS

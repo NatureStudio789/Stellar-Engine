@@ -11,11 +11,18 @@ cbuffer Camera : register(b0)
     float3 CameraPosition;
 };
 
-cbuffer LightingBuffer : register(b3)
+cbuffer PointLightBuffer : register(b3)
 {
     PointLight PointLightList[50];
     float padding;
     int PointLightCount;
+};
+
+cbuffer DirectionalLightBuffer : register(b4)
+{
+    DirectionalLight DirectionalLightList[50];
+    float padding1;
+    int DirectionalLightCount;
 };
 
 SamplerState MaterialSampler : register(s0);
@@ -39,10 +46,16 @@ float4 main(Input input) : SV_Target
 
     float3 Result = float3(0.0f, 0.0f, 0.0f);
 
-    [unroll]
+    [unroll(50)]
     for (int i = 0; i < PointLightCount; i++)
     {
-        Result += DirectLighting(PointLightList[i], Material, WorldPosition, CameraPosition, Normal);
+        Result += PointLighting(PointLightList[i], Material, WorldPosition, CameraPosition, Normal);
+    }
+
+    [unroll(50)]
+    for (int i = 0; i < DirectionalLightCount; i++)
+    {
+        Result += DirectionalLighting(DirectionalLightList[i], Material, WorldPosition, CameraPosition, Normal);
     }
 
     Result = AmbientLighting(Result, Material);

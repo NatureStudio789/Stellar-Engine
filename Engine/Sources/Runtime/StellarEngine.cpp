@@ -32,6 +32,9 @@ namespace SE
 
 		// Post-Initialize those API which depend on other modules.
 		SAPIConfigurator::PostInitializeAPI();
+
+		// Initialize Time Manager.
+		STimeManager::InitializeTimeManager();
 	}
 
 	void StellarEngine::LaunchEngine()
@@ -40,6 +43,8 @@ namespace SE
 
 		while (FApplication::Instance->IsApplicationRunning())
 		{
+			STimeManager::UpdateTimeManager();
+
 			FApplication::Instance->UpdateApplication();
 			FInput::UpdateInput();
 

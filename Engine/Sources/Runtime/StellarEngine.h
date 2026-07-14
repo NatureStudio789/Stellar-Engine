@@ -7,6 +7,7 @@
 #include "Graphics/Framebuffer/Framebuffer.h"
 #include "Function/Application/Event/EventProcesser.h"
 #include "Core/EngineSystem/EngineSystem.h"
+#include "Core/TimeManager/TimeManager.h"
 
 namespace SE
 {
@@ -26,6 +27,8 @@ namespace SE
 
 	private:
 		std::shared_ptr<FEventProcesser> EngineEventProcesser;
+
+		STimer EngineFPSTimer;
 	};
 }
 

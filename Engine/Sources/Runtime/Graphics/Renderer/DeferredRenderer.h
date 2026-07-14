@@ -6,6 +6,7 @@ namespace SE
 {
 	class GCompositionPass;
 	class GPointLightRegistry;
+	class GDirectionalLightRegistry;
 
 	class GDeferredRenderer : public GRenderer
 	{
@@ -15,6 +16,7 @@ namespace SE
 		/*Normally, There is only one light registry for one category available in renderer.
 		If the function is called twice, the data of the exist one would be replace.*/
 		void SetLightRegistry(std::shared_ptr<GPointLightRegistry> registry);
+		void SetLightRegistry(std::shared_ptr<GDirectionalLightRegistry> registry);
 
 	private:
 		std::shared_ptr<GFramebuffer> GBufferFramebuffer;

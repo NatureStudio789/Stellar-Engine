@@ -5,6 +5,13 @@ struct PointLight
 	float3 Color;
 };
 
+struct DirectionalLight
+{
+    float3 Direction;
+    float Strength;
+    float3 Color;
+};
+
 struct LightingMaterial
 {
 	float3 Albedo;
@@ -40,6 +47,14 @@ float GeometrySchlickGGX(float NdotV, float roughness)
     return num / denom;
 }
 
+float3 GetFresnelF0(float3 albedo, float metallic)
+{
+    float3 f0 = float3(0.04f, 0.04f, 0.04f);
+    f0 = lerp(f0, albedo, metallic);
+    
+    return f0;
+}
+
 float GeometrySmith(float3 N, float3 V, float3 L, float roughness)
 {
     float NdotV = max(dot(N, V), 0.0f);
@@ -56,36 +71,49 @@ float3 FresnelSchlick(float cosTheta, float3 F0)
     return F0 + (1.0f - F0) * pow(clamp(1.0f - cosTheta, 0.0f, 1.0f), 5.0f);
 }
 
-float3 DirectLighting(PointLight light, LightingMaterial material, float3 worldPosition, float3 cameraPosition, float3 normal)
+float3 CalculateLight(float3 L, float3 radiance, float3 N, float3 V, 
+    float3 albedo, float metallic, float roughness)
 {
-    float3 N = normalize(normal);
-    float3 V = normalize(cameraPosition - worldPosition);
-
-    float3 F0 = float3(0.04f, 0.04f, 0.04f);
-    F0 = lerp(F0, material.Albedo, material.Metallic);
-
-    float3 L = normalize(light.Position - worldPosition);
     float3 H = normalize(V + L);
-
-    float distance = length(light.Position - worldPosition);
-    float attenuation = 1.0f / (distance * distance);
-    float3 radiance = light.Color * attenuation * light.Strength;
-
-    float NDF = DistributionGGX(N, H, material.Roughness);
-    float G = GeometrySmith(N, V, L, material.Roughness);
+    
+    float3 F0 = GetFresnelF0(albedo, metallic);
+    
+    float NDF = DistributionGGX(N, H, roughness);
+    float G = GeometrySmith(N, V, L, roughness);
     float3 F = FresnelSchlick(max(dot(H, V), 0.0f), F0);
 
     float3 numerator = NDF * G * F;
-    float denominator = 4.0f * max(dot(N, V), 0.0f) * max(dot(N, L), 0.0f) + 0.00001f;
-    float3 specular = numerator / denominator;
-
+    float denomiator = 4.0f * max(dot(N, V), 0.0f) * max(dot(N, L), 0.0f) + 0.0001f;
+    float3 specular = numerator / denomiator;
+    
     float3 kS = F;
     float3 kD = float3(1.0f, 1.0f, 1.0f) - kS;
-    kD *= 1.0f - material.Metallic;
-
-    float NdotL = max(dot(N, L), 0.0f);
+    kD *= 1.0f - metallic;
+    float3 diffuse = kD * albedo / PI;
     
-    return (kD * material.Albedo / PI + specular) * radiance * NdotL;
+    float NdotL = max(dot(N, L), 0.0f);
+    return (diffuse + specular) * radiance * NdotL;
+}
+
+float3 PointLighting(PointLight light, LightingMaterial material, float3 worldPosition, float3 cameraPosition, float3 normal)
+{
+    float3 L = normalize(light.Position - worldPosition);
+    
+    float distance = length(light.Position - worldPosition);
+    float attenuation = 1.0f / max(distance * distance, 0.0001f);
+    float3 radiance = light.Color * light.Strength * attenuation;
+    
+    return CalculateLight(L, radiance, normalize(normal), normalize(cameraPosition - worldPosition),
+        material.Albedo, material.Metallic, material.Roughness);
+}
+
+float3 DirectionalLighting(DirectionalLight light, LightingMaterial material, float3 worldPosition, float3 cameraPosition, float3 normal)
+{
+    float3 L = normalize(-light.Direction);
+    float3 radiance = light.Color * light.Strength;
+
+    return CalculateLight(L, radiance, normalize(normal), normalize(cameraPosition - worldPosition), 
+        material.Albedo, material.Metallic, material.Roughness);
 }
 
 float3 AmbientLighting(float3 directLightingColor, LightingMaterial material)

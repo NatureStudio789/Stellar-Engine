@@ -12,6 +12,7 @@
 #include "RenderPass/DeferredRendering/CompositionPass.h"
 
 #include "Lighting/PointLight/PointLightRegistry.h"
+#include "Lighting/DirectionalLight/DirectionalLightRegistry.h"
 
 #include "DeferredRenderer.h"
 
@@ -101,6 +102,11 @@ namespace SE
     }
 
     void GDeferredRenderer::SetLightRegistry(std::shared_ptr<GPointLightRegistry> registry)
+    {
+        this->CompositionPass->AddApplicable(registry->LightCBuffer);
+    }
+
+    void GDeferredRenderer::SetLightRegistry(std::shared_ptr<GDirectionalLightRegistry> registry)
     {
         this->CompositionPass->AddApplicable(registry->LightCBuffer);
     }

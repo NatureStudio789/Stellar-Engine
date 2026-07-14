@@ -423,11 +423,17 @@ namespace SE
 			AttributionParameter.ShaderRegisterIndex = 0;
 			CompositionRootParameterList.push_back(AttributionParameter);
 
-			GRootParameter LightParameter;
-			LightParameter.ParameterType = GRootParameter::SE_PARAMETER_CBV;
-			LightParameter.DescriptorCount = 1;
-			LightParameter.ShaderRegisterIndex = 3;
-			CompositionRootParameterList.push_back(LightParameter);
+			GRootParameter PointLightParameter;
+			PointLightParameter.ParameterType = GRootParameter::SE_PARAMETER_CBV;
+			PointLightParameter.DescriptorCount = 1;
+			PointLightParameter.ShaderRegisterIndex = 3;
+			CompositionRootParameterList.push_back(PointLightParameter);
+
+			GRootParameter DirectionalLightParameter;
+			DirectionalLightParameter.ParameterType = GRootParameter::SE_PARAMETER_CBV;
+			DirectionalLightParameter.DescriptorCount = 1;
+			DirectionalLightParameter.ShaderRegisterIndex = 4;
+			CompositionRootParameterList.push_back(DirectionalLightParameter);
 
 			GRootParameter AlbedoBufferParameter;
 			AlbedoBufferParameter.ParameterType = GRootParameter::SE_PARAMETER_SRV;
