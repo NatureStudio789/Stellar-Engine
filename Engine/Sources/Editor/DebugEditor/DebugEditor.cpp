@@ -35,7 +35,7 @@ namespace SE
 			ImGui::Begin("Performance");
 
 			ImGui::Text(("Frame Delta Time : " + std::to_string(STimeManager::GetFrameDeltaTime())).c_str());
-			ImGui::Text(("FPS : " + std::to_string(STimeManager::GetFrameDeltaTime())).c_str());
+			ImGui::Text(("FPS : " + std::to_string(STimeManager::GetFramePerSecond())).c_str());
 
 			ImGui::End();
 		}
