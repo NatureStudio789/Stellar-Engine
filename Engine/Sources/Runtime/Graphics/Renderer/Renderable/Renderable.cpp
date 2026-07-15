@@ -9,6 +9,8 @@ namespace SE
 		this->IndexBuffer = null;
 		this->Topology = null;
 
+		this->AABB = null;
+
 		this->RenderTechniqueList.clear();
 	}
 
@@ -24,6 +26,8 @@ namespace SE
 		this->IndexBuffer = other.IndexBuffer;
 		this->Topology = other.Topology;
 
+		this->AABB = other.AABB;
+
 		this->RenderTechniqueList = other.RenderTechniqueList;
 	}
 
@@ -32,6 +36,8 @@ namespace SE
 		this->VertexBuffer.reset();
 		this->IndexBuffer.reset();
 		this->Topology.reset();
+
+		this->AABB.reset();
 
 		for (auto& technique : this->RenderTechniqueList)
 		{
@@ -52,9 +58,14 @@ namespace SE
 		this->Activate();
 	}
 
+	void GRenderable::SetAABB(std::shared_ptr<SAABB> aabb)
+	{
+		this->AABB = aabb;
+	}
+
 	void GRenderable::AddRenderTechnique(std::shared_ptr<GRenderTechnique> technique)
 	{
-		technique->SetParent(*this);
+		technique->SetParent(this);
 
 		this->RenderTechniqueList.push_back(technique);
 	}
@@ -65,7 +76,7 @@ namespace SE
 
 		for (auto& technique : this->RenderTechniqueList)
 		{
-			technique->SetParent(*this);
+			technique->SetParent(this);
 		}
 	}
 
@@ -149,5 +160,10 @@ namespace SE
 	const glm::mat4x4& GRenderable::GetAccumulatedMatrix() const noexcept
 	{
 		return this->AccumulatedMatrix;
+	}
+
+	std::shared_ptr<SAABB> GRenderable::GetAABB()
+	{
+		return this->AABB;
 	}
 }

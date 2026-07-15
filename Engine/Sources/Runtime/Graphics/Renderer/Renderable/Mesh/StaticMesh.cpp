@@ -11,6 +11,7 @@ namespace SE
 
 		this->MeshRootNode = null;
 		this->MeshItemList.clear();
+		this->MeshItemAABBList.clear();
 
 		this->AccumulatedMatrix = glm::mat4x4(1.0f);
 	}
@@ -32,6 +33,7 @@ namespace SE
 
 		this->MeshRootNode = other.MeshRootNode;
 		this->MeshItemList = other.MeshItemList;
+		this->MeshItemAABBList = other.MeshItemAABBList;
 
 		this->AccumulatedMatrix = other.AccumulatedMatrix;
 	}
@@ -50,7 +52,9 @@ namespace SE
 
 		for (const auto& itemData : Data.ItemDataList)
 		{
-			this->MeshItemList.push_back(std::make_shared<GMeshItem>(itemData));
+			auto MeshItem = std::make_shared<GMeshItem>(itemData);
+			this->MeshItemList.push_back(MeshItem);
+			this->MeshItemAABBList.push_back(MeshItem->GetAABB());
 		}
 
 		this->MeshRootNode = this->BuildMeshNode(Data.RootNodeData);
@@ -66,7 +70,9 @@ namespace SE
 
 		for (const auto& itemData : data.ItemDataList)
 		{
-			this->MeshItemList.push_back(std::make_shared<GMeshItem>(itemData));
+			auto MeshItem = std::make_shared<GMeshItem>(itemData);
+			this->MeshItemList.push_back(MeshItem);
+			this->MeshItemAABBList.push_back(MeshItem->GetAABB());
 		}
 
 		this->MeshRootNode = this->BuildMeshNode(data.RootNodeData);
@@ -93,6 +99,11 @@ namespace SE
 	std::shared_ptr<GMeshNode> GStaticMesh::GetRootNode()
 	{
 		return this->MeshRootNode;
+	}
+
+	const std::vector<std::shared_ptr<SAABB>>& GStaticMesh::GetItemAABBList() const noexcept
+	{
+		return this->MeshItemAABBList;
 	}
 
 	GStaticMesh::Data GStaticMesh::Load(const std::string& filePath)

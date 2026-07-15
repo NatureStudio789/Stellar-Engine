@@ -12,7 +12,7 @@ namespace SE
 		GApplicable() = default;
 		virtual ~GApplicable() = default;
 
-		virtual void SetParent(const GRenderable& parent) {}
+		virtual void SetParent(GRenderable* parent) {}
 		virtual void Apply() {}
 	};
 }

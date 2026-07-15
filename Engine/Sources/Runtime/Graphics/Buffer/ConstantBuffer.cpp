@@ -26,9 +26,9 @@ namespace SE
         this->Parent = null;
     }
 
-    void GTransformCBuffer::SetParent(const GRenderable & parent)
+    void GTransformCBuffer::SetParent(GRenderable* parent)
     {
-        this->Parent = &parent;
+        this->Parent = parent;
     }
 
     void GTransformCBuffer::Apply()
@@ -37,6 +37,12 @@ namespace SE
 
         glm::mat4x4 WorldMatrix;
         WorldMatrix = this->Parent->GetTransform().GetMatrix() * this->Parent->GetAccumulatedMatrix();
+
+        if (auto ParentAABB = this->Parent->GetAABB())
+        {
+            ParentAABB->Transform(WorldMatrix);
+        }
+
         WorldMatrix = glm::transpose(WorldMatrix);
 
         this->UpdateData({ WorldMatrix });

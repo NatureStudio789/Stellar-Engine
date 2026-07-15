@@ -16,7 +16,7 @@ namespace SE
 		void Initialize(const std::string& name, const std::string& channel, bool isActive = true);
 		void AddRenderStage(std::shared_ptr<GRenderStage> renderStage);
 
-		void SetParent(const GRenderable& parent);
+		void SetParent(GRenderable* parent);
 
 		void SetActive(bool active);
 

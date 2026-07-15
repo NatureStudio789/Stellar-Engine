@@ -57,7 +57,7 @@ namespace SE
 		this->RenderStageList.push_back(renderStage);
 	}
 
-	void GRenderTechnique::SetParent(const GRenderable& parent)
+	void GRenderTechnique::SetParent(GRenderable* parent)
 	{
 		for (auto& renderStage : this->RenderStageList)
 		{

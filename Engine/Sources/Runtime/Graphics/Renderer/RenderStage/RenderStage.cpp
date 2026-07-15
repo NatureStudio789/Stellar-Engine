@@ -50,7 +50,7 @@ namespace SE
 		this->ApplicableList.push_back(applicable);
 	}
 
-	void GRenderStage::SetParent(const GRenderable& renderable)
+	void GRenderStage::SetParent(GRenderable* renderable)
 	{
 		for (auto& applicable : this->ApplicableList)
 		{

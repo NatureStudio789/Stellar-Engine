@@ -36,6 +36,8 @@ namespace SE
 
 		std::shared_ptr<GMeshNode> GetRootNode();
 
+		const std::vector<std::shared_ptr<SAABB>>& GetItemAABBList() const noexcept;
+
 		static Data Load(const std::string& filePath);
 		static Data Load(const std::string& filePath, char* fileData, unsigned long long dataSize);
 
@@ -56,6 +58,7 @@ namespace SE
 
 		std::shared_ptr<GMeshNode> MeshRootNode;
 		std::vector<std::shared_ptr<GMeshItem>> MeshItemList;
+		std::vector<std::shared_ptr<SAABB>> MeshItemAABBList;
 
 		glm::mat4x4 AccumulatedMatrix;
 	};

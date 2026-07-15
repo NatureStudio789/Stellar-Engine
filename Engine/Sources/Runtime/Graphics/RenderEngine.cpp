@@ -62,7 +62,7 @@ namespace SE
 		{
 			light = std::make_shared<GPointLight>("test", GPointLight::Data({ PositionXZDist(gen), 30.0f, PositionXZDist (gen)}, 60000.0f,
 				{ ColorDist(gen), ColorDist(gen), ColorDist(gen)}));
-			//this->TestPLRegistry->Register(light);
+			this->TestPLRegistry->Register(light);
 		}
 
 		glm::vec3 direction = { 0.0f, 0.0f, 1.0f };

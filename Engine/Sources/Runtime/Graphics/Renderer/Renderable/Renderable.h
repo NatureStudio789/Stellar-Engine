@@ -7,6 +7,8 @@
 #include "../../Topology/Topology.h"
 #include "../RenderTechnique/RenderTechnique.h"
 
+#include "../../../Core/AABB/AABB.h"
+
 #include "../../../Core/Transform/Transform.h"
 
 namespace SE
@@ -22,6 +24,7 @@ namespace SE
 
 		void Initialize(const std::string& name, std::shared_ptr<GVertexBuffer> vertexBuffer,
 			std::shared_ptr<GIndexBuffer> indexBuffer, std::shared_ptr<GTopology> topology);
+		void SetAABB(std::shared_ptr<SAABB> aabb);
 
 		void AddRenderTechnique(std::shared_ptr<GRenderTechnique> technique);
 		void SetRenderTechniqueList(std::vector<std::shared_ptr<GRenderTechnique>> techniqueList);
@@ -42,10 +45,14 @@ namespace SE
 		const STransform& GetTransform() const noexcept;
 		const glm::mat4x4& GetAccumulatedMatrix() const noexcept;
 
+		std::shared_ptr<SAABB> GetAABB();
+
 	private:
 		std::shared_ptr<GVertexBuffer> VertexBuffer;
 		std::shared_ptr<GIndexBuffer> IndexBuffer;
 		std::shared_ptr<GTopology> Topology;
+
+		std::shared_ptr<SAABB> AABB;
 
 		std::vector<std::shared_ptr<GRenderTechnique>> RenderTechniqueList;
 

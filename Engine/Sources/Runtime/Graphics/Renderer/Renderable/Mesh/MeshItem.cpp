@@ -24,9 +24,17 @@ namespace SE
 	{
 		this->ItemData = data;
 
+		std::shared_ptr<SAABB> ItemAABB = std::make_shared<SAABB>();
+		for (const auto& vertex : this->ItemData.Vertices)
+		{
+			ItemAABB->Min = glm::min(vertex.Position, ItemAABB->Min);
+			ItemAABB->Max = glm::max(vertex.Position, ItemAABB->Max);
+		}
+
 		GRenderable::Initialize(this->ItemData.Name, 
 			GVertexBuffer::Create((void*)this->ItemData.Vertices.data(), (unsigned int)this->ItemData.Vertices.size(), (unsigned int)sizeof(Vertex)), 
 			GIndexBuffer::Create(this->ItemData.Indices.data(), (unsigned int)this->ItemData.Indices.size()), GTopology::Create(GTopology::SE_TOPOLOGY_TRIANGLELIST));
+		this->SetAABB(ItemAABB);
 
 		auto LightingTechnique = std::make_shared<GRenderTechnique>("LightingTechnique", "main");
 

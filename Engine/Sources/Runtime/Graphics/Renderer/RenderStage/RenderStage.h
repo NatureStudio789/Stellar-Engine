@@ -20,7 +20,7 @@ namespace SE
 		void Initialize(const std::string& renderQueuePassName);
 		void AddApplicable(std::shared_ptr<GApplicable> applicable);
 
-		void SetParent(const GRenderable& renderable);
+		void SetParent(GRenderable* renderable);
 
 		void Apply();
 		void Submit(std::shared_ptr<GRenderStage> self, std::shared_ptr<GRenderable> renderable);

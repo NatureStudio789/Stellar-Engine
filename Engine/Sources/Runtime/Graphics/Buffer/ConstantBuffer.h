@@ -123,12 +123,12 @@ namespace SE
 		GTransformCBuffer(const GTransformCBuffer& other);
 		~GTransformCBuffer() override;
 
-		void SetParent(const GRenderable& parent) override;
+		void SetParent(GRenderable* parent) override;
 
 		void Apply() override;
 
 	private:
-		const GRenderable* Parent;
+		GRenderable* Parent;
 	};
 }
 
