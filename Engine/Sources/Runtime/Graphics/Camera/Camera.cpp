@@ -137,7 +137,7 @@ namespace SE
 
 	glm::mat4x4 GCamera::GetViewMatrix() const noexcept
 	{
-		glm::vec3 CameraFront = this->Rotation * glm::vec3(0.0f, 0.0f, -1.0f);
+		glm::vec3 CameraFront = this->Rotation * glm::vec3(0.0f, 0.0f, 1.0f);
 		glm::vec3 CameraUp;
 		if (this->IsFreeLook)
 		{
@@ -153,8 +153,8 @@ namespace SE
 
 	void GCamera::UpdateVectors()
 	{
-		this->Forward = this->Rotation * glm::vec3(0.0f, 0.0f, -1.0f);
-		this->Right = this->Rotation * glm::vec3(-1.0f, 0.0f, 0.0f);
+		this->Forward = this->Rotation * glm::vec3(0.0f, 0.0f, 1.0f);
+		this->Right = this->Rotation * glm::vec3(1.0f, 0.0f, 0.0f);
 	}
 
 	void GCamera::ApplyToPipeline()
@@ -172,6 +172,11 @@ namespace SE
 	void SCameraRegistry::SetCurrentInstance(const std::string& name)
 	{
 		CurrentInstanceName = name;
+	}
+
+	void SCameraRegistry::SetCurrentInstance(const SUUID& id)
+	{
+		CurrentInstanceName = GetInstance(id)->GetName();
 	}
 
 	void SCameraRegistry::ApplyInstance(const std::string& name)

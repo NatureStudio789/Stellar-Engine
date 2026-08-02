@@ -18,6 +18,7 @@ namespace SE
 	GRenderPass::GRenderPass(const GRenderPass& other)
 	{
 		this->RenderPassName = other.RenderPassName;
+		this->RenderAttribution = other.RenderAttribution;
 	}
 
 	GRenderPass::~GRenderPass()
@@ -140,6 +141,11 @@ namespace SE
 	void GRenderPass::SetParent(const GRenderer* parent)
 	{
 
+	}
+
+	void GRenderPass::SetRenderAttribution(std::shared_ptr<GRenderAttribution> attribution)
+	{
+		this->RenderAttribution = attribution;
 	}
 
 	std::shared_ptr<GFramebuffer> GRenderPass::GetFramebufferInstance(const GResourcePackage& package)

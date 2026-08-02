@@ -48,4 +48,9 @@ namespace SE
 				this->Renderable->GetVerticesCount(), 1, 0, 0);
 		}
 	}
+
+	std::shared_ptr<GRenderable> GDrawTask::GetRenderable()
+	{
+		return this->Renderable;
+	}
 }

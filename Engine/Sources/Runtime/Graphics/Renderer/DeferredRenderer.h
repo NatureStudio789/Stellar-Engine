@@ -4,6 +4,7 @@
 
 namespace SE
 {
+	class GShadowPass;
 	class GCompositionPass;
 	class GPointLightRegistry;
 	class GDirectionalLightRegistry;
@@ -22,6 +23,7 @@ namespace SE
 		std::shared_ptr<GFramebuffer> GBufferFramebuffer;
 		std::shared_ptr<GFramebuffer> FinalCompositionFramebuffer;
 
+		std::shared_ptr<GShadowPass> ShadowPass;
 		std::shared_ptr<GCompositionPass> CompositionPass;
 	};
 }

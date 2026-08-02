@@ -16,6 +16,9 @@ namespace SE
 		GOutflow(const GOutflow& other);
 		~GOutflow();
 
+		//This function is ONLY available for Source Outflow.
+		void SetResourcePackage(GResourcePackage package);
+
 		bool GetAvailable() const noexcept;
 		const std::string& GetName() const noexcept;
 		/*Tag whether this outflow is a source, which means that it get its own

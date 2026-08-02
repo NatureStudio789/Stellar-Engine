@@ -4,6 +4,7 @@
 #include "PipelineState/PipelineState.h"
 #include "Material/StandardMaterial.h"
 #include "../Function/Input/Input.h"
+#include "../Core/TimeManager/TimeManager.h"
 #include "RenderEngine.h"
 
 namespace SE
@@ -30,24 +31,24 @@ namespace SE
 
 		this->TestCamera = std::make_shared<GCamera>();
 		this->TestCamera->SetName("Test");
-		this->TestCamera->SetPosition(0.0f, 0.0f, 16.0f);
+		this->TestCamera->SetPosition(0.0f, 10.0f, -2.0f);
 		this->TestCamera->SetNearZ(0.01f);
-		this->TestCamera->SetFarZ(10000.0f);
+		this->TestCamera->SetFarZ(300.0f);
 		this->TestCamera->IsFreeLook = true;
 		SCameraRegistry::Register(this->TestCamera);
 
 		auto DeferredRenderer = std::make_shared<GDeferredRenderer>("MainDeferredRenderer");
+		DeferredRenderer->SetMainCamera(this->TestCamera->GetUUID());
 		DeferredRenderer->Compile();
-		DeferredRenderer->SetMainCamera(this->TestCamera->GetName());
 		SRendererRegistry::Register(DeferredRenderer);
 		FMouse::AddMovementCallback([this](const glm::ivec2& movement)
 		{
-			this->TestCamera->Rotate({ -movement.y * 0.1f, movement.x * 0.1f, 0.0f });
+			this->TestCamera->Rotate({ movement.y * 0.008f * STimeManager::GetFrameDeltaTime(), movement.x * 0.008f * STimeManager::GetFrameDeltaTime(), 0.0f});
 		});
 
 		this->TestPLRegistry = std::make_shared<GPointLightRegistry>();
 		DeferredRenderer->SetLightRegistry(TestPLRegistry);
-		this->TestDLRegistry = std::make_shared<GDirectionalLightRegistry>();
+		this->TestDLRegistry = std::make_shared<GDirectionalLightRegistry>("MainDirectionalLightRegistry");
 		DeferredRenderer->SetLightRegistry(TestDLRegistry);
 
 		std::vector<std::shared_ptr<GPointLight>> TestLightList;
@@ -62,27 +63,25 @@ namespace SE
 		{
 			light = std::make_shared<GPointLight>("test", GPointLight::Data({ PositionXZDist(gen), 30.0f, PositionXZDist (gen)}, 60000.0f,
 				{ ColorDist(gen), ColorDist(gen), ColorDist(gen)}));
-			this->TestPLRegistry->Register(light);
+			//this->TestPLRegistry->Register(light);
 		}
 
-		glm::vec3 direction = { 0.0f, 0.0f, 1.0f };
-		glm::quat rot = { glm::radians(glm::vec3(-45.0f, 0.0f, 0.0f)) };
-		direction = rot * direction;
+		glm::vec3 direction = { 1.0f, 0.0f, 0.0f };
+		glm::quat rot = { glm::radians(glm::vec3(0.0f, 0.0f, -50.0f)) };
+		direction = glm::normalize(rot * direction);
 		std::shared_ptr<GDirectionalLight> DirectionalLight = std::make_shared<GDirectionalLight>("test2", 
-			GDirectionalLight::Data(direction, 30.0f, {1.0f, 1.0f, 0.8f}));
+			GDirectionalLight::Data(direction, 10.0f, {1.0f, 1.0f, 0.8f}));
 		this->TestDLRegistry->Register(DirectionalLight);
 
-		std::shared_ptr<GStandardMaterial> testmat = std::make_shared<GStandardMaterial>("testmat");
-		SMaterialRegistry::Register(testmat);
-		testmat->SetAlbedo(GTexture::Create("Engine/Assets/Textures/Background.jpeg", 0, GRenderGroup::ALBEDO_GROUP));
-
 		{
-			this->testmesh = std::make_shared<GStaticMesh>("Engine/Assets/Models/Sponza/Sponza.fbx");
+			this->testmesh = std::make_shared<GStaticMesh>("Engine/Assets/Models/Terrain/Terrain.fbx");
+			this->testmesh->SetTransform(STransform(glm::vec3(0.0f, 0.0f, 0.0f), glm::radians(glm::vec3(90.0f, 0.0f, 0.0f)), glm::vec3(5.0f, 5.0f, 5.0f)));
 		}
 
 		{
-			this->TestMeshTransform.Position = { 0.0f, 30.0f, 0.0f };
-			this->TestMeshTransform.Scale = { 8.0f, 8.0f, 8.0f };
+			this->TestMeshTransform.Position = { 0.0f, 18.0f, 0.0f };
+			this->TestMeshTransform.Scale = { 4.0f, 4.0f, 4.0f };
+			this->TestMeshTransform.Rotation = glm::quat(glm::radians(glm::vec3{0.0f, 0.0f, 0.0f}));
 			this->testmesh2 = std::make_shared<GStaticMesh>("Engine/Assets/Models/Cerberus/Cerberus.fbx");
 			this->testmesh2->SetTransform(this->TestMeshTransform);
 		}
@@ -99,22 +98,22 @@ namespace SE
 
 		if (FKeyboard::GetKeyPress('W'))
 		{
-			this->TestCamera->Translate(this->TestCamera->Forward * 0.5f);
+			this->TestCamera->Translate(this->TestCamera->Forward * 0.03f * STimeManager::GetFrameDeltaTime());
 		}
 		if (FKeyboard::GetKeyPress('S'))
 		{
-			this->TestCamera->Translate(-this->TestCamera->Forward * 0.5f);
+			this->TestCamera->Translate(-this->TestCamera->Forward * 0.03f * STimeManager::GetFrameDeltaTime());
 		}
 		if (FKeyboard::GetKeyPress('A'))
 		{
-			this->TestCamera->Translate(-this->TestCamera->Right * 0.5f);
+			this->TestCamera->Translate(-this->TestCamera->Right * 0.03f * STimeManager::GetFrameDeltaTime());
 		}
 		if (FKeyboard::GetKeyPress('D'))
 		{
-			this->TestCamera->Translate(this->TestCamera->Right * 0.5f);
+			this->TestCamera->Translate(this->TestCamera->Right * 0.03f * STimeManager::GetFrameDeltaTime());
 		}
 
-		this->TestMeshTransform.Rotate({ 0.0f, -0.8f, 0.0f });
+		this->TestMeshTransform.Rotate({ 0.0f, -0.08f * STimeManager::GetFrameDeltaTime(), 0.0f});
 
 		this->testmesh2->SetTransform(this->TestMeshTransform);
 

@@ -2,6 +2,8 @@
 #define _SE_CAMERA_H_
 #include "../../Core/Registry/Registry.h"
 
+#include "../../Core/AABB/AABB.h"
+
 namespace SE
 {
 	template<typename T>
@@ -37,8 +39,8 @@ namespace SE
 		glm::vec3 Position;
 		glm::quat Rotation;
 
-		glm::vec3 Forward = { 0.0f, 0.0f, -1.0f };
-		glm::vec3 Right = { -1.0f, 0.0f, 0.0f };
+		glm::vec3 Forward = { 0.0f, 0.0f, 1.0f };
+		glm::vec3 Right = { 1.0f, 0.0f, 0.0f };
 		glm::vec3 Up = { 0.0f, 1.0f, 0.0f };
 
 		float FOV;
@@ -80,6 +82,7 @@ namespace SE
 	{
 	public:
 		static void SetCurrentInstance(const std::string& name);
+		static void SetCurrentInstance(const SUUID& id);
 
 		static void ApplyInstance(const std::string& name);
 		static void ApplyInstance(const SUUID& id);

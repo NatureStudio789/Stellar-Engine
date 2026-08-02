@@ -28,6 +28,7 @@ namespace SE
 		void ExecuteSetup();
 
 		GResourcePackage GBufferPackage;
+		GResourcePackage DirectionalLightDepthMapSetPackage;
 
 		std::shared_ptr<GRenderable> FramebufferPresenter;
 		std::shared_ptr<GConstantBuffer<AttriCBufferData>> AttributionCBuffer;

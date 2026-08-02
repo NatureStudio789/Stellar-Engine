@@ -12,6 +12,7 @@ namespace SE
 	std::string GRenderGroup::ROUGHNESS_GROUP = "Roughness_RenderGroup";
 	std::string GRenderGroup::NORMAL_GROUP = "Normal_RenderGroup";
 	std::string GRenderGroup::POSITION_GROUP = "Position_RenderGroup";
+	std::string GRenderGroup::SHADOW_GROUP = "Shadow_RenderGroup";
 	std::string GRenderGroup::COMPOSITION_GROUP = "Composition_RenderGroup";
 
 	std::string GRenderGroup::FULLSCREEN_GROUP = "Fullscren_RenderGroup";
@@ -20,6 +21,6 @@ namespace SE
 	{
 		return groupName == LIGHTING_GROUP || groupName == WIREFRAME_GROUP || groupName == ALBEDO_GROUP || 
 			groupName == METALLIC_GROUP || groupName == ROUGHNESS_GROUP || groupName == NORMAL_GROUP || 
-			groupName == POSITION_GROUP || groupName == COMPOSITION_GROUP || groupName == FULLSCREEN_GROUP;
+			groupName == POSITION_GROUP || groupName == SHADOW_GROUP || groupName == COMPOSITION_GROUP || groupName == FULLSCREEN_GROUP;
 	}
 }

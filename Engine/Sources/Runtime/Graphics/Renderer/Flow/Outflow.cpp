@@ -6,13 +6,15 @@ namespace SE
 {
 	GOutflow::GOutflow(const std::string& name, GResourcePackage package, bool isDynamic)
 	{
+		this->IsSourceOutflow = true;
+
 		this->OutflowName = name;
-		this->ResourcePackage = package;
 		this->IsAvailable = true;
 		this->IsDynamicFlowing = isDynamic;
 
-		this->IsSourceOutflow = true;
 		this->SourceInflowName = "";
+
+		this->SetResourcePackage(package);
 	}
 
 	GOutflow::GOutflow(const std::string& name, std::shared_ptr<GInflow> sourceInflow)
@@ -42,6 +44,16 @@ namespace SE
 	GOutflow::~GOutflow()
 	{
 		
+	}
+
+	void GOutflow::SetResourcePackage(GResourcePackage package)
+	{
+		if (!this->IsSourceOutflow)
+		{
+			SMessageHandler::Instance->SetFatal("Graphics", "GOutflow::SetResourcePackage() is ONLY available for Source Outflow!");
+		}
+
+		this->ResourcePackage = package;
 	}
 
 	bool GOutflow::GetAvailable() const noexcept

@@ -33,6 +33,7 @@ namespace SE
 			this->DirectionalLightCount = 0;
 		}
 
+		glm::mat4x4 LightCameraMatrixList[50];
 		GDirectionalLight::Data DirectionalLightList[50];
 		int DirectionalLightCount;
 	};

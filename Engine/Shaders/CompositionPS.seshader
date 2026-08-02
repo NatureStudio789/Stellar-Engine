@@ -20,6 +20,7 @@ cbuffer PointLightBuffer : register(b3)
 
 cbuffer DirectionalLightBuffer : register(b4)
 {
+    float4x4 DirectionalLightCameraMatrixList[50];
     DirectionalLight DirectionalLightList[50];
     float padding1;
     int DirectionalLightCount;
@@ -31,6 +32,7 @@ Texture2D MetallicBuffer : register(t1);
 Texture2D RoughnessBuffer : register(t2);
 Texture2D NormalBuffer : register(t3);
 Texture2D PositionBuffer : register(t4);
+Texture2D DirectionalDepthMapList[50] : register(t5);
 
 float4 main(Input input) : SV_Target
 {
@@ -55,7 +57,9 @@ float4 main(Input input) : SV_Target
     [unroll(50)]
     for (int i = 0; i < DirectionalLightCount; i++)
     {
-        Result += DirectionalLighting(DirectionalLightList[i], Material, WorldPosition, CameraPosition, Normal);
+        float shadow = DirectionalShadow(DirectionalLightCameraMatrixList[i], WorldPosition, DirectionalDepthMapList[i], MaterialSampler);
+
+        Result += (1.0f - shadow) * DirectionalLighting(DirectionalLightList[i], Material, WorldPosition, CameraPosition, Normal);
     }
 
     Result = AmbientLighting(Result, Material);

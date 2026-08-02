@@ -2,6 +2,8 @@
 #define _SE_RENDERER_H_
 #include "../../Core/Addressable/Addressable.h"
 #include "../../Core/Registry/Registry.h"
+
+#include "RenderAttribution/RenderAttribution.h"
 #include "RenderPass/RenderPass.h"
 
 namespace SE
@@ -13,7 +15,7 @@ namespace SE
 		GRenderer(const std::string& name);
 		virtual ~GRenderer();
 
-		void SetMainCamera(const std::string& name);
+		void SetMainCamera(SUUID cameraId);
 
 		void Compile();
 
@@ -44,7 +46,7 @@ namespace SE
 		std::vector<std::shared_ptr<GFlowChain>> DynamicFlowChainList;
 		bool IsCompiled = false;
 
-		std::string MainCameraName;
+		std::shared_ptr<GRenderAttribution> RenderAttribution = std::make_shared<GRenderAttribution>();
 
 		friend class GRenderPass;
 		friend class GRenderQueuePass;

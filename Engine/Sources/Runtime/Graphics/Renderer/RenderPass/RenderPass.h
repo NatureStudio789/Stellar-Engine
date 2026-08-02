@@ -5,6 +5,7 @@
 #include "../Flow/FlowChain.h"
 #include "../ResourcePackage/ResourcePackage.h"
 #include "../../Camera/Camera.h"
+#include "../RenderAttribution/RenderAttribution.h"
 
 namespace SE
 {
@@ -33,6 +34,7 @@ namespace SE
 		void AddOutflow(std::shared_ptr<GOutflow> outflow);
 
 		virtual void SetParent(const GRenderer* parent);
+		void SetRenderAttribution(std::shared_ptr<GRenderAttribution> attribution);
 
 		std::shared_ptr<GFramebuffer> GetFramebufferInstance(const GResourcePackage& package);
 
@@ -40,6 +42,8 @@ namespace SE
 
 		std::vector<std::shared_ptr<GInflow>> InflowList;
 		std::vector<std::shared_ptr<GOutflow>> OutflowList;
+
+		std::shared_ptr<GRenderAttribution> RenderAttribution;
 
 		friend class GRenderer;
 	};

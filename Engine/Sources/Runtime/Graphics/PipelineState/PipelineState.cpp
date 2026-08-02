@@ -127,6 +127,9 @@ namespace SE
 		auto RS = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
 		RS.CullMode = this->RasterizeStateInstance.CullMode;
 		RS.FillMode = this->RasterizeStateInstance.FillMode;
+		RS.DepthBias = this->RasterizeStateInstance.DepthBias;
+		RS.DepthBiasClamp = this->RasterizeStateInstance.DepthBiasClamp;
+		RS.SlopeScaledDepthBias = this->RasterizeStateInstance.SlopeScaledDepthBias;
 		PipelineStateDesc.RasterizerState = RS;
 
 		auto BS = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
@@ -415,6 +418,49 @@ namespace SE
 		}
 
 		{
+			std::vector<GRootParameter> ShadowRootParameterList;
+
+			GRootParameter TransformParameter;
+			TransformParameter.ParameterType = GRootParameter::SE_PARAMETER_CBV;
+			TransformParameter.DescriptorCount = 1;
+			TransformParameter.ShaderRegisterIndex = 0;
+			ShadowRootParameterList.push_back(TransformParameter);
+
+			GRootParameter LightCameraParameter;
+			LightCameraParameter.ParameterType = GRootParameter::SE_PARAMETER_CBV;
+			LightCameraParameter.DescriptorCount = 1;
+			LightCameraParameter.ShaderRegisterIndex = 1;
+			ShadowRootParameterList.push_back(LightCameraParameter);
+
+			auto ShadowPipelineState = std::make_shared<GPipelineState>(GRenderGroup::SHADOW_GROUP);
+
+			ShadowPipelineState->AddShader(GShader::Create(GShader::SE_VERTEX_SHADER, "Engine/Shaders/ShadowVS.seshader"));
+			ShadowPipelineState->AddShader(GShader::Create(GShader::SE_PIXEL_SHADER, "Engine/Shaders/ShadowPS.seshader"));
+
+			ShadowPipelineState->SetTopology(GTopology::Create(GTopology::SE_TOPOLOGY_TRIANGLELIST));
+
+			ShadowPipelineState->SetRasterizerState(GPipelineState::RasterizerState(
+				D3D12_CULL_MODE_BACK, D3D12_FILL_MODE_SOLID, 10000, 0.0f, 1.0f));
+
+			std::vector<D3D12_INPUT_ELEMENT_DESC> ShadowInputLayout =
+			{
+				{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
+				{"TEXTURECOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
+				{"NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 20, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
+			};
+			ShadowPipelineState->SetInputLayout(GPipelineState::InputLayout(ShadowInputLayout));
+
+			ShadowPipelineState->GetRootSignature()->SetParameterList(ShadowRootParameterList);
+
+			GPipelineState::RenderTargetConfiguration RTConfiguration;
+			RTConfiguration.RenderTargetCount = 0;
+			ShadowPipelineState->SetRenderTargetConfiguration(RTConfiguration);
+
+			ShadowPipelineState->Initialize();
+			Register(ShadowPipelineState);
+		}
+
+		{
 			std::vector<GRootParameter> CompositionRootParameterList;
 
 			GRootParameter AttributionParameter;
@@ -464,6 +510,12 @@ namespace SE
 			PositionBufferParameter.ShaderRegisterIndex = 4;
 			PositionBufferParameter.DescriptorCount = 1;
 			CompositionRootParameterList.push_back(PositionBufferParameter);
+
+			GRootParameter DirectionalShadowMapParameter;
+			DirectionalShadowMapParameter.ParameterType = GRootParameter::SE_PARAMETER_SRV;
+			DirectionalShadowMapParameter.ShaderRegisterIndex = 5;
+			DirectionalShadowMapParameter.DescriptorCount = 50;
+			CompositionRootParameterList.push_back(DirectionalShadowMapParameter);
 
 			auto CompositionPipelineState = GPipelineState::Create(GRenderGroup::COMPOSITION_GROUP);
 

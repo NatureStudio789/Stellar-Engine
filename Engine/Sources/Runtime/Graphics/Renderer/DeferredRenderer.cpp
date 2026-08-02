@@ -9,6 +9,7 @@
 #include "RenderPass/DeferredRendering/RoughnessPass.h"
 #include "RenderPass/DeferredRendering/NormalPass.h"
 #include "RenderPass/DeferredRendering/PositionPass.h"
+#include "RenderPass/DeferredRendering/ShadowPass.h"
 #include "RenderPass/DeferredRendering/CompositionPass.h"
 
 #include "Lighting/PointLight/PointLightRegistry.h"
@@ -91,9 +92,16 @@ namespace SE
         }
 
         {
+            this->ShadowPass = std::make_shared<GShadowPass>("ShadowMap");
+               
+            this->AppendRenderPass(this->ShadowPass);
+        }
+
+        {
             this->CompositionPass = std::make_shared<GCompositionPass>("CompositionPass");
             this->CompositionPass->SetLinkage("CompositionFramebuffer", "CompositionBufferClearingPass.ClearingFramebuffer");
             this->CompositionPass->SetLinkage("GBuffer", "PositionBuffer.GBufferFramebuffer");
+            this->CompositionPass->SetLinkage("DirectionalDepthMapList", "ShadowMap.DirectionalDepthMapSRVList");
 
             this->AppendRenderPass(this->CompositionPass);
         }
@@ -109,5 +117,6 @@ namespace SE
     void GDeferredRenderer::SetLightRegistry(std::shared_ptr<GDirectionalLightRegistry> registry)
     {
         this->CompositionPass->AddApplicable(registry->LightCBuffer);
+        this->ShadowPass->SetLightRegistry(registry);
     }
 }

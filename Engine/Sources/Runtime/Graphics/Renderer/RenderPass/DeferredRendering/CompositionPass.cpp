@@ -2,6 +2,7 @@
 #include "../../../Framebuffer/Framebuffer.h"
 #include "../../../Buffer/ConstantBuffer.h"
 #include "../../../PipelineState/PipelineState.h"
+#include "../../../ShaderResourceView/SRVSet.h"
 
 #include "../../Renderable/Renderable.h"
 #include "CompositionPass.h"
@@ -38,6 +39,9 @@ namespace SE
 
 		auto GBufferInflow = GInflow::Create("GBuffer", this->GBufferPackage);
 		this->AddInflow(GBufferInflow);
+
+		auto DirectionalLightDepthMapInflow = GInflow::Create("DirectionalDepthMapList", this->DirectionalLightDepthMapSetPackage);
+		this->AddInflow(DirectionalLightDepthMapInflow);
 
 		this->AddApplicable(SPipelineStateRegistry::GetInstance(GRenderGroup::COMPOSITION_GROUP));
 
@@ -131,6 +135,9 @@ namespace SE
 		this->AddApplicable(RoughnessSRV);
 		this->AddApplicable(NormalSRV);
 		this->AddApplicable(PositionSRV);
+
+		auto DirectionalDepthMapSet = SSRVSetRegistry::GetInstance(this->DirectionalLightDepthMapSetPackage.GetResourceIdentifier().GetUUID());
+		this->AddApplicable(DirectionalDepthMapSet);
 
 		this->FramebufferPresenter->LinkTechnique("MainDeferredRenderer");
 	}

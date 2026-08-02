@@ -31,14 +31,27 @@ namespace SE
 
 		struct RasterizerState
 		{
-			RasterizerState() = default;
-			RasterizerState(D3D12_CULL_MODE cullMode, D3D12_FILL_MODE fillMode) :
-				CullMode(cullMode), FillMode(fillMode)
+			RasterizerState()
+			{
+				this->DepthBias = D3D12_DEFAULT_DEPTH_BIAS;
+				this->DepthBiasClamp = D3D12_DEFAULT_DEPTH_BIAS_CLAMP;
+				this->SlopeScaledDepthBias = D3D12_DEFAULT_SLOPE_SCALED_DEPTH_BIAS;
+
+				this->CullMode = D3D12_CULL_MODE_NONE;
+				this->FillMode = D3D12_FILL_MODE_SOLID;
+			}
+			RasterizerState(D3D12_CULL_MODE cullMode, D3D12_FILL_MODE fillMode, 
+				int depthBias = D3D12_DEFAULT_DEPTH_BIAS, float depthBiasClamp = D3D12_DEFAULT_DEPTH_BIAS_CLAMP, 
+				float slopeScaledDepthBias = D3D12_DEFAULT_SLOPE_SCALED_DEPTH_BIAS) :
+				CullMode(cullMode), FillMode(fillMode), DepthBias(depthBias), DepthBiasClamp(depthBiasClamp), SlopeScaledDepthBias(slopeScaledDepthBias)
 			{
 
 			}
 			RasterizerState(const RasterizerState&) = default;
 
+			INT DepthBias;
+			FLOAT DepthBiasClamp;
+			FLOAT SlopeScaledDepthBias;
 			D3D12_CULL_MODE CullMode;
 			D3D12_FILL_MODE FillMode;
 		};

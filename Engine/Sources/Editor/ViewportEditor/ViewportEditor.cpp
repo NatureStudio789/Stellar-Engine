@@ -1,6 +1,7 @@
 #include <Core.h>
 #include "../../Runtime/Graphics/Framebuffer/Framebuffer.h"
 #include "../../Runtime/Graphics/Texture/Texture.h"
+#include "../../Runtime/Graphics/ShaderResourceView/SRVSet.h"
 #include "ViewportEditor.h"
 
 namespace SE
@@ -116,6 +117,21 @@ namespace SE
 
 			ImGui::Image((ImTextureID)CompositionFramebuffer->GetRTShaderResourceView()->GetGPUDescriptor().ptr,
 				ImVec2((float)CompositionFramebuffer->GetWidth(), (float)CompositionFramebuffer->GetHeight()));
+
+			ImGui::End();
+		}
+
+		auto DirectionalDepthMapList = SSRVSetRegistry::GetInstance("MainDirectionalLightRegistry_DepthMapSet");
+
+		{
+			ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+
+			ImGui::Begin("Depth Map");
+
+			ImGui::PopStyleVar();
+
+			ImGui::Image((ImTextureID)DirectionalDepthMapList->GetDescriptorHandle()->GPUHandle.ptr,
+				ImVec2(1024, 1024));
 
 			ImGui::End();
 		}

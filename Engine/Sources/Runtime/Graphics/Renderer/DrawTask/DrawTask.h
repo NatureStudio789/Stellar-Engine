@@ -20,6 +20,8 @@ namespace SE
 
 		void Execute();
 
+		std::shared_ptr<GRenderable> GetRenderable();
+
 	private:
 		std::shared_ptr<GRenderStage> RenderStage;
 		std::shared_ptr<GRenderable> Renderable;

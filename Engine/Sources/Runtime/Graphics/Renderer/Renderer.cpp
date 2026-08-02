@@ -15,6 +15,7 @@ namespace SE
 		this->RendererCommandList = GCommandList::Create(
 			this->GetContext()->GetDevice(), GCommandList::SE_COMMAND_LIST_DIRECT);
 		this->RendererCommandList->SetName(this->GetName());
+		this->RenderAttribution->CommandListId = this->RendererCommandList->GetUUID();
 		SCommandListRegistry::Register(this->RendererCommandList);
 	}
 
@@ -23,15 +24,16 @@ namespace SE
 
 	}
 
-	void GRenderer::SetMainCamera(const std::string& name)
+	void GRenderer::SetMainCamera(SUUID cameraId)
 	{
-		if (!SCameraRegistry::HasInstance(name))
+		if (!SCameraRegistry::HasInstance(cameraId))
 		{
 			SMessageHandler::Instance->SetFatal("Graphics",
-				std::format("No available camera named '{}' in registry!", name));
+				std::format("No available camera named '{}' in registry!", (const std::string&)cameraId));
 		}
 
-		this->MainCameraName = name;
+		this->RenderAttribution->MainCameraId = cameraId;
+		this->RenderAttribution->IsRequiringCamera = true;
 	}
 
 	void GRenderer::Compile()
@@ -151,8 +153,17 @@ namespace SE
 			SMessageHandler::Instance->SetFatal("Graphics", std::format("The renderer named '{}' is NOT compiled before execution!", this->GetName()));
 		}
 
+		for (auto& dynamicFlowChain : this->DynamicFlowChainList)
+		{
+			dynamicFlowChain->Link();
+		}
+
 		SCommandListRegistry::SetCurrentInstance(this->GetName());
-		SCameraRegistry::SetCurrentInstance(this->MainCameraName);
+
+		if (this->RenderAttribution->IsRequiringCamera)
+		{
+			SCameraRegistry::SetCurrentInstance(this->RenderAttribution->MainCameraId);
+		}
 
 		this->RendererCommandList->Open();
 
@@ -162,11 +173,6 @@ namespace SE
 		}
 
 		this->RendererCommandList->Close();
-
-		for (auto& dynamicFlowChain : this->DynamicFlowChainList)
-		{
-			dynamicFlowChain->Link();
-		}
 	}
 
 	void GRenderer::SetInflowTarget(const std::string& inflowName, const std::string& target)
@@ -258,6 +264,7 @@ namespace SE
 		}
 
 		renderPass->SetParent(this);
+		renderPass->SetRenderAttribution(this->RenderAttribution);
 		this->RenderPassList.push_back(renderPass);
 	}
 

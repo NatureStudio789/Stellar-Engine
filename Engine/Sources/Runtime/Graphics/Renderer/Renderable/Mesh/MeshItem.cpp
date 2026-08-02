@@ -88,6 +88,12 @@ namespace SE
 			PositionStage->AddApplicable(GTransformCBuffer::Create(GRenderGroup::POSITION_GROUP, 0));
 
 			LightingTechnique->AddRenderStage(PositionStage);
+
+			auto ShadowStage = std::make_shared<GRenderStage>("ShadowMap");
+
+			ShadowStage->AddApplicable(GTransformCBuffer::Create(GRenderGroup::SHADOW_GROUP, 0));
+
+			LightingTechnique->AddRenderStage(ShadowStage);
 		}
 
 		this->AddRenderTechnique(LightingTechnique);

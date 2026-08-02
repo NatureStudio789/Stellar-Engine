@@ -29,6 +29,8 @@ namespace SE
 		unsigned int RootParameterIndex;
 		std::shared_ptr<GDescriptorHandle> DescriptorHandle;
 		bool IsDescriptorAllocated;
+
+		friend class GSRVSet;
 	};
 }
 

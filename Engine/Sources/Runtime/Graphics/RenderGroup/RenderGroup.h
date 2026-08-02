@@ -18,6 +18,7 @@ namespace SE
 		static std::string ROUGHNESS_GROUP;
 		static std::string NORMAL_GROUP;
 		static std::string POSITION_GROUP;
+		static std::string SHADOW_GROUP;
 		static std::string COMPOSITION_GROUP;
 
 		static std::string FULLSCREEN_GROUP;

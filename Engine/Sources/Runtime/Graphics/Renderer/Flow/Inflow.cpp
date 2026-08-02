@@ -45,11 +45,6 @@ namespace SE
 
 	void GInflow::Apply(std::shared_ptr<GOutflow> outflow)
 	{
-		if (this->IsLinked)
-		{
-			SMessageHandler::Instance->SetFatal("Graphics", std::format("This inflow named '{}' has already been linked!", this->InflowName));
-		}
-
 		this->ResourcePackage = outflow->ResourcePackage;
 		this->IsLinked = true;
 	}

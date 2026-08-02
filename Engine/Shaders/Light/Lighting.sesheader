@@ -126,3 +126,30 @@ float3 AmbientLighting(float3 directLightingColor, LightingMaterial material)
 
     return Color;
 }
+
+float DirectionalShadow(float4x4 lightMatrix, float3 worldPosition, Texture2D depthMap, SamplerState shadowSampler)
+{
+    float4 LightSpacePosition = mul(float4(worldPosition, 1.0f), lightMatrix);
+
+    float3 ProjectionCoord = LightSpacePosition.xyz / LightSpacePosition.w;
+
+    float RealDepth = ProjectionCoord.z;
+
+    float shadow = 0.0f;
+    uint width, height, numMips;
+    depthMap.GetDimensions(0, width, height, numMips);
+    float2 TexelSize = float2((float)width, (float)height);
+    TexelSize = 1.0f / TexelSize;
+    [unroll]
+    for (int x = -1; x <= 1; x++)
+    {
+        for (int y = -1; y <= 1; y++)
+        {
+            float PCFDepth = depthMap.Sample(shadowSampler, ProjectionCoord.xy + float2(x, y) * TexelSize).r;
+            shadow += RealDepth > PCFDepth ? 1.0f : 0.0f;
+        }
+    }
+
+    shadow /= 9.0f;
+    return shadow;
+}
