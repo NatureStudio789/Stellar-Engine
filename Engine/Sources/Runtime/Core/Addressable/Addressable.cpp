@@ -43,4 +43,10 @@ namespace SE
 	{
 		this->IdentifierHandle.UUID.Activate();
 	}
+
+	void SAddressable::Activate(std::string uuid)
+	{
+		this->IdentifierHandle.UUID.UUID = uuid;
+		this->IdentifierHandle.UUID.IsAvailable = true;
+	}
 }

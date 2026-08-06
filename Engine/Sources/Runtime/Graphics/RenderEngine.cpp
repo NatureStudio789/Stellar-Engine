@@ -51,20 +51,23 @@ namespace SE
 		this->TestDLRegistry = std::make_shared<GDirectionalLightRegistry>("MainDirectionalLightRegistry");
 		DeferredRenderer->SetLightRegistry(TestDLRegistry);
 
-		std::vector<std::shared_ptr<GPointLight>> TestLightList;
-		TestLightList.resize(20);
+		//std::vector<std::shared_ptr<GPointLight>> TestLightList;
+		//TestLightList.resize(20);
 
-		std::random_device rd;
-		std::mt19937 gen(rd());
-		std::uniform_real_distribution<float> PositionXZDist(-600.0f, 600.0f);
-		std::uniform_real_distribution<float> ColorDist(0.0f, 1.0f);
+		//std::random_device rd;
+		//std::mt19937 gen(rd());
+		//std::uniform_real_distribution<float> PositionXZDist(-80.0f, 80.0f);
+		//std::uniform_real_distribution<float> ColorDist(0.0f, 1.0f);
 
-		for (auto light : TestLightList)
-		{
-			light = std::make_shared<GPointLight>("test", GPointLight::Data({ PositionXZDist(gen), 30.0f, PositionXZDist (gen)}, 60000.0f,
-				{ ColorDist(gen), ColorDist(gen), ColorDist(gen)}));
-			//this->TestPLRegistry->Register(light);
-		}
+		//int i = 0;
+		//for (auto light : TestLightList)
+		//{
+		//	light = std::make_shared<GPointLight>("point_light_test" + std::to_string(i), GPointLight::Data({PositionXZDist(gen), 20.0f, PositionXZDist(gen)}, 600.0f,
+		//		{ ColorDist(gen), ColorDist(gen), ColorDist(gen)}));
+		//	this->TestPLRegistry->Register(light);
+
+		//	i++;
+		//}
 
 		glm::vec3 direction = { 1.0f, 0.0f, 0.0f };
 		glm::quat rot = { glm::radians(glm::vec3(0.0f, 0.0f, -50.0f)) };

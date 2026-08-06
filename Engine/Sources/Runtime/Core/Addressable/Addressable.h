@@ -51,6 +51,7 @@ namespace SE
 
 	protected:
 		void Activate();
+		void Activate(std::string uuid);
 
 		Identifier IdentifierHandle;
 	};

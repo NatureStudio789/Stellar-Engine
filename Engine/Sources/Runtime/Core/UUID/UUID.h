@@ -23,6 +23,8 @@ namespace SE
 	private:
 		std::string UUID;
 		bool IsAvailable;
+
+		friend class SAddressable;
 	};
 }
 

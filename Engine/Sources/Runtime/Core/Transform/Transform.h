@@ -7,8 +7,8 @@ namespace SE
 	{
 	public:
 		STransform();
-		STransform(const glm::vec3& position, glm::quat& rotation, glm::vec3& scale);
-		STransform(const glm::vec3& position, glm::vec3& eulerAngles, glm::vec3& scale);
+		STransform(const glm::vec3& position, const glm::quat& rotation, const glm::vec3& scale);
+		STransform(const glm::vec3& position, const glm::vec3& eulerAngles, const glm::vec3& scale);
 		STransform(const STransform& other);
 		~STransform();
 

@@ -10,14 +10,14 @@ namespace SE
 		this->Scale = { 1.0f, 1.0f, 1.0f };
 	}
 
-	STransform::STransform(const glm::vec3& position, glm::quat& rotation, glm::vec3& scale)
+	STransform::STransform(const glm::vec3& position, const glm::quat& rotation, const glm::vec3& scale)
 	{
 		this->Position = position;
 		this->Rotation = rotation;
 		this->Scale = scale;
 	}
 
-	STransform::STransform(const glm::vec3& position, glm::vec3& eulerAngles, glm::vec3& scale)
+	STransform::STransform(const glm::vec3& position, const glm::vec3& eulerAngles, const glm::vec3& scale)
 	{
 		this->Position = position;
 		this->Rotation = glm::quat(eulerAngles);

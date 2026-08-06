@@ -121,19 +121,19 @@ namespace SE
 			ImGui::End();
 		}
 
-		auto DirectionalDepthMapList = SSRVSetRegistry::GetInstance("MainDirectionalLightRegistry_DepthMapSet");
+		//auto DirectionalDepthMapList = SSRVSetRegistry::GetInstance("MainDirectionalLightRegistry_DepthMapSet");
 
-		{
-			ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+		//{
+		//	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
 
-			ImGui::Begin("Depth Map");
+		//	ImGui::Begin("Depth Map");
 
-			ImGui::PopStyleVar();
+		//	ImGui::PopStyleVar();
 
-			ImGui::Image((ImTextureID)DirectionalDepthMapList->GetDescriptorHandle()->GPUHandle.ptr,
-				ImVec2(1024, 1024));
+		//	ImGui::Image((ImTextureID)DirectionalDepthMapList->GetDescriptorHandle()->GPUHandle.ptr,
+		//		ImVec2(1024, 1024));
 
-			ImGui::End();
-		}
+		//	ImGui::End();
+		//}
 	}
 }

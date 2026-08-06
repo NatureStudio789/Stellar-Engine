@@ -4,6 +4,8 @@
 
 namespace SE
 {
+	class GStandardMaterial;
+
 	class GStaticMesh
 	{
 	public:
