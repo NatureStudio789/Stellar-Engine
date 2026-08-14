@@ -14,6 +14,9 @@
 #include <queue>
 #include <chrono>
 #include <any>
+#include <mutex>
+#include <shared_mutex>
+#include <atomic>
 
 #include <GLFW/glfw3.h>
 #ifdef SE_PLATFORM_WINDOWS

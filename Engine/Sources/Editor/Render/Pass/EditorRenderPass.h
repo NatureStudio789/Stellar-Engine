@@ -18,6 +18,8 @@ namespace SE
 	private:
 		GResourcePackage FramebufferPackage;
 		std::shared_ptr<GTexture> texture;
+		std::shared_ptr<GTexture> EngineIcon_Large;
+		std::shared_ptr<GTexture> EngineIcon_Small;
 	};
 }
 

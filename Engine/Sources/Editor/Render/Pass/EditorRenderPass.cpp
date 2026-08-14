@@ -10,7 +10,8 @@ namespace SE
 	{
 		this->AddInflow(GInflow::Create("EditorFramebuffer", this->FramebufferPackage));
 
-		this->texture = GTexture::Create("Engine/Assets/Textures/Morgen.jpg");
+		this->EngineIcon_Large = GTexture::Create("Engine/Assets/Textures/Stellar-Engine_Large.png");
+		this->EngineIcon_Small = GTexture::Create("Engine/Assets/Textures/Stellar-Engine_Small.png");
 	}
 
 	void EEditorRenderPass::Execute()
@@ -42,7 +43,7 @@ namespace SE
 
 		ImGui::PopStyleVar(2);
 
-		const float titlebarHeight = 58.0f;
+		const float titlebarHeight = 88.0f;
 		float titlebarVerticalOffset = SWindowRegistry::GetMainInstance()->GetWindowMaximzied() ? -6.0f : 0.0f;
 		const ImVec2 windowPadding = ImGui::GetCurrentWindow()->WindowPadding;
 
@@ -54,7 +55,14 @@ namespace SE
 										 ImGui::GetCursorScreenPos().y + titlebarHeight };
 			auto* bgDrawList = ImGui::GetBackgroundDrawList();
 			auto* fgDrawList = ImGui::GetForegroundDrawList();
-			bgDrawList->AddRectFilled(titlebarMin, titlebarMax, ImColor(0.5f, 0.08f, 0.5f));
+			bgDrawList->AddRectFilled(titlebarMin, titlebarMax, ImColor(0.5f, 0.08f, 0.8f));
+
+			const int logoWidth = 48;
+			const int logoHeight = 48;
+			const ImVec2 logoOffset(windowPadding.x, windowPadding.y + titlebarVerticalOffset);
+			const ImVec2 logoRectStart = { ImGui::GetItemRectMin().x + logoOffset.x, ImGui::GetItemRectMin().y + logoOffset.y };
+			const ImVec2 logoRectMax = { logoRectStart.x + logoWidth, logoRectStart.y + logoHeight };
+			fgDrawList->AddImage((ImTextureID)this->EngineIcon_Small->GetGPUDescriptor().ptr, logoRectStart, logoRectMax);
 		}
 
 		ImGui::BeginHorizontal("Titlebar", { ImGui::GetWindowWidth() - windowPadding.y * 2.0f, ImGui::GetFrameHeightWithSpacing() });
@@ -81,6 +89,16 @@ namespace SE
 
 		ImGui::DockSpace(ImGui::GetID("MyDockspace"));
 
+
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+
+		ImGui::Begin("Icon");
+
+		ImGui::PopStyleVar();
+
+		ImGui::Image((ImTextureID)this->EngineIcon_Large->GetGPUDescriptor().ptr, ImVec2(894.0f, 894.0f));
+
+		ImGui::End();
 
 		for (auto& [uuid, editor] : SEditorRegistry::GetInstanceList())
 		{

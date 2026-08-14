@@ -10,15 +10,21 @@ namespace SE
 		AAsset();
 		AAsset(const std::string& serializedFilePath);
 		AAsset(const AAsset& other);
-		virtual ~AAsset();
+		~AAsset();
 
 		// Initialize asset with the serialized file.
 		void Load(const std::string& serializedFilePath);
 
 		// Initialize asset by importing data from raw file.
 		void Import(const std::string& rawFilePath);
-		// Update data of asset through current raw file.
-		void Reimport();
+
+		const std::string& GetCategory() const noexcept;
+		const std::string& GetFilePackage() const noexcept;
+
+		std::string GetRawFilePath() const noexcept;
+
+		std::string GetSerializedFilePath() const noexcept;
+		bool GetSerialized() const noexcept;
 
 		template<typename DataType>
 		DataType GetData()
@@ -26,7 +32,14 @@ namespace SE
 			return std::any_cast<DataType>(this->Data);
 		}
 
-	protected:
+	private:
+		// #For hot reloading by Asset Loader.
+		void ResetData(const std::any& data);
+		void ResetPackage(const std::filesystem::path& package);
+
+		static std::string ValidateCategory(std::string fileExtension);
+		static std::any ImportData(std::string filePath, std::string category);
+
 		std::string Category;
 
 		// The directory of the asset file.
@@ -42,9 +55,7 @@ namespace SE
 
 		std::any Data;
 
-	private:
-		static std::string ValidateCategory(std::string fileExtension);
-		static std::any ImportData(std::string filePath, std::string category);
+		friend class AAssetLoader;
 
 	public:
 		// Asset Categories Enum :

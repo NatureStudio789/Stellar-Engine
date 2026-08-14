@@ -16,6 +16,11 @@ namespace SE
 	EDebugEditor::EDebugEditor(const std::string& name) : EEditor()
 	{
 		this->SetName(name);
+
+		this->Observer.Start("Engine/Assets/", [](DWORD action, const std::wstring& fileName)
+			{
+				std::wcout << "[DirectoryObserver] Action : " << action << ", FileName" << fileName << std::endl;
+			});
 	}
 
 	EDebugEditor::EDebugEditor(const EDebugEditor & other) : EEditor(other)

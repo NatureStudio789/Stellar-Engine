@@ -66,9 +66,48 @@ namespace SE
 		// TO DO: Serialize the asset...
 	}
 
-	void AAsset::Reimport()
+	const std::string& AAsset::GetCategory() const noexcept
 	{
-		this->Data = ImportData(this->RawFilePath.string(), this->Category);
+		return this->Category;
+	}
+
+	const std::string& AAsset::GetFilePackage() const noexcept
+	{
+		return this->FilePackage;
+	}
+
+	std::string AAsset::GetRawFilePath() const noexcept
+	{
+		return this->RawFilePath.string();
+	}
+
+	std::string AAsset::GetSerializedFilePath() const noexcept
+	{
+		return this->SerializedFilePath.string();
+	}
+
+	bool AAsset::GetSerialized() const noexcept
+	{
+		return this->IsSerialized;
+	}
+
+	void AAsset::ResetData(const std::any& data)
+	{
+		this->Data = data;
+	}
+
+	void AAsset::ResetPackage(const std::filesystem::path& package)
+	{
+		this->FilePackage = package.string();
+
+		std::filesystem::path FileName = this->RawFilePath.filename();
+		this->RawFilePath = package / FileName;
+		if (this->IsSerialized)
+		{
+			this->SerializedFilePath = package / std::filesystem::path(FileName.stem().string() + ".sasset");
+
+			// TO DO: Reserialize the Asset...
+		}
 	}
 
 	std::string AAsset::ValidateCategory(std::string fileExtension)

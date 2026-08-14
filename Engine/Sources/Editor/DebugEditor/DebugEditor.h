@@ -2,6 +2,8 @@
 #define _SE_DEBUGEDITOR_H_
 #include "../Editor.h"
 
+#include "../../Runtime/Function/DirectoryObserver/DirectoryObserver.h"
+
 namespace SE
 {
 	class EDebugEditor : public EEditor
@@ -14,6 +16,9 @@ namespace SE
 
 		void Initialize() override;
 		void Render() override;
+
+	private:
+		FDirectoryObserver Observer;
 	};
 }
 
