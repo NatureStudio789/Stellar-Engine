@@ -7,6 +7,8 @@
 #include "../Core/TimeManager/TimeManager.h"
 #include "RenderEngine.h"
 
+#include "../Core/APIConfigurator/APIConfigurator.h"
+
 namespace SE
 {
 	STELLAR_REGISTER_ENGINE(RenderEngine);
@@ -20,7 +22,7 @@ namespace SE
 	void RenderEngine::Initialize()
 	{
 		GRenderConfiguration::InitializeConfiguration();
-
+		
 		this->MainGraphicsContext = GGraphicsContext::Create(
 			SWindowRegistry::GetMainInstance()->GetWindowHandle(),
 			SWindowRegistry::GetMainInstance()->GetWindowSize());
@@ -28,6 +30,33 @@ namespace SE
 		SGraphicsContextRegistry::Register(this->MainGraphicsContext);
 
 		SPipelineStateRegistry::InitializeRegistry();
+		
+		this->TestLoader = std::make_shared<AAssetLoader>();
+		this->TestLoader->SetName("Test");
+		SAssetLoaderRegistry::Register(this->TestLoader);
+		std::thread Loading([this]()
+			{
+				try 
+				{
+					this->TestLoader->Initialize("Engine/Assets/");
+				}
+				catch (const SE::SMessage& message)
+				{
+					(void)message;
+					SE::SAPIConfigurator::ShutdownAPI();
+
+					return -1;
+				}
+				catch (const std::filesystem::filesystem_error& e) {
+					// 捕获异常
+					::MessageBoxA(null, e.what(), "Stellar Engine - filesystem", MB_OK | MB_ICONINFORMATION);
+
+					return -1;
+				}
+
+				return 0;
+			});
+		Loading.join();
 
 		this->TestCamera = std::make_shared<GCamera>();
 		this->TestCamera->SetName("Test");
@@ -77,7 +106,7 @@ namespace SE
 		this->TestDLRegistry->Register(DirectionalLight);
 
 		{
-			this->testmesh = std::make_shared<GStaticMesh>("Engine/Assets/Models/Terrain/Terrain.fbx");
+			this->testmesh = std::make_shared<GStaticMesh>(this->TestLoader->GetAsset("Engine/Assets/Models/Terrain/Terrain.sasset"));
 			this->testmesh->SetTransform(STransform(glm::vec3(0.0f, 0.0f, 0.0f), glm::radians(glm::vec3(90.0f, 0.0f, 0.0f)), glm::vec3(5.0f, 5.0f, 5.0f)));
 		}
 
@@ -85,7 +114,7 @@ namespace SE
 			this->TestMeshTransform.Position = { 0.0f, 18.0f, 0.0f };
 			this->TestMeshTransform.Scale = { 4.0f, 4.0f, 4.0f };
 			this->TestMeshTransform.Rotation = glm::quat(glm::radians(glm::vec3{0.0f, 0.0f, 0.0f}));
-			this->testmesh2 = std::make_shared<GStaticMesh>("Engine/Assets/Models/Cerberus/Cerberus.fbx");
+			this->testmesh2 = std::make_shared<GStaticMesh>(this->TestLoader->GetAsset("Engine/Assets/Models/Cerberus/Cerberus.sasset"));
 			this->testmesh2->SetTransform(this->TestMeshTransform);
 		}
 	}

@@ -4,22 +4,30 @@
 #include "../Graphics/Image/Image.h"
 #include "../Graphics/Renderer/Renderable/Mesh/StaticMesh.h"
 
+#include "../Function/Serializer/AssetSerializer.h"
+
 #include "Asset.h"
 
 namespace SE
 {
-	AAsset::AAsset() : SAddressable()
+	AAsset::AAsset(const std::string& belongingLoaderName) : SAddressable()
 	{
+		this->BelongingLoaderName = belongingLoaderName;
+
 		this->Category = "Unknown";
 	}
 
-	AAsset::AAsset(const std::string& serializedFilePath) : SAddressable()
+	AAsset::AAsset(const std::string& serializedFilePath, const std::string& belongingLoaderName) : SAddressable()
 	{
+		this->BelongingLoaderName = belongingLoaderName;
+
 		this->Load(serializedFilePath);
 	}
 
 	AAsset::AAsset(const AAsset & other) : SAddressable(other)
 	{
+		this->BelongingLoaderName = other.BelongingLoaderName;
+
 		this->Category = other.Category;
 
 		this->FilePackage = other.FilePackage;
@@ -31,6 +39,8 @@ namespace SE
 		this->IsSerialized = other.IsSerialized;
 
 		this->Data = other.Data;
+
+		this->BindingParent = other.BindingParent;
 	}
 
 	AAsset::~AAsset()
@@ -40,9 +50,9 @@ namespace SE
 
 	void AAsset::Load(const std::string & serializedFilePath)
 	{
-		// TO DO: Deserialize the asset from serialized file...
+		FAssetSerializer::Import(serializedFilePath, this);
 
-		this->Data = ImportData(this->RawFilePath.string(), this->Category);
+		this->Data = ImportData(this->RawFilePath.string(), this->Category, this->BelongingLoaderName);
 	}
 
 	void AAsset::Import(const std::string& rawFilePath)
@@ -59,11 +69,22 @@ namespace SE
 
 		this->Category = ValidateCategory(this->RawFileExtension);
 
-		this->Data = ImportData(this->RawFilePath.string(), this->Category);
+		this->Data = ImportData(this->RawFilePath.string(), this->Category, this->BelongingLoaderName);
 
 		this->Activate();
 
-		// TO DO: Serialize the asset...
+		FAssetSerializer::Export(this->SerializedFilePath.string(), this);
+		this->IsSerialized = true;
+	}
+
+	void AAsset::AddBindingParent(SAssetizable* parent)
+	{
+		this->BindingParent.push_back(parent);
+	}
+
+	const std::string& AAsset::GetBelongingLoaderName() const noexcept
+	{
+		return this->BelongingLoaderName;
 	}
 
 	const std::string& AAsset::GetCategory() const noexcept
@@ -94,6 +115,11 @@ namespace SE
 	void AAsset::ResetData(const std::any& data)
 	{
 		this->Data = data;
+
+		for (auto parent : this->BindingParent)
+		{
+			parent->ReinitializeFromAsset(this);
+		}
 	}
 
 	void AAsset::ResetPackage(const std::filesystem::path& package)
@@ -106,7 +132,7 @@ namespace SE
 		{
 			this->SerializedFilePath = package / std::filesystem::path(FileName.stem().string() + ".sasset");
 
-			// TO DO: Reserialize the Asset...
+			FAssetSerializer::Export(this->SerializedFilePath.string(), this);
 		}
 	}
 
@@ -114,7 +140,7 @@ namespace SE
 	{
 		std::vector<std::string> SupportedTextureFileTypes =
 		{
-			".bmp", ".png", ".jpg", "jpeg", ".gif",
+			".bmp", ".png", ".jpg", ".jpeg", ".gif",
 			".tif", ".tiff", ".wdp", ".hdp", ".jxr"
 		};
 
@@ -145,7 +171,7 @@ namespace SE
 		return "Unknown";
 	}
 
-	std::any AAsset::ImportData(std::string filePath, std::string category)
+	std::any AAsset::ImportData(std::string filePath, std::string category, std::string belongingLoaderName)
 	{
 		if (category == Texture)
 		{
@@ -154,7 +180,7 @@ namespace SE
 		}
 		else if (category == StaticMesh)
 		{
-			GStaticMesh::Data StaticMeshData = GStaticMesh::Load(filePath);
+			GStaticMesh::Data StaticMeshData = GStaticMesh::Load(filePath, true, belongingLoaderName);
 			return std::any(StaticMeshData);
 		}
 		else
@@ -165,6 +191,6 @@ namespace SE
 	}
 
 
-	std::string AAsset::Texture = "SA_Texture";
-	std::string AAsset::StaticMesh = "SA_StaticMesh";
+	const std::string AAsset::Texture = "SA_Texture";
+	const std::string AAsset::StaticMesh = "SA_StaticMesh";
 }

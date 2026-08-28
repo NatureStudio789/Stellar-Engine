@@ -1,4 +1,5 @@
 #include <Core.h>
+#include "../../../../Asset/Loader/AssetLoader.h"
 #include "../../../Material/StandardMaterial.h"
 #include "StaticMesh.h"
 
@@ -26,7 +27,17 @@ namespace SE
 		this->Initialize(data);
 	}
 
-	GStaticMesh::GStaticMesh(const GStaticMesh & other)
+	GStaticMesh::GStaticMesh(const SUUID& assetId, const std::string& assetLoaderName)
+	{
+		this->Initialize(SAssetLoaderRegistry::GetInstance(assetLoaderName)->GetAsset(assetId));
+	}
+
+	GStaticMesh::GStaticMesh(std::shared_ptr<AAsset> asset)
+	{
+		this->Initialize(asset);
+	}
+
+	GStaticMesh::GStaticMesh(const GStaticMesh & other) : SAssetizable(other)
 	{
 		this->MeshFilePath = other.MeshFilePath;
 		this->MeshFileDirectory = other.MeshFileDirectory;
@@ -38,17 +49,12 @@ namespace SE
 		this->AccumulatedMatrix = other.AccumulatedMatrix;
 	}
 
-	GStaticMesh::~GStaticMesh()
-	{
-		
-	}
-
 	void GStaticMesh::Initialize(const std::string & filePath)
 	{
 		this->MeshFilePath = filePath;
 		this->MeshFileDirectory = std::filesystem::path(filePath).parent_path().string();
 
-		const auto& Data = Load(filePath);
+		const auto& Data = Load(filePath, false, "");
 
 		for (const auto& itemData : Data.ItemDataList)
 		{
@@ -81,6 +87,21 @@ namespace SE
 		this->LinkTechnique("MainDeferredRenderer");
 	}
 
+	void GStaticMesh::Initialize(std::shared_ptr<AAsset> asset)
+	{
+		asset->AddBindingParent(this);
+
+		if (asset->GetCategory() != AAsset::StaticMesh)
+		{
+			SMessageHandler::Instance->SetFatal("Graphics",
+				std::format("Failed to initialize static mesh through the asset in a wrong category : '{}'!", asset->GetCategory()));
+		}
+
+		this->Initialize(asset->GetData<Data>());
+		this->IsAssetized = true;
+		this->AssetLoaderName = asset->GetBelongingLoaderName();
+	}
+
 	void GStaticMesh::SetTransform(const STransform & transform)
 	{
 		this->MeshRootNode->SetTransform(transform);
@@ -106,7 +127,7 @@ namespace SE
 		return this->MeshItemAABBList;
 	}
 
-	GStaticMesh::Data GStaticMesh::Load(const std::string& filePath)
+	GStaticMesh::Data GStaticMesh::Load(const std::string& filePath, bool isAssetized, std::string assetLoaderName)
 	{
 		Data MeshData;
 		MeshData.FilePath = filePath;
@@ -122,7 +143,7 @@ namespace SE
 		std::vector<GMeshItem::Data> MeshItemDataList;
 		for (UINT i = 0; i < MeshScene->mNumMeshes; i++)
 		{
-			MeshItemDataList.push_back(ParseMeshItem(MeshScene, MeshScene->mMeshes[i], MeshData.FilePath));
+			MeshItemDataList.push_back(ParseMeshItem(MeshScene, MeshScene->mMeshes[i], MeshData.FilePath, isAssetized, assetLoaderName));
 		}
 
 		MeshData.ItemDataList = MeshItemDataList;
@@ -132,7 +153,7 @@ namespace SE
 		return MeshData;
 	}
 
-	GStaticMesh::Data GStaticMesh::Load(const std::string& filePath, char* fileData, unsigned long long dataSize)
+	GStaticMesh::Data GStaticMesh::Load(const std::string& filePath, char* fileData, unsigned long long dataSize, bool isAssetized, std::string assetLoaderName)
 	{
 		Data MeshData;
 		MeshData.FilePath = filePath;
@@ -148,7 +169,7 @@ namespace SE
 		std::vector<GMeshItem::Data> MeshItemDataList;
 		for (UINT i = 0; i < MeshScene->mNumMeshes; i++)
 		{
-			MeshItemDataList.push_back(ParseMeshItem(MeshScene, MeshScene->mMeshes[i], MeshData.FilePath));
+			MeshItemDataList.push_back(ParseMeshItem(MeshScene, MeshScene->mMeshes[i], MeshData.FilePath, isAssetized, assetLoaderName));
 		}
 
 		MeshData.ItemDataList = MeshItemDataList;
@@ -156,6 +177,43 @@ namespace SE
 		MeshData.RootNodeData = ParseMeshNode(MeshScene, MeshScene->mRootNode, MeshItemDataList);
 
 		return MeshData;
+	}
+
+	void GStaticMesh::ReinitializeFromAsset(AAsset* asset)
+	{
+		if (asset->GetCategory() != AAsset::StaticMesh)
+		{
+			SMessageHandler::Instance->SetFatal("Graphics",
+				std::format("Failed to initialize static mesh through the asset in a wrong category : '{}'!", asset->GetCategory()));
+		}
+
+		for (auto meshItem : this->MeshItemList)
+		{
+			meshItem.reset();
+			meshItem = null;
+		}
+		this->MeshItemList.clear();
+
+		for (auto meshItemAABB : this->MeshItemAABBList)
+		{
+			meshItemAABB.reset();
+			meshItemAABB = null;
+		}
+		this->MeshItemAABBList.clear();
+
+		auto AssetData = asset->GetData<Data>();
+
+		for (const auto& itemData : AssetData.ItemDataList)
+		{
+			auto MeshItem = std::make_shared<GMeshItem>(itemData);
+			this->MeshItemList.push_back(MeshItem);
+			this->MeshItemAABBList.push_back(MeshItem->GetAABB());
+		}
+
+		this->LinkTechnique("MainDeferredRenderer");
+
+		auto RootNode = this->BuildMeshNode(AssetData.RootNodeData);
+		this->MeshRootNode = RootNode;
 	}
 
 	void GStaticMesh::LinkTechnique(const std::string& rendererName)
@@ -180,13 +238,13 @@ namespace SE
 
 		for (auto& childNodeData : data.ChildrenList)
 		{
-			Node->AddChild(BuildMeshNode(childNodeData));
+			Node->AddChild(this->BuildMeshNode(childNodeData));
 		}
 
 		return Node;
 	}
 
-	GMeshItem::Data GStaticMesh::ParseMeshItem(const aiScene* scene, aiMesh* mesh, const std::string& filePath)
+	GMeshItem::Data GStaticMesh::ParseMeshItem(const aiScene* scene, aiMesh* mesh, const std::string& filePath, bool isAssetized, std::string assetLoaderName)
 	{
 		GMeshItem::Data ItemData;
 		ItemData.Name = mesh->mName.C_Str();
@@ -230,10 +288,10 @@ namespace SE
 				(StaticMeshName + "_Mat_" + Material->GetName().C_Str()));
 
 			std::string FileDirectory = std::filesystem::path(filePath).parent_path().string();
-			LoadTexture(Material, ItemMaterial, aiTextureType_DIFFUSE, FileDirectory);
-			LoadMetallicTexture(Material, ItemMaterial, FileDirectory);
-			LoadTexture(Material, ItemMaterial, aiTextureType_SHININESS, FileDirectory);
-			LoadTexture(Material, ItemMaterial, aiTextureType_NORMALS, FileDirectory);
+			LoadTexture(Material, ItemMaterial, aiTextureType_DIFFUSE, FileDirectory, isAssetized, assetLoaderName);
+			LoadMetallicTexture(Material, ItemMaterial, FileDirectory, isAssetized, assetLoaderName);
+			LoadTexture(Material, ItemMaterial, aiTextureType_SHININESS, FileDirectory, isAssetized, assetLoaderName);
+			LoadTexture(Material, ItemMaterial, aiTextureType_NORMALS, FileDirectory, isAssetized, assetLoaderName);
 
 			SMaterialRegistry::Register(ItemMaterial);
 		}
@@ -265,57 +323,89 @@ namespace SE
 	}
 
 	void GStaticMesh::LoadTexture(aiMaterial* material, std::shared_ptr<GStandardMaterial> outputMaterial, 
-		aiTextureType type, std::string modelFileDirectory)
+		aiTextureType type, std::string modelFileDirectory, bool isAssetized, std::string assetLoaderName)
 	{
 		if (material->GetTextureCount(type))
 		{
 			aiString WrittenPath;
 			material->GetTexture(type, 0, &WrittenPath);
 			
-			std::string FilePath;
+			std::filesystem::path RawTextureFilePath;
 			if (std::filesystem::exists(WrittenPath.C_Str()))
 			{
-				FilePath = WrittenPath.C_Str();
+				RawTextureFilePath = WrittenPath.C_Str();
 			}
 			else
 			{
 				auto FinalPath = std::filesystem::path(modelFileDirectory) / std::filesystem::path(WrittenPath.C_Str());
-				FilePath = FinalPath.string();
+				RawTextureFilePath = FinalPath;
 			}
 
-			switch (type)
+			if (isAssetized)
 			{
-				case aiTextureType_DIFFUSE:
-				{
-					std::shared_ptr<GTexture> Texture = std::make_shared<GTexture>(FilePath, 0, GRenderGroup::ALBEDO_GROUP);
-					outputMaterial->SetAlbedo(Texture);
-					break;
-				}
+				std::filesystem::path TextureSerializedFilePath = (RawTextureFilePath.parent_path() / RawTextureFilePath.stem()).string() + ".sasset";
+				// The assets of Textures in material of Static Mesh must be registered in the same registry of the Static Mesh's.
+				auto TextureAsset = SAssetLoaderRegistry::GetInstance(assetLoaderName)->GetAsset(TextureSerializedFilePath);
 
-				case aiTextureType_NORMALS:
+				switch (type)
 				{
-					std::shared_ptr<GTexture> Texture = std::make_shared<GTexture>(FilePath, 3, GRenderGroup::NORMAL_GROUP);
-					outputMaterial->SetNormalTexture(Texture);
-					break;
-				}
+					case aiTextureType_DIFFUSE:
+					{
+						std::shared_ptr<GTexture> Texture = std::make_shared<GTexture>(TextureAsset);
+						Texture->SetRootParameterIndex(0, GRenderGroup::ALBEDO_GROUP);
+						outputMaterial->SetAlbedo(Texture);
+						break;
+					}
 
-				case aiTextureType_SHININESS:
+					case aiTextureType_NORMALS:
+					{
+						std::shared_ptr<GTexture> Texture = std::make_shared<GTexture>(TextureAsset);
+						Texture->SetRootParameterIndex(3, GRenderGroup::NORMAL_GROUP);
+						outputMaterial->SetNormalTexture(Texture);
+						break;
+					}
+
+					case aiTextureType_SHININESS:
+					{
+						std::shared_ptr<GTexture> Texture = std::make_shared<GTexture>(TextureAsset);
+						Texture->SetRootParameterIndex(2, GRenderGroup::ROUGHNESS_GROUP);
+						outputMaterial->SetRoughness(Texture);
+						break;
+					}
+				}
+			}
+			else
+			{
+				switch (type)
 				{
-					std::shared_ptr<GTexture> Texture = std::make_shared<GTexture>(FilePath, 2, GRenderGroup::ROUGHNESS_GROUP);
-					outputMaterial->SetRoughness(Texture);
-					break;
-				}
+					case aiTextureType_DIFFUSE:
+					{
+						std::shared_ptr<GTexture> Texture = std::make_shared<GTexture>(RawTextureFilePath.string(), 0, GRenderGroup::ALBEDO_GROUP);
+						outputMaterial->SetAlbedo(Texture);
+						break;
+					}
 
-				//case aiTextureType_AMBIENT_OCCLUSION:
-				//{
-				//	outMat->SetAoTexture(AssetName);
-				//	break;
-				//}
+					case aiTextureType_NORMALS:
+					{
+						std::shared_ptr<GTexture> Texture = std::make_shared<GTexture>(RawTextureFilePath.string(), 3, GRenderGroup::NORMAL_GROUP);
+						Texture->SetRootParameterIndex(3, GRenderGroup::NORMAL_GROUP);
+						outputMaterial->SetNormalTexture(Texture);
+						break;
+					}
+
+					case aiTextureType_SHININESS:
+					{
+						std::shared_ptr<GTexture> Texture = std::make_shared<GTexture>(RawTextureFilePath.string(), 2, GRenderGroup::ROUGHNESS_GROUP);
+						outputMaterial->SetRoughness(Texture);
+						break;
+					}
+				}
 			}
 		}
 	}
 
-	void GStaticMesh::LoadMetallicTexture(aiMaterial* material, std::shared_ptr<GStandardMaterial> outputMaterial, std::string modelFileDirectory)
+	void GStaticMesh::LoadMetallicTexture(aiMaterial* material, std::shared_ptr<GStandardMaterial> outputMaterial, 
+		std::string modelFileDirectory, bool isAssetized, std::string assetLoaderName)
 	{
 		std::shared_ptr<GTexture> MetallicTexture = null;
 
@@ -331,19 +421,32 @@ namespace SE
 					UINT StringLength = *(UINT*)Properties->mData;
 					std::string WrittenPath = { Properties->mData + 4, StringLength };
 
-					std::string FilePath;
+					std::filesystem::path RawTextureFilePath;
 					if (std::filesystem::exists(WrittenPath))
 					{
-						FilePath = WrittenPath;
+						RawTextureFilePath = WrittenPath;
 					}
 					else
 					{
-						auto FinalPath = std::filesystem::path(modelFileDirectory) / std::filesystem::path(WrittenPath);
-						FilePath = FinalPath.string();
+						RawTextureFilePath = std::filesystem::path(modelFileDirectory) / std::filesystem::path(WrittenPath);
 					}
 
-					MetallicTexture = std::make_shared<GTexture>(FilePath, 1, GRenderGroup::METALLIC_GROUP);
-					outputMaterial->SetMetallic(MetallicTexture);
+					if (isAssetized)
+					{
+						std::filesystem::path TextureSerializedFilePath = (RawTextureFilePath.parent_path() / RawTextureFilePath.stem()).string() + ".sasset";
+						// The assets of Textures in material of Static Mesh must be registered in the same registry of the Static Mesh's.
+						auto TextureAsset = SAssetLoaderRegistry::GetInstance(assetLoaderName)->GetAsset(TextureSerializedFilePath);
+
+						MetallicTexture = std::make_shared<GTexture>(TextureAsset);
+						MetallicTexture->SetRootParameterIndex(1, GRenderGroup::METALLIC_GROUP);
+
+						outputMaterial->SetMetallic(MetallicTexture);
+					}
+					else
+					{
+						MetallicTexture = std::make_shared<GTexture>(RawTextureFilePath.string(), 1, GRenderGroup::METALLIC_GROUP);
+						outputMaterial->SetMetallic(MetallicTexture);
+					}
 
 					return;
 				}

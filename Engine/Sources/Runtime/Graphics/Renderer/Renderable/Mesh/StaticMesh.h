@@ -1,12 +1,15 @@
 #ifndef _SE_STATICMESH_H_
 #define _SE_STATICMESH_H_
+#include "../../../../Core/Assetizable/Assetizable.h"
+
 #include "MeshNode.h"
 
 namespace SE
 {
+	class AAsset;
 	class GStandardMaterial;
 
-	class GStaticMesh
+	class GStaticMesh : public SAssetizable
 	{
 	public:
 		struct Data
@@ -25,11 +28,14 @@ namespace SE
 		GStaticMesh();
 		GStaticMesh(const std::string& filePath);
 		GStaticMesh(const Data& data);
+		GStaticMesh(const SUUID& assetId, const std::string& assetLoaderName);
+		GStaticMesh(std::shared_ptr<AAsset> asset);
 		GStaticMesh(const GStaticMesh& other);
-		~GStaticMesh();
+		~GStaticMesh() override = default;
 
 		void Initialize(const std::string& filePath);
 		void Initialize(const Data& data);
+		void Initialize(std::shared_ptr<AAsset> asset);
 
 		void SetTransform(const STransform& transform);
 		void SetAccumulatedMatrix(glm::mat4x4 accumulatedMatrix);
@@ -40,20 +46,23 @@ namespace SE
 
 		const std::vector<std::shared_ptr<SAABB>>& GetItemAABBList() const noexcept;
 
-		static Data Load(const std::string& filePath);
-		static Data Load(const std::string& filePath, char* fileData, unsigned long long dataSize);
+		static Data Load(const std::string& filePath, bool isAssetized, std::string assetLoaderName);
+		static Data Load(const std::string& filePath, char* fileData, unsigned long long dataSize, bool isAssetized, std::string assetLoaderName);
 
 	private:
+		void ReinitializeFromAsset(AAsset* asset) override;
+
 		void LinkTechnique(const std::string& rendererName);
 
 		std::shared_ptr<GMeshNode> BuildMeshNode(const GMeshNode::Data& data);
 
-		static GMeshItem::Data ParseMeshItem(const aiScene* scene, aiMesh* mesh, const std::string& filePath);
+		static GMeshItem::Data ParseMeshItem(const aiScene* scene, aiMesh* mesh, const std::string& filePath, bool isAssetized, std::string assetLoaderName);
 		static GMeshNode::Data ParseMeshNode(const aiScene* scene, aiNode* node, const std::vector<GMeshItem::Data>& itemDataList);
 
 		static void LoadTexture(aiMaterial* material, std::shared_ptr<GStandardMaterial> outputMaterial,
-			aiTextureType type, std::string modelFileDirectory);
-		static void LoadMetallicTexture(aiMaterial* material, std::shared_ptr<GStandardMaterial> outputMaterial, std::string modelFileDirectory);
+			aiTextureType type, std::string modelFileDirectory, bool isAssetized, std::string assetLoaderName);
+		static void LoadMetallicTexture(aiMaterial* material, std::shared_ptr<GStandardMaterial> outputMaterial, 
+			std::string modelFileDirectory, bool isAssetized, std::string assetLoaderName);
 
 		std::string MeshFilePath;
 		std::string MeshFileDirectory;

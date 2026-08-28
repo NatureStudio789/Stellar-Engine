@@ -6,11 +6,13 @@ namespace SE
 	AAssetLoader::AAssetLoader() : SAddressable()
 	{
 		this->AssetDirectory = "";
+
+		this->Activate();
 	}
 
-	AAssetLoader::AAssetLoader(const std::string& name, const std::string& assetDirectory) : SAddressable()
+	AAssetLoader::AAssetLoader(const std::string& assetDirectory) : SAddressable()
 	{
-		this->Initialize(name, assetDirectory);
+		this->Initialize(assetDirectory);
 	}
 
 	AAssetLoader::AAssetLoader(const AAssetLoader & other) : SAddressable(other)
@@ -24,32 +26,73 @@ namespace SE
 
 	}
 
-	void AAssetLoader::Initialize(const std::string & name, const std::string & assetDirectory)
+	void AAssetLoader::Initialize(const std::string & assetDirectory)
 	{
-		this->SetName(name);
 		this->AssetDirectory = assetDirectory;
 
 		std::vector<std::string> RawFilePathList;
-		IterateDirectory(this->AssetDirectory, RawFilePathList);
+		std::vector<std::string> SerializedFilePathList;
+		IterateDirectory(this->AssetDirectory, RawFilePathList, SerializedFilePathList);
 
-		std::map<std::string, bool> LoadedChecker;
-		for (const auto& rawFilePath : RawFilePathList)
+		// Sort paths in categories to solve the dependencies between different kinds of assets.
+		std::map<int, std::vector<std::string>> FilePathToLoadInCategories;
+
+		for (auto serializedFilePath : SerializedFilePathList)
 		{
-			LoadedChecker[rawFilePath] = false;
-		}
-		for (auto& [uuid, asset] : this->AssetList)
-		{
-			LoadedChecker[asset->GetRawFilePath()] = true;
-		}
-		for (auto& [_rawFilePath, isLoaded] : LoadedChecker)
-		{
-			if (!isLoaded)
+			auto SerializedFilePath = std::filesystem::path(serializedFilePath);
+			std::filesystem::path SerializedNoExtension = SerializedFilePath.parent_path() / SerializedFilePath.stem();
+
+			for (auto iterator = RawFilePathList.begin(); iterator != RawFilePathList.end(); ++iterator)
 			{
-				std::shared_ptr<AAsset> Asset = std::make_shared<AAsset>();
-				Asset->Import(_rawFilePath);
+				auto RawFilePath = std::filesystem::path(*iterator);
+				std::filesystem::path RawNoExtension = RawFilePath.parent_path() / RawFilePath.stem();
 
-				std::unique_lock<std::shared_mutex> AssetLocker(this->AssetMutex);
-				this->AssetList[Asset->GetUUID()] = Asset;
+				if (SerializedNoExtension == RawNoExtension)
+				{
+					std::string Category = AAsset::ValidateCategory(RawFilePath.extension().string());
+					int CategoryIndex = -1;
+					if (Category == AAsset::Texture)
+					{
+						CategoryIndex = 0;
+					}
+					else if (Category == AAsset::StaticMesh)
+					{
+						CategoryIndex = 1;
+					}
+
+					FilePathToLoadInCategories[CategoryIndex].push_back(SerializedFilePath.string());
+
+					RawFilePathList.erase(iterator);
+					break;
+				}
+			}
+		}
+
+		for (auto RestRawFilePath : RawFilePathList)
+		{
+			std::filesystem::path RawFilePath = { RestRawFilePath };
+			std::string Category = AAsset::ValidateCategory(RawFilePath.extension().string());
+
+			int CategoryIndex = -1;
+			if (Category == AAsset::Texture)
+			{
+				CategoryIndex = 0;
+			}
+			else if (Category == AAsset::StaticMesh)
+			{
+				CategoryIndex = 1;
+			}
+
+			FilePathToLoadInCategories[CategoryIndex].push_back(RestRawFilePath);
+		}
+
+		for (auto [index, filePathList] : FilePathToLoadInCategories)
+		{
+			for (auto assetFilePath : filePathList)
+			{
+				std::cout << "Loading in asset : " << assetFilePath << "\n";
+
+				this->LoadInAsset(assetFilePath);
 			}
 		}
 
@@ -58,12 +101,14 @@ namespace SE
 			{
 				static std::filesystem::path LastRenamedOldName = "";
 
-				auto FilePath = std::filesystem::path(fileName);
+				auto FilePath = this->AssetDirectory / std::filesystem::path(fileName);
 
 				switch (action)
 				{
 					case FILE_ACTION_ADDED:
 					{
+						std::cout << "Asset File Added : " << FilePath << "\n";
+
 						// TO DO: Show notification to ask if it should be imported.
 
 						break;
@@ -71,6 +116,8 @@ namespace SE
 
 					case FILE_ACTION_REMOVED:
 					{
+						std::cout << "Asset File Removed : " << FilePath << "\n";
+
 						// TO DO: Show warning of unexpected file moving for asset.
 
 						break;
@@ -78,22 +125,14 @@ namespace SE
 
 					case FILE_ACTION_MODIFIED:
 					{
+						std::cout << "Asset File Modified : " << FilePath << "\n";
+
 						std::string Category = AAsset::ValidateCategory(FilePath.extension().string());
 						if (Category != "Unknown")
 						{
-							auto Data = AAsset::ImportData(FilePath.string(), Category);
+							auto Data = AAsset::ImportData(FilePath.string(), Category, this->GetName());
 
-							std::string FileName = FilePath.stem().string();
-
-							std::unique_lock<std::shared_mutex> AssetLocker(this->AssetMutex);
-							for (auto& [uuid, asset] : this->AssetList)
-							{
-								if (asset->GetName() == FileName)
-								{
-									asset->ResetData(Data);
-									break;
-								}
-							}
+							this->GetAsset(FilePath)->ResetData(Data);
 						}
 
 						break;
@@ -103,7 +142,7 @@ namespace SE
 					{
 						if (std::filesystem::directory_entry(FilePath).is_directory())
 						{
-							LastRenamedOldName = FilePath;
+							LastRenamedOldName = this->AssetDirectory / FilePath;
 						}
 
 						break;
@@ -141,18 +180,9 @@ namespace SE
 
 							for (auto childRawFilePath : ChildRawFilePathList)
 							{
-								std::string FileName = childRawFilePath.stem().string();
-								if (this->FindAsset(FileName))
+								if (this->FindAsset(childRawFilePath))
 								{
-									std::unique_lock<std::shared_mutex> AssetLocker(this->AssetMutex);
-									for (auto& [uuid, asset] : this->AssetList)
-									{
-										if (asset->GetName() == FileName)
-										{
-											asset->ResetPackage(childRawFilePath.parent_path());
-											break;
-										}
-									}
+									this->GetAsset(childRawFilePath)->ResetPackage(childRawFilePath.parent_path());
 								}
 							}
 						}
@@ -162,38 +192,89 @@ namespace SE
 				}
 			});
 
-		this->Activate();
 	}
 
 	void AAssetLoader::Update()
 	{
-
+		
 	}
 
-	bool AAssetLoader::FindAsset(const std::string& name) const noexcept
+	bool AAssetLoader::FindAsset(std::filesystem::path serializedOrRawFilePath) const noexcept
 	{
+		if(serializedOrRawFilePath.extension() == ".sasset")
+		{
+			std::unique_lock<std::shared_mutex> AssetLocker(this->AssetMutex);
+
+			for (auto [uuid, asset] : this->AssetList)
+			{
+				auto NormalizedAssetSerializePath = std::filesystem::canonical(asset->SerializedFilePath);
+				auto NormalizedWantedSerializePath = std::filesystem::canonical(serializedOrRawFilePath);
+				if (NormalizedAssetSerializePath == NormalizedWantedSerializePath)
+				{
+					return true;
+				}
+			}
+		}
+		else if (AAsset::ValidateCategory(serializedOrRawFilePath.extension().string()) != "Unknown")
+		{
+			std::unique_lock<std::shared_mutex> AssetLocker(this->AssetMutex);
+
+			for (auto [uuid, asset] : this->AssetList)
+			{
+				auto NormalizedAssetRawPath = std::filesystem::canonical(asset->RawFilePath);
+				auto NormalizedWantedRawPath = std::filesystem::canonical(serializedOrRawFilePath);
+				if (NormalizedAssetRawPath == NormalizedWantedRawPath)
+				{
+					return true;
+				}
+			}
+		}
+
 		return false;
 	}
 
 	bool AAssetLoader::FindAsset(const SUUID& uuid) const noexcept
 	{
-		return false;
+		std::unique_lock<std::shared_mutex> AssetLocker(this->AssetMutex);
+		return this->AssetList.count(uuid) > 0;
 	}
 
-	std::shared_ptr<AAsset> AAssetLoader::GetAsset(const std::string& name)
+	std::shared_ptr<AAsset> AAssetLoader::GetAsset(std::filesystem::path serializedOrRawFilePath)
 	{
-		std::unique_lock<std::shared_mutex> AssetLocker(this->AssetMutex);
-
-		for (auto& [uuid, asset] : this->AssetList)
+		if (serializedOrRawFilePath.extension() == ".sasset")
 		{
-			if (asset->GetName() == name)
+			std::unique_lock<std::shared_mutex> AssetLocker(this->AssetMutex);
+
+			for (auto [uuid, asset] : this->AssetList)
 			{
-				return asset;
+				auto NormalizedAssetSerializePath = std::filesystem::canonical(asset->SerializedFilePath);
+				auto NormalizedWantedSerializePath = std::filesystem::canonical(serializedOrRawFilePath);
+				if (NormalizedAssetSerializePath == NormalizedWantedSerializePath)
+				{
+					return asset;
+				}
 			}
 		}
+		else if (AAsset::ValidateCategory(serializedOrRawFilePath.extension().string()) != "Unknown")
+		{
+			std::unique_lock<std::shared_mutex> AssetLocker(this->AssetMutex);
 
-		SMessageHandler::Instance->SetFatal("Asset",
-			std::format("No registered asset named '{}' found in loader!", name));
+			for (auto [uuid, asset] : this->AssetList)
+			{
+				auto NormalizedAssetRawPath = std::filesystem::canonical(asset->RawFilePath);
+				auto NormalizedWantedRawPath = std::filesystem::canonical(serializedOrRawFilePath);
+				if (NormalizedAssetRawPath == NormalizedWantedRawPath)
+				{
+					return asset;
+				}
+			}
+		}
+		else
+		{
+			SMessageHandler::Instance->SetFatal("Asset",
+				std::format("No registered asset with serialized file path : '{}' found in registry!", serializedOrRawFilePath.string()));
+		}
+
 		return null;
 	}
 
@@ -210,7 +291,14 @@ namespace SE
 		return this->AssetList[uuid];
 	}
 
-	void AAssetLoader::IterateDirectory(std::filesystem::path directory, std::vector<std::string>& rawFilePathList)
+	void AAssetLoader::RegisterAsset(std::shared_ptr<AAsset> asset)
+	{
+		std::unique_lock<std::shared_mutex> AssetLocker(this->AssetMutex);
+		this->AssetList[asset->GetUUID()] = asset;
+	}
+
+	void AAssetLoader::IterateDirectory(std::filesystem::path directory, 
+		std::vector<std::string>& rawFilePathList, std::vector<std::string>& serializedFilePathList)
 	{
 		for (const auto& directoryEntry : std::filesystem::recursive_directory_iterator(directory))
 		{
@@ -218,33 +306,49 @@ namespace SE
 
 			if (directoryEntry.is_regular_file())
 			{
-				this->LoadInAsset(Path, rawFilePathList);
+				if (Path.extension() == ".sasset")
+				{
+					serializedFilePathList.push_back(Path.string());
+				}
+				else if (AAsset::ValidateCategory(Path.extension().string()) != "Unknown")
+				{
+					rawFilePathList.push_back(Path.string());
+				}
+				else
+				{
+					// Do nothing, because the file is not a supported asset category.
+				}
 			}
-			else if (directoryEntry.is_directory())
-			{
-				IterateDirectory(Path, rawFilePathList);
-			}
+			//else if (directoryEntry.is_directory())
+			//{
+			//	IterateDirectory(Path, rawFilePathList, serializedFilePathList);
+			//}
 		}
 	}
 
-	void AAssetLoader::LoadInAsset(std::filesystem::path filePath, std::vector<std::string>& rawFilePathList)
+	void AAssetLoader::LoadInAsset(std::filesystem::path filePath)
 	{
 		std::shared_ptr<AAsset> Asset;
 
 		if (filePath.extension() == ".sasset")
 		{
-			Asset = std::make_shared<AAsset>(filePath.string());
+			Asset = std::make_shared<AAsset>(filePath.string(), this->GetName());
+			Asset->BelongingLoaderName = this->GetName();
 
-			std::unique_lock<std::shared_mutex> AssetLocker(this->AssetMutex);
-			this->AssetList[Asset->GetUUID()] = Asset;
+			this->RegisterAsset(Asset);
 		}
 		else if (AAsset::ValidateCategory(filePath.extension().string()) != "Unknown")
 		{
-			rawFilePathList.push_back(filePath.string());
+			Asset = std::make_shared<AAsset>(this->GetName());
+			Asset->Import(filePath.string());
+
+			this->RegisterAsset(Asset);
 		}
 		else
 		{
-			// Do nothing, because the file is not a supported asset category.
+			SMessageHandler::Instance->SetFatal("Asset", 
+				std::format("File : '{}' with '{}' extension\n"
+					"	Unexpected file type for asset!", filePath.string(), filePath.extension().string()));
 		}
 	}
 }

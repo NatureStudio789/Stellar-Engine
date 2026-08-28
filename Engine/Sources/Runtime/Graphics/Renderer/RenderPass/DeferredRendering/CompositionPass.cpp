@@ -111,24 +111,19 @@ namespace SE
 		auto GBufferFramebuffer = SFramebufferRegistry::GetInstance(this->GBufferPackage.GetResourceIdentifier().GetUUID());
 
 		auto AlbedoSRV = GBufferFramebuffer->GetRTShaderResourceView(0);
-		AlbedoSRV->SetRootParameterIndex(SPipelineStateRegistry::GetInstance(GRenderGroup::COMPOSITION_GROUP)->GetRootSignature()->
-			GetRootParameterIndex(GRootParameter(GRootParameter::SE_PARAMETER_SRV, 0)));
+		AlbedoSRV->SetRootParameterIndex(0, GRenderGroup::COMPOSITION_GROUP);
 
 		auto MetallicSRV = GBufferFramebuffer->GetRTShaderResourceView(1);
-		MetallicSRV->SetRootParameterIndex(SPipelineStateRegistry::GetInstance(GRenderGroup::COMPOSITION_GROUP)->GetRootSignature()->
-			GetRootParameterIndex(GRootParameter(GRootParameter::SE_PARAMETER_SRV, 1)));
+		MetallicSRV->SetRootParameterIndex(1, GRenderGroup::COMPOSITION_GROUP);
 
 		auto RoughnessSRV = GBufferFramebuffer->GetRTShaderResourceView(2);
-		RoughnessSRV->SetRootParameterIndex(SPipelineStateRegistry::GetInstance(GRenderGroup::COMPOSITION_GROUP)->GetRootSignature()->
-			GetRootParameterIndex(GRootParameter(GRootParameter::SE_PARAMETER_SRV, 2)));
+		RoughnessSRV->SetRootParameterIndex(2, GRenderGroup::COMPOSITION_GROUP);
 
 		auto NormalSRV = GBufferFramebuffer->GetRTShaderResourceView(3);
-		NormalSRV->SetRootParameterIndex(SPipelineStateRegistry::GetInstance(GRenderGroup::COMPOSITION_GROUP)->GetRootSignature()->
-			GetRootParameterIndex(GRootParameter(GRootParameter::SE_PARAMETER_SRV, 3)));
+		NormalSRV->SetRootParameterIndex(3, GRenderGroup::COMPOSITION_GROUP);
 
 		auto PositionSRV = GBufferFramebuffer->GetRTShaderResourceView(4);
-		PositionSRV->SetRootParameterIndex(SPipelineStateRegistry::GetInstance(GRenderGroup::COMPOSITION_GROUP)->GetRootSignature()->
-			GetRootParameterIndex(GRootParameter(GRootParameter::SE_PARAMETER_SRV, 4)));
+		PositionSRV->SetRootParameterIndex(4, GRenderGroup::COMPOSITION_GROUP);
 
 		this->AddApplicable(AlbedoSRV);
 		this->AddApplicable(MetallicSRV);

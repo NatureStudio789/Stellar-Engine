@@ -6,6 +6,8 @@
 #include "Renderer/Lighting/PointLight/PointLightRegistry.h"
 #include "Renderer/Lighting/DirectionalLight/DirectionalLightRegistry.h"
 
+#include "../Asset/Loader/AssetLoader.h"
+
 namespace SE
 {
 	class RenderEngine : public SEngine
@@ -31,6 +33,8 @@ namespace SE
 		std::shared_ptr<GCamera> TestCamera;
 		std::shared_ptr<GPointLightRegistry> TestPLRegistry;
 		std::shared_ptr<GDirectionalLightRegistry> TestDLRegistry;
+
+		std::shared_ptr<AAssetLoader> TestLoader;
 	};
 }
 

@@ -47,6 +47,8 @@
 #include <Assimp/scene.h>
 #include <Assimp/postprocess.h>
 
+#include <yaml-cpp/yaml.h>
+
 #include <wrl/client.h>
 using namespace Microsoft;
 

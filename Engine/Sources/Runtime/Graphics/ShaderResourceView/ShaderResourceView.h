@@ -17,16 +17,21 @@ namespace SE
 		void AllocateDescriptor(unsigned int descriptorCount = 1);
 
 		void SetRootParameterIndex(unsigned int rootParameterIndex);
+		void SetRootParameterIndex(unsigned int shaderRegisterIndex, const std::string& renderGroup);
 
 		virtual void Apply() override;
 
 		const CD3DX12_GPU_DESCRIPTOR_HANDLE& GetGPUDescriptor() const noexcept;
 		const unsigned int& GetRootParameterIndex() const noexcept;
+		bool GetAvailableForApplying() const noexcept;
 		std::shared_ptr<GDescriptorHandle> GetDescriptorHandle();
 		const bool& GetAllocated() const noexcept;
 
 	protected:
+		unsigned int DescriptorCount;
 		unsigned int RootParameterIndex;
+		bool IsAvailableForApplying = false;
+
 		std::shared_ptr<GDescriptorHandle> DescriptorHandle;
 		bool IsDescriptorAllocated;
 

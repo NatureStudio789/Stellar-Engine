@@ -18,7 +18,6 @@ namespace SE
 		void Render() override;
 
 	private:
-		FDirectoryObserver Observer;
 	};
 }
 

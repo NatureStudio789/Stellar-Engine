@@ -22,6 +22,7 @@ BinaryDependenciesDir = "Dependencies/Binaries/"
 
 include "Third Party/GLFW/GLFW.lua"
 include "Third Party/imgui/imgui.lua"
+include "Third Party/yaml-cpp/yaml-cpp.lua"
 
 project "Stellar Engine"
 	location "./"
@@ -52,7 +53,7 @@ project "Stellar Engine"
 		IncludeDependenciesDir,
 		"Third Party/GLFW/include/",
 		"Third Party/imgui/",
-		"Third Party/Assimp/",
+		"Third Party/yaml-cpp/include",
 	}
 
 	libdirs
@@ -65,6 +66,7 @@ project "Stellar Engine"
 	{
 		"GLFW",
 		"imgui",
+		"yaml-cpp",
 
 		"dxgi",
 		"d3d12",
@@ -81,6 +83,7 @@ project "Stellar Engine"
 	defines
 	{
 		"SE_BUILD_ENGINE",
+		"YAML_CPP_STATIC_DEFINE",
 	}
 
 	filter "system:Windows"
@@ -137,6 +140,7 @@ project "Stellar Engine"
 		optimize "On"
 
 	filter "configurations:Distribution"
+		runtime "Release"
 		defines
 		{
 			"SE_DISTRIBUTION"

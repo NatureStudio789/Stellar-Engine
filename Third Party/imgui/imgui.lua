@@ -50,7 +50,7 @@ project "ImGui"
 		runtime "Release"
 		optimize "on"
 
-    filter "configurations:Dist"
+    filter "configurations:Distribution"
 		runtime "Release"
 		optimize "on"
         symbols "off"
